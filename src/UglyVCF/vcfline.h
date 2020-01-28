@@ -9,7 +9,7 @@ class VCFline
 {
 private:
     QString header;
-    int chr = 0;
+    QString chr;
     int pos = 0;
     QString id;
     QString ref;
@@ -17,16 +17,18 @@ private:
     int qual = 0;
     QString filter;
     QString info;
-    QString fromat;
+    QString format;
     QString anno;
+
+    //const int size = 10;
 
 public:
     VCFline();
 
     QString getHeader() const;
     void setHeader(const QString &value);
-    int getChr() const;
-    void setChr(int value);
+    QString getChr() const;
+    void setChr(const QString &value);
     int getPos() const;
     void setPos(int value);
     QString getId() const;
@@ -41,8 +43,8 @@ public:
     void setFilter(const QString &value);
     QString getInfo() const;
     void setInfo(const QString &value);
-    QString getFromat() const;
-    void setFromat(const QString &value);
+    QString getFormat() const;
+    void setFormat(const QString &value);
     QString getAnno() const;
     void setAnno(const QString &value);
 };

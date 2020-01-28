@@ -1,6 +1,9 @@
 #include "mainwindow.h"
+#include "vcftable.h"
 
 #include <QApplication>
+#include <string>
+#include <iostream>
 
 int main(int argc, char *argv[])
 {

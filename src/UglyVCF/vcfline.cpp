@@ -14,12 +14,12 @@ void VCFline::setHeader(const QString &value)
     header = value;
 }
 
-int VCFline::getChr() const
+QString VCFline::getChr() const
 {
     return chr;
 }
 
-void VCFline::setChr(int value)
+void VCFline::setChr(const QString &value)
 {
     chr = value;
 }
@@ -94,14 +94,14 @@ void VCFline::setInfo(const QString &value)
     info = value;
 }
 
-QString VCFline::getFromat() const
+QString VCFline::getFormat() const
 {
-    return fromat;
+    return format;
 }
 
-void VCFline::setFromat(const QString &value)
+void VCFline::setFormat(const QString &value)
 {
-    fromat = value;
+    format = value;
 }
 
 QString VCFline::getAnno() const
