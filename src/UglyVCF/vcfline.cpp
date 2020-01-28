@@ -1,4 +1,16 @@
 #include "vcfline.h"
+#include <QString>
+
+QString VCFline::getDataField(int i)
+{
+    return dataFields[i];
+}
+
+// TODO: this method somehow returns 4, but should return 10 (size of array)
+int VCFline::getDataFieldsSize()
+{
+    return dataFields->size();
+}
 
 VCFline::VCFline()
 {
@@ -16,92 +28,92 @@ void VCFline::setHeader(const QString &value)
 
 QString VCFline::getChr() const
 {
-    return chr;
+    return dataFields[0];
 }
 
 void VCFline::setChr(const QString &value)
 {
-    chr = value;
+    dataFields[0] = value;
 }
 
-int VCFline::getPos() const
+QString VCFline::getPos() const
 {
-    return pos;
+    return dataFields[1];
 }
 
-void VCFline::setPos(int value)
+void VCFline::setPos(QString value)
 {
-    pos = value;
+    dataFields[1] = value;
 }
 
 QString VCFline::getId() const
 {
-    return id;
+    return dataFields[2];
 }
 
 void VCFline::setId(const QString &value)
 {
-    id = value;
+    dataFields[2] = value;
 }
 
 QString VCFline::getRef() const
 {
-    return ref;
+    return dataFields[3];
 }
 
 void VCFline::setRef(const QString &value)
 {
-    ref = value;
+    dataFields[3] = value;
 }
 
 QString VCFline::getAlt() const
 {
-    return alt;
+    return dataFields[4];
 }
 
 void VCFline::setAlt(const QString &value)
 {
-    alt = value;
+    dataFields[4] = value;
 }
 
-int VCFline::getQual() const
+QString VCFline::getQual() const
 {
-    return qual;
+    return dataFields[5];
 }
 
-void VCFline::setQual(int value)
+void VCFline::setQual(QString value)
 {
-    qual = value;
+    dataFields[5] = value;
 }
 
 QString VCFline::getFilter() const
 {
-    return filter;
+    return dataFields[6];
 }
 
 void VCFline::setFilter(const QString &value)
 {
-    filter = value;
+    dataFields[6] = value;
 }
 
 QString VCFline::getInfo() const
 {
-    return info;
+    return dataFields[7];
 }
 
 void VCFline::setInfo(const QString &value)
 {
-    info = value;
+    dataFields[7] = value;
 }
 
 QString VCFline::getFormat() const
 {
-    return format;
+    return dataFields[8];
 }
 
 void VCFline::setFormat(const QString &value)
 {
-    format = value;
+    dataFields[8] = value;
 }
 
 QString VCFline::getAnno() const

@@ -32,7 +32,7 @@ QList<VCFline> VCFtable::getLines()
 
 VCFline VCFtable::getLine(int i)
 {
-    return this->listOfLines.takeAt(i);
+    return this->listOfLines.at(i);
 }
 
 void VCFtable::addLine(VCFline newline)
@@ -49,7 +49,6 @@ void VCFtable::parse(string filename)
     ifstream file(filename);
     vector<string> tokens;
     const char DELIM = '\t';
-    int countCols = 0;
 
     while (getline(file, line))
     {
@@ -63,26 +62,26 @@ void VCFtable::parse(string filename)
         {
             istringstream stream(line);
             string token;
-            countCols = 0;
+            tokens.clear();
 
             while (getline(stream, token, DELIM))
             {
                 tokens.push_back(token);
-                countCols++;
             }
             // fill tokens into line
             VCFline vcfline = VCFline();
             vcfline.setChr(QString::fromStdString(tokens[0]));
-            vcfline.setPos(stoi(tokens[1]));
+            vcfline.setPos(QString::fromStdString(tokens[1]));
             vcfline.setId(QString::fromStdString(tokens[2]));
             vcfline.setRef(QString::fromStdString(tokens[3]));
             vcfline.setAlt(QString::fromStdString(tokens[4]));
-            vcfline.setQual(stoi(tokens[5]));
+            vcfline.setQual(QString::fromStdString(tokens[5]));
             vcfline.setFilter(QString::fromStdString(tokens[6]));
-            if (countCols >= 8)
+            if (tokens.size() >= 8)
             {
                 vcfline.setFormat(QString::fromStdString(tokens[7]));
             }
+            ///vcfline.setSize(tokens.size());
             // append line to table
             this->addLine(vcfline);
         }
