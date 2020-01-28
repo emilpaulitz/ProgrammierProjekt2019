@@ -17,7 +17,8 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_openVCFfile_clicked()
+
+void MainWindow::on_actionVCF_file_triggered()
 {
     QString fileName = QFileDialog::getOpenFileName(this, "Open Vcf file", QDir::homePath());
     QFile VCFfile(fileName);

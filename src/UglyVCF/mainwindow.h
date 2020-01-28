@@ -17,7 +17,8 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_openVCFfile_clicked();
+
+    void on_actionVCF_file_triggered();
 
 private:
     Ui::MainWindow *ui;
