@@ -30,7 +30,8 @@ void MainWindow::on_actionVCF_file_triggered()
     // create table
     QTableWidget *tableWidget = new QTableWidget();
     int NUM_LINES = tableObj.getLines().size();
-    int NUM_COLS = tableObj.getLine(0).getDataFieldsSize();
+    //int NUM_COLS = tableObj.getLine(0).getDataFieldsSize(); //TODO somehow returns wrong size
+    int NUM_COLS = 10;
     tableWidget->setRowCount(NUM_LINES);
     tableWidget->setColumnCount(NUM_COLS);
 

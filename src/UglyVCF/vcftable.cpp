@@ -77,9 +77,14 @@ void VCFtable::parse(string filename)
             vcfline.setAlt(QString::fromStdString(tokens[4]));
             vcfline.setQual(QString::fromStdString(tokens[5]));
             vcfline.setFilter(QString::fromStdString(tokens[6]));
-            if (tokens.size() >= 8)
+            vcfline.setInfo(QString::fromStdString(tokens[7]));
+            if (tokens.size() >= 9)
             {
-                vcfline.setFormat(QString::fromStdString(tokens[7]));
+                vcfline.setFormat(QString::fromStdString(tokens[8]));
+                if (tokens.size() >= 10)
+                {
+                    vcfline.setSample(QString::fromStdString(tokens[9]));
+                }
             }
             ///vcfline.setSize(tokens.size());
             // append line to table

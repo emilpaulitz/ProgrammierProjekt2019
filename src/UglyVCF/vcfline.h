@@ -10,7 +10,7 @@ class VCFline
 private:
     QString dataFields[10];
 
-    QString header, chr, pos, id, ref, alt, qual, filter, info, format, anno;
+    QString header, chr, pos, id, ref, alt, qual, filter, info, format, sample, anno;
 
     //int size = -1;
 
@@ -42,6 +42,8 @@ public:
     void setFormat(const QString &value);
     QString getAnno() const;
     void setAnno(const QString &value);
+    QString getSample() const;
+    void setSample(const QString &value);
 
     int getSize() const;
     void setSize(int value);
