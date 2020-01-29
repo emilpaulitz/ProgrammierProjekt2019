@@ -8,17 +8,16 @@
 class VCFline
 {
 private:
+    int size = 10;
     QString dataFields[10];
-
     QString header, chr, pos, id, ref, alt, qual, filter, info, format, sample, anno;
 
-    //int size = -1;
 
 public:
     VCFline();
 
     QString getDataField(int i);
-    int getDataFieldsSize();
+    int getSize();
 
     QString getHeader() const;
     void setHeader(const QString &value);

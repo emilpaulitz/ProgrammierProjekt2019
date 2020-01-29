@@ -6,10 +6,9 @@ QString VCFline::getDataField(int i)
     return dataFields[i];
 }
 
-// TODO: this method somehow returns 4, but should return 10 (size of array)
-int VCFline::getDataFieldsSize()
+int VCFline::getSize()
 {
-    return dataFields->size();
+    return size;
 }
 
 VCFline::VCFline()

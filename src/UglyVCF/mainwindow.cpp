@@ -28,12 +28,14 @@ void MainWindow::on_actionVCF_file_triggered()
     VCFtable tableObj = VCFtable();
     tableObj.parse(fileName);
     // create table
-    QTableWidget *tableWidget = new QTableWidget();
+    //QTableWidget *tableWidget = new QTableWidget();
     int NUM_LINES = tableObj.getLines().size();
-    //int NUM_COLS = tableObj.getLine(0).getDataFieldsSize(); //TODO somehow returns wrong size
-    int NUM_COLS = 10;
-    tableWidget->setRowCount(NUM_LINES);
-    tableWidget->setColumnCount(NUM_COLS);
+    int NUM_COLS = tableObj.getLine(0).getSize(); //TODO somehow returns wrong size
+    ui->tableWidget->setRowCount(NUM_LINES);
+    ui->tableWidget->setColumnCount(NUM_COLS);
+
+    QStringList headerLabels = {"CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER", "INFO", "FORMAT", "SAMPLE", "ANNO"};
+    ui->tableWidget->setHorizontalHeaderLabels(headerLabels);
 
     // fill table
     VCFline currLine;
@@ -44,8 +46,8 @@ void MainWindow::on_actionVCF_file_triggered()
         for (int k = 0; k < NUM_COLS; k++)
         {
             newItem = new QTableWidgetItem(currLine.getDataField(k));
-            tableWidget->setItem(i, k, newItem);
+            ui->tableWidget->setItem(i, k, newItem);
         }
     }
-    tableWidget->show();
+    ui->tableWidget->show();
 }
