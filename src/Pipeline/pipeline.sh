@@ -1,6 +1,6 @@
 #!/bin/bash
 # usage: ./pipeline.sh [read1] [read2] [ref]
-#time ./pipeline.sh ~/Desktop/Data/NA12878_03_AACGTGAT_L001_R1_001.fastq.gz ~/Desktop/Data/NA12878_03_AACGTGAT_L001_R2_001.fastq.gz ~/Desktop/Data/GRCh37.fa
+# ./pipeline.sh ~/Desktop/Data/NA12878_03_AACGTGAT_L001_R1_001.fastq.gz ~/Desktop/Data/NA12878_03_AACGTGAT_L001_R2_001.fastq.gz ~/Desktop/Data/GRCh37.fa
 
 
 # clear old cache
