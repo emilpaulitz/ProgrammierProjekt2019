@@ -16,9 +16,18 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    QString pipelinePath;
+    QString refGenPath;
+
 private slots:
 
     void on_actionVCF_file_triggered();
+
+    void on_actionset_pipeline_triggered();
+
+    void on_actionFastQ_file_triggered();
+
+    void on_actionset_reference_genome_triggered();
 
 private:
     Ui::MainWindow *ui;

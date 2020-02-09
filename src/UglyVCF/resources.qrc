@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>rsc/uglyVCF_icon1.ico</file>
+        <file>rsc/uglyVCF_icon2.ico</file>
+        <file>rsc/uglyVCF_icon3.ico</file>
+        <file>rsc/pipeline_icon.png</file>
+        <file>rsc/dna_icon.png</file>
+        <file>rsc/dna2_icon.png</file>
+        <file>rsc/fastq_icon.png</file>
+        <file>rsc/vcf_icon.png</file>
+        <file>rsc/pipelineSet_icon.png</file>
+        <file>rsc/pipelineSet2_icon.png</file>
+        <file>rsc/uglyVCF_icon5.ico</file>
+        <file>rsc/uglyVCF_icon6.ico</file>
+    </qresource>
+</RCC>

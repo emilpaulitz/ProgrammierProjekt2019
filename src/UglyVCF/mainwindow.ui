@@ -37,17 +37,66 @@
     <property name="title">
      <string>Open</string>
     </property>
+    <addaction name="actionFastQ_file"/>
     <addaction name="actionVCF_file"/>
    </widget>
+   <widget class="QMenu" name="menuSettings">
+    <property name="title">
+     <string>Settings</string>
+    </property>
+    <addaction name="actionset_pipeline"/>
+    <addaction name="actionset_reference_genome"/>
+   </widget>
    <addaction name="menuOpen"/>
+   <addaction name="menuSettings"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionVCF_file">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/rsc/vcf_icon.png</normaloff>:/icons/rsc/vcf_icon.png</iconset>
+   </property>
    <property name="text">
     <string>VCF file</string>
    </property>
   </action>
+  <action name="actionset_pipeline">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/rsc/pipeline_icon.png</normaloff>
+     <normalon>:/icons/rsc/pipelineSet2_icon.png</normalon>:/icons/rsc/pipeline_icon.png</iconset>
+   </property>
+   <property name="text">
+    <string>set pipeline</string>
+   </property>
+  </action>
+  <action name="actionFastQ_file">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/rsc/fastq_icon.png</normaloff>:/icons/rsc/fastq_icon.png</iconset>
+   </property>
+   <property name="text">
+    <string>FastQ file</string>
+   </property>
+  </action>
+  <action name="actionset_reference_genome">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/rsc/dna2_icon.png</normaloff>:/icons/rsc/dna2_icon.png</iconset>
+   </property>
+   <property name="text">
+    <string>set reference genome</string>
+   </property>
+  </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
