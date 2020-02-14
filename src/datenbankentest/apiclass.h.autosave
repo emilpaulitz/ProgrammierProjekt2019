@@ -1,0 +1,14 @@
+#ifndef APICLASS_H
+#define APICLASS_H
+
+//signals and slots qt 
+
+//Q_Object erben 
+
+class apiclass
+{
+public:
+    apiclass();
+};
+
+#endif // APICLASS_H
