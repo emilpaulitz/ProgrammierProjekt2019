@@ -21,6 +21,8 @@ public:
 
 private slots:
 
+    void parseVCF(QString filename);
+
     void on_actionVCF_file_triggered();
 
     void on_actionset_pipeline_triggered();
