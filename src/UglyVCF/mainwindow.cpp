@@ -139,19 +139,3 @@ void MainWindow::on_actionpull_all_annotations_triggered()
     QMessageBox::information(this, tr("Caution"), tr(&msg[0]));
 }
 
-void MainWindow::on_actionpull_annotations_triggered()
-{
-    QMessageBox::information(this, tr("Caution"), tr("this is a test"));
-}
-
-void MainWindow::on_actionpull_all_annotations_triggered()
-{
-    int i = 0;
-    for (VCFline line : this->tableObj.getLines()) {
-        // TODO: pull annotation for lines
-        ++i;
-    }
-    std::string msg = "Number of lines: " + std::to_string(i);
-    QMessageBox::information(this, tr("Caution"), tr(&msg[0]));
-}
-
