@@ -27,6 +27,7 @@ MainWindow::~MainWindow()
 void MainWindow::on_actionVCF_file_triggered()
 {
     std::string fileName = QFileDialog::getOpenFileName(this, "Open Vcf file", QDir::homePath()).toStdString();
+    // TODO: fix bug: crashes when clicking "abbrechen" in file explorer
     // create table object
     this->tableObj = VCFtable();
     tableObj.parse(fileName);
@@ -116,8 +117,10 @@ void MainWindow::on_actionpull_all_annotations_triggered()
 {
     int i = 0;
     for (VCFline line : this->tableObj.getLines()) {
+        // TODO: pull annotation for lines
         ++i;
     }
-    QMessageBox::information(this, tr("Caution"), tr("Number of lines: " + i)); //.append(std::to_string(i))));
+    std::string msg = "Number of lines: " + std::to_string(i);
+    QMessageBox::information(this, tr("Caution"), tr(&msg[0]));
 }
 
