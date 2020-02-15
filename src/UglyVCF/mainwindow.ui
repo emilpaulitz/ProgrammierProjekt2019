@@ -112,6 +112,10 @@
    </property>
   </action>
   <action name="actionpull_all_annotations">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/rsc/pull_all_annotations.png</normaloff>:/icons/rsc/pull_all_annotations.png</iconset>
+   </property>
    <property name="text">
     <string>pull all annotations</string>
    </property>

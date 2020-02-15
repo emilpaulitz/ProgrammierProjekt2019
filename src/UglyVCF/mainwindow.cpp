@@ -118,6 +118,6 @@ void MainWindow::on_actionpull_all_annotations_triggered()
     for (VCFline line : this->tableObj.getLines()) {
         ++i;
     }
-    QMessageBox::information(this, tr("Caution"), tr("Number of lines: ")); //.append(std::to_string(i))));
+    QMessageBox::information(this, tr("Caution"), tr("Number of lines: " + i)); //.append(std::to_string(i))));
 }
 
