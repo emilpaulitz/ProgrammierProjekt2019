@@ -66,19 +66,19 @@ echo -e "\e[33m "variant calling... \e[0m"
 freebayes -f $REF $BAM > cache/free.vcf
 echo -e "\e[33m "done \e[0m"
 
-#TODO variant normalization <vcfallelicprimitives>
+# variant normalization <vcfallelicprimitives>
 # usage: vcfallelicprimitives [options][file]
 echo -e "\e[33m "variant normalization... \e[0m"
 ~/miniconda3/pkgs/vcflib-1.0.0_rc3-py37hc088bd4_0/bin/vcfallelicprimitives -k cache/free.vcf > cache/norm.vcf
 echo -e "\e[33m "done \e[0m"
 
-# TODO break multi allelic variants <vcfbreakmulti>
+# break multi allelic variants <vcfbreakmulti>
 # usage: vcfbreakmulti [options][file]
 echo -e "\e[33m "break multi allelic variants"
 ./ngs-bits-master/bin/VcfBreakMulti -in cache/norm.vcf -out cache/break.vcf
 echo -e "\e[33m "done \e[0m"
 
-#TODO left-align variants <VcfLeftNormalize>
+# left-align variants <VcfLeftNormalize>
 echo -e "\e[33m "left-align variants"
 ./ngs-bits-master/bin/VcfLeftNormalize -in cache/break.vcf -out cache/leftvar.vcf -ref $REF
 echo -e "\e[33m "done \e[0m"
