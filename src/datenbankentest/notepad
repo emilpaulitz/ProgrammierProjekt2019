@@ -1,0 +1,38 @@
+QSqlQuery testquery;
+
+testquery.exec("CREATE TABLE test2 (id int)");
+testquery.exec("INSERT INTO test2 VALUES (1),(2),(3)");
+testquery.exec("SELECT * FROM test2");
+qDebug() << testquery.lastError();
+while(testquery.next()){
+    int id = testquery.value(0).toInt();
+    qDebug() << id << endl;
+}
+
+testquery.prepare("INSERT INTO test VALUES (:id ,:variante)");
+testquery.bindValue(":id", 6);
+testquery.bindValue(":variante", "f");
+testquery.exec();
+
+for( int i = 0; i < 20; i++){
+  testquery.prepare("INSERT INTO test VALUES (:id ,:variante)");
+  testquery.bindValue(":id",i);
+  char c = i*2;
+  testquery.bindValue(":variante", c);
+  testquery.exec();
+}
+
+testquery.exec("DELETE FROM test WHERE id >= 0");
+
+
+
+if (testquery.exec("SELECT * FROM test")) {
+      while (testquery.next()){
+        int id = testquery.value(0).toInt();
+        QString variante = testquery.value(1).toString();
+        qDebug() << id << variante << endl;
+      }
+}
+else {
+    qDebug() << testquery.lastError();
+}
