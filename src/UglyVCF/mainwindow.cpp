@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "vcftable.h"
+#include "vcfline.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -31,6 +32,10 @@ void MainWindow::parseVCF(QString filename)
     // create table object
     VCFtable tableObj = VCFtable();
     tableObj.parse(filename.toStdString());
+
+    // create table object
+    this->tableObj = VCFtable();
+    tableObj.parse(filename.toStdString());
     int NUM_LINES = tableObj.getLines().size();
     int NUM_COLS = tableObj.getLine(0).getSize();
     ui->tableWidget->setRowCount(NUM_LINES);
@@ -58,6 +63,7 @@ void MainWindow::parseVCF(QString filename)
 void MainWindow::on_actionVCF_file_triggered()
 {
     QString fileName = QFileDialog::getOpenFileName(this, "Open Vcf file", QDir::homePath());
+    // TODO: fix bug: crashes when clicking "abbrechen" in file explorer
     parseVCF(fileName);
 }
 
@@ -119,5 +125,21 @@ void MainWindow::on_actionFastQ_file_triggered()
             }
         }
     }
+}
+
+void MainWindow::on_actionpull_annotations_triggered()
+{
+    QMessageBox::information(this, tr("Caution"), tr("this is a test"));
+}
+
+void MainWindow::on_actionpull_all_annotations_triggered()
+{
+    int i = 0;
+    for (VCFline line : this->tableObj.getLines()) {
+        // TODO: pull annotation for lines
+        ++i;
+    }
+    std::string msg = "Number of lines: " + std::to_string(i);
+    QMessageBox::information(this, tr("Caution"), tr(&msg[0]));
 }
 

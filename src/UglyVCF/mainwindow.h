@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QtWidgets>
+#include "vcftable.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -31,8 +32,14 @@ private slots:
 
     void on_actionset_reference_genome_triggered();
 
+    void on_actionpull_annotations_triggered();
+
+    void on_actionpull_all_annotations_triggered();
+
 private:
     Ui::MainWindow *ui;
+
+    VCFtable tableObj;
 
 };
 #endif // MAINWINDOW_H
