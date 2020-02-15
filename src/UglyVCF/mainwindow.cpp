@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "vcftable.h"
+#include "vcfline.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -27,7 +28,7 @@ void MainWindow::on_actionVCF_file_triggered()
 {
     std::string fileName = QFileDialog::getOpenFileName(this, "Open Vcf file", QDir::homePath()).toStdString();
     // create table object
-    VCFtable tableObj = VCFtable();
+    this->tableObj = VCFtable();
     tableObj.parse(fileName);
     int NUM_LINES = tableObj.getLines().size();
     int NUM_COLS = tableObj.getLine(0).getSize();
@@ -104,5 +105,19 @@ void MainWindow::on_actionFastQ_file_triggered()
 
         // TODO: find and display vcf result
     }
+}
+
+void MainWindow::on_actionpull_annotations_triggered()
+{
+    QMessageBox::information(this, tr("Caution"), tr("this is a test"));
+}
+
+void MainWindow::on_actionpull_all_annotations_triggered()
+{
+    int i = 0;
+    for (VCFline line : this->tableObj.getLines()) {
+        ++i;
+    }
+    QMessageBox::information(this, tr("Caution"), tr("Number of lines: ")); //.append(std::to_string(i))));
 }
 

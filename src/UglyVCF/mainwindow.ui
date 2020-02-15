@@ -30,7 +30,7 @@
      <x>0</x>
      <y>0</y>
      <width>554</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuOpen">
@@ -47,8 +47,16 @@
     <addaction name="actionset_pipeline"/>
     <addaction name="actionset_reference_genome"/>
    </widget>
+   <widget class="QMenu" name="menuAnalysis">
+    <property name="title">
+     <string>Analysis</string>
+    </property>
+    <addaction name="actionpull_annotations"/>
+    <addaction name="actionpull_all_annotations"/>
+   </widget>
    <addaction name="menuOpen"/>
    <addaction name="menuSettings"/>
+   <addaction name="menuAnalysis"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionVCF_file">
@@ -92,6 +100,23 @@
    </property>
    <property name="text">
     <string>set reference genome</string>
+   </property>
+  </action>
+  <action name="actionpull_annotations">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/rsc/pull_annotation.ico</normaloff>:/icons/rsc/pull_annotation.ico</iconset>
+   </property>
+   <property name="text">
+    <string>pull annotations...</string>
+   </property>
+  </action>
+  <action name="actionpull_all_annotations">
+   <property name="text">
+    <string>pull all annotations</string>
+   </property>
+   <property name="toolTip">
+    <string>pull annotations for every line in current VCF</string>
    </property>
   </action>
  </widget>
