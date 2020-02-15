@@ -36,6 +36,10 @@ private slots:
 
     void on_actionpull_all_annotations_triggered();
 
+    void on_tableWidget_cellClicked(int row, int column);
+
+    void on_actionhide_annotations_triggered();
+
 private:
     Ui::MainWindow *ui;
 

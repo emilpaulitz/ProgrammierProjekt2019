@@ -26,6 +26,13 @@
       </item>
      </layout>
     </item>
+    <item row="0" column="1">
+     <widget class="QTextEdit" name="annoWidget">
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -34,7 +41,7 @@
      <x>0</x>
      <y>0</y>
      <width>554</width>
-     <height>30</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuOpen">
@@ -57,6 +64,7 @@
     </property>
     <addaction name="actionpull_annotations"/>
     <addaction name="actionpull_all_annotations"/>
+    <addaction name="actionhide_annotations"/>
    </widget>
    <addaction name="menuOpen"/>
    <addaction name="menuSettings"/>
@@ -125,6 +133,11 @@
    </property>
    <property name="toolTip">
     <string>pull annotations for every line in current VCF</string>
+   </property>
+  </action>
+  <action name="actionhide_annotations">
+   <property name="text">
+    <string>hide annotations</string>
    </property>
   </action>
  </widget>

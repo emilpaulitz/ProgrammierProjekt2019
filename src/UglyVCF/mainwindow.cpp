@@ -16,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ui->annoWidget->hide();
 }
 
 MainWindow::~MainWindow()
@@ -58,7 +59,7 @@ void MainWindow::parseVCF(QString filename)
 
 void MainWindow::on_actionVCF_file_triggered()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, "Open Vcf file", QDir::homePath());
+    QString fileName = QFileDialog::getOpenFileName(this, "Open Vcf file", QDir::homePath(), tr("VCF files (*.vcf)"));
     // TODO: fix bug: crashes when clicking "abbrechen" in file explorer
     parseVCF(fileName);
 }
@@ -76,7 +77,7 @@ void MainWindow::on_actionset_pipeline_triggered()
 
 void MainWindow::on_actionset_reference_genome_triggered()
 {
-    refGenPath = QFileDialog::getOpenFileName(this, "set reference genome", QDir::homePath(), tr("FastA files (*.fasta, *.fa)"));
+    refGenPath = QFileDialog::getOpenFileName(this, "set reference genome", QDir::homePath(), tr("FastA files (*.fasta *.fa)"));
 }
 
 void MainWindow::on_actionFastQ_file_triggered()
@@ -95,8 +96,8 @@ void MainWindow::on_actionFastQ_file_triggered()
     {
         //open FastQ files (read 1, read 2)
         QString read1 = "", read2 = "";
-        read1 = QFileDialog::getOpenFileName(this, "open READ 1 FastQ file", QDir::homePath()); //, tr("FASTQ files (*.fastq *.fq)")
-        read2 = QFileDialog::getOpenFileName(this, "open READ 2 FastQ file", QDir::homePath());
+        read1 = QFileDialog::getOpenFileName(this, "open READ 1 FastQ file", QDir::homePath(), tr("FASTQ files (*.fastq *.fq *.fastq.gz *fq.gz)"));
+        read2 = QFileDialog::getOpenFileName(this, "open READ 2 FastQ file", QDir::homePath(), tr("FASTQ files (*.fastq *.fq *.fastq.gz *fq.gz)"));
         // check if everything is set
         if (read1 == "" || read2 == "")
         {
@@ -123,11 +124,13 @@ void MainWindow::on_actionFastQ_file_triggered()
     }
 }
 
+//TODO: what do we need this method for?
 void MainWindow::on_actionpull_annotations_triggered()
 {
     QMessageBox::information(this, tr("Caution"), tr("this is a test"));
 }
 
+//TODO: what do we need this method for?
 void MainWindow::on_actionpull_all_annotations_triggered()
 {
     int i = 0;
@@ -139,3 +142,15 @@ void MainWindow::on_actionpull_all_annotations_triggered()
     QMessageBox::information(this, tr("Caution"), tr(&msg[0]));
 }
 
+
+void MainWindow::on_tableWidget_cellClicked(int row, int column)
+{
+    // show annotations
+    ui->annoWidget->setText(this->tableObj.getLine(row).getAnno());
+    ui->annoWidget->show();
+}
+
+void MainWindow::on_actionhide_annotations_triggered()
+{
+    ui->annoWidget->hide();
+}
