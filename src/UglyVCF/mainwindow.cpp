@@ -8,6 +8,7 @@
 #include <QFile>
 #include <string>
 #include <QTableWidget>
+#include <QProcess>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -91,8 +92,16 @@ void MainWindow::on_actionFastQ_file_triggered()
             QMessageBox::warning(this, tr("Error"), tr("need forward and backward READS"));
         }
         // start pipeline
+        QMessageBox::information(this, tr("Caution"), tr("starting pipeline, this may take a while"));
         QString command = pipelinePath + " " + read1 + " " + read2 + " " + refGenPath;
         QProcess::execute(command);
+        if (QProcess::ExitStatus()==EXIT_SUCCESS){
+            on_actionVCF_file_triggered();
+        }
+        if(QProcess::ExitStatus()==EXIT_FAILURE){
+            QMessageBox::warning(this, tr("Error"), tr("pipeline could not be executed"));
+        }
+
         // TODO: find and display vcf result
     }
 }
