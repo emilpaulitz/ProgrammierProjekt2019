@@ -30,10 +30,6 @@ MainWindow::~MainWindow()
 void MainWindow::parseVCF(QString filename)
 {
     // create table object
-    VCFtable tableObj = VCFtable();
-    tableObj.parse(filename.toStdString());
-
-    // create table object
     this->tableObj = VCFtable();
     tableObj.parse(filename.toStdString());
     int NUM_LINES = tableObj.getLines().size();
@@ -125,6 +121,22 @@ void MainWindow::on_actionFastQ_file_triggered()
             }
         }
     }
+}
+
+void MainWindow::on_actionpull_annotations_triggered()
+{
+    QMessageBox::information(this, tr("Caution"), tr("this is a test"));
+}
+
+void MainWindow::on_actionpull_all_annotations_triggered()
+{
+    int i = 0;
+    for (VCFline line : this->tableObj.getLines()) {
+        // TODO: pull annotation for lines
+        ++i;
+    }
+    std::string msg = "Number of lines: " + std::to_string(i);
+    QMessageBox::information(this, tr("Caution"), tr(&msg[0]));
 }
 
 void MainWindow::on_actionpull_annotations_triggered()

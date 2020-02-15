@@ -12,5 +12,7 @@
         <file>rsc/pipelineSet2_icon.png</file>
         <file>rsc/uglyVCF_icon5.ico</file>
         <file>rsc/uglyVCF_icon6.ico</file>
+        <file>rsc/pull_annotation.ico</file>
+        <file>rsc/pull_all_annotations.png</file>
     </qresource>
 </RCC>
