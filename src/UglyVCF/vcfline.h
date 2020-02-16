@@ -1,8 +1,6 @@
 #ifndef VCFLINE_H
 #define VCFLINE_H
 
-
-#include <string>
 #include <QString>
 
 class VCFline
@@ -39,6 +37,7 @@ public:
     void setInfo(const QString &value);
     QString getFormat() const;
     void setFormat(const QString &value);
+
     QString getAnno() const;
     void setAnno(const QString &value);
     QString getSample() const;

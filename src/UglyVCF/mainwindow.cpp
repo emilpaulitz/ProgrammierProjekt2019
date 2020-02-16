@@ -10,6 +10,9 @@
 #include <string>
 #include <QTableWidget>
 #include <QProcess>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -56,11 +59,34 @@ void MainWindow::parseVCF(QString filename)
     ui->tableWidget->show();
 }
 
+/**
+ * @brief MainWindow::makeVEPrequest make a request to VEP with given line, save annotation in line obj
+ * @param line the VCFline, you want the mutation to be checked
+ */
+void MainWindow::makeVEPrequest(VCFline line)
+{
+    // get annotations
+    QNetworkAccessManager *manager = new QNetworkAccessManager(this);
+    QString URL = "http://grch37.rest.ensembl.org/vep/homo_sapiens/hgvs/";
+    // hgvs notation: NG_0000 CHR .10:g.POS REF>ALT (no spaces)
+    QString endpoint = line.getChr().remove(0,3) + ":g." + line.getPos() + line.getRef() + ">" + line.getAlt(); //"NG_0000" + .10
+    // make request
+    QNetworkRequest *request = new QNetworkRequest(QUrl(URL + endpoint));
+    manager->get(*request);
+    connect(manager, &QNetworkAccessManager::finished, this, [&](QNetworkReply *reply)
+    {
+        QByteArray data = reply->readAll();
+        QString str = QString::fromLatin1(data);
+        // write annotations to line obj
+        line.setAnno(str);
+        // FIX: is anno really set??
+    });
+}
 
 void MainWindow::on_actionVCF_file_triggered()
 {
     QString fileName = QFileDialog::getOpenFileName(this, "Open Vcf file", QDir::homePath(), tr("VCF files (*.vcf)"));
-    // TODO: fix bug: crashes when clicking "abbrechen" in file explorer
+    // FIX: crashes when clicking "abbrechen" in file explorer
     parseVCF(fileName);
 }
 
@@ -127,7 +153,15 @@ void MainWindow::on_actionFastQ_file_triggered()
 //TODO: what do we need this method for?
 void MainWindow::on_actionpull_annotations_triggered()
 {
-    QMessageBox::information(this, tr("Caution"), tr("this is a test"));
+    QNetworkAccessManager *manager = new QNetworkAccessManager(this);
+    manager->get(QNetworkRequest(QUrl("http://grch37.rest.ensembl.org/lookup/symbol/homo_sapiens/BRCA2?")));
+    connect(manager, &QNetworkAccessManager::finished, this, [&](QNetworkReply *reply)
+    {
+        QByteArray data = reply->readAll();
+        QString str = QString::fromLatin1(data);
+        ui->annoWidget->setText(str);
+        ui->annoWidget->show();
+    });
 }
 
 //TODO: what do we need this method for?
@@ -145,9 +179,33 @@ void MainWindow::on_actionpull_all_annotations_triggered()
 
 void MainWindow::on_tableWidget_cellClicked(int row, int column)
 {
-    // show annotations
-    ui->annoWidget->setText(this->tableObj.getLine(row).getAnno());
+    // method, when makeVEPrequest works
+    // TODO: find a different way to access clicked lineObj (sorting may mess up the order, so row is not equal to i in getLine(i) )
+    /*
+    VCFline line = this->tableObj.getLine(row);
+    makeVEPrequest(line);
+    ui->annoWidget->setText(line.getAnno());
     ui->annoWidget->show();
+    */
+    // get annotations
+    QNetworkAccessManager *manager = new QNetworkAccessManager(this);
+    QString URL = "http://grch37.rest.ensembl.org/vep/homo_sapiens/hgvs/";
+    // get chr, pos, ref, alt
+    VCFline line = this->tableObj.getLine(row);
+    // hgvs notation: NG_0000 CHR .10:g.POS REF>ALT (no spaces)
+    QString endpoint = line.getChr().remove(0,3) + ":g." + line.getPos() + line.getRef() + ">" + line.getAlt(); //"NG_0000" + .10
+    // make request
+    QNetworkRequest *request = new QNetworkRequest(QUrl(URL + endpoint));
+    manager->get(*request);
+    connect(manager, &QNetworkAccessManager::finished, this, [&](QNetworkReply *reply)
+    {
+        QByteArray data = reply->readAll();
+        QString str = QString::fromLatin1(data);
+        // show annotations
+        line.setAnno(str);
+        ui->annoWidget->setText(line.getAnno());
+        ui->annoWidget->show();
+    });
 }
 
 void MainWindow::on_actionhide_annotations_triggered()

@@ -17,12 +17,12 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    void makeVEPrequest(VCFline line);
+
     QString pipelinePath;
     QString refGenPath;
 
 private slots:
-
-    void parseVCF(QString filename);
 
     void on_actionVCF_file_triggered();
 
@@ -41,6 +41,9 @@ private slots:
     void on_actionhide_annotations_triggered();
 
 private:
+
+    void parseVCF(QString filename);
+
     Ui::MainWindow *ui;
 
     VCFtable tableObj;
