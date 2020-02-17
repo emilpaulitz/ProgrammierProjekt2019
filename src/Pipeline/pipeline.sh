@@ -74,11 +74,16 @@ echo -e "\e[33m done \e[0m"
 
 # break multi allelic variants <vcfbreakmulti>
 # usage: vcfbreakmulti [options][file]
-echo -e "\e[33m break multi allelic variants"
+echo -e "\e[33m break multi allelic variants... \e[0m"
 ./ngs-bits-master/bin/VcfBreakMulti -in cache/norm.vcf -out cache/break.vcf
 echo -e "\e[33m done \e[0m"
 
 # left-align variants <VcfLeftNormalize>
-echo -e "\e[33m left-align variants"
+echo -e "\e[33m left-align variants... \e[0m"
 ./ngs-bits-master/bin/VcfLeftNormalize -in cache/break.vcf -out cache/leftvar.vcf -ref $REF
+echo -e "\e[33m done \e[0m"
+
+# sort <VcfSort>
+echo -e "\e[33m sort vcf file... \e[0m"
+./ngs-bits-master/bin/VcfSort -in cache/leftvar.vcf -out cache/final.vcf
 echo -e "\e[33m done \e[0m"
