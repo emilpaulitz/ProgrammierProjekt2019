@@ -21,6 +21,7 @@ SOURCES += \
     datenbank.cpp \
     main.cpp \
     mainwindow.cpp \
+    transcriptcons.cpp \
     vcfline.cpp \
     vcftable.cpp
 
@@ -28,6 +29,7 @@ HEADERS += \
     annotationservice.h \
     datenbank.h \
     mainwindow.h \
+    transcriptcons.h \
     vcfline.h \
     vcftable.h
 

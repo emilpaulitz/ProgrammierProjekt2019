@@ -11,6 +11,8 @@
 #include <QTableWidget>
 #include <QProcess>
 
+#include <QString>
+
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
@@ -89,11 +91,24 @@ void MainWindow::makeVEPrequest(VCFline& line)
         connect(manager, &QNetworkAccessManager::finished, this, [&](QNetworkReply *reply)
         {
             QByteArray data = reply->readAll();
+
+            //unwichtig
             QString str = QString::fromLatin1(data);
-            QJsonDocument jsmin = QJsonDocument::fromRawData(data, data.size());
-            // show annotations
-            line.setAnno(str);
-            qDebug() << "makeVEPrequest: " + str;
+
+            QJsonDocument jsmin = QJsonDocument::fromJson(data);
+            QJsonArray jarray = jsmin.array();
+            QString key = "transcript_consequences";
+            QJsonObject jobject = jarray[0].toObject();
+            QJsonDocument secjson = QJsonDocument::fromJson(data);
+            QString strJson(secjson.toJson(QJsonDocument::Indented));
+            qWarning() << strJson;
+            //qWarning() << "Jarray is :" << jobject.value(key).toString();
+
+            //unwichtig
+
+                        // show annotations
+            line.setAnno(strJson);
+           // qDebug() << "makeVEPrequest: " + str;
         });
     } else {
         QMessageBox::information(this, tr("no connection to network"),
