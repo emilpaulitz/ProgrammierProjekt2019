@@ -6,9 +6,10 @@
 class VCFline
 {
 private:
-    int size = 10;
     QString dataFields[10];
     QString header, chr, pos, id, ref, alt, qual, filter, info, format, sample, anno;
+    int size = 10;
+    int index;
 
 
 public:
@@ -21,6 +22,7 @@ public:
     void setHeader(const QString &value);
     QString getChr() const;
     void setChr(const QString &value);
+    QString getChrNum();
     QString getPos() const;
     void setPos(QString value);
     QString getId() const;
@@ -45,7 +47,8 @@ public:
 
     int getSize() const;
     void setSize(int value);
-
+    int getIndex() const;
+    void setIndex(const int value);
 
 };
 

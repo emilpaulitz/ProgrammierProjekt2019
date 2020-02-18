@@ -33,6 +33,15 @@ void VCFline::setChr(const QString &value)
 {
     dataFields[0] = value;
 }
+QString VCFline::getChrNum()
+{
+    QString num = this->getChr().remove(0,3);
+    if (num == "X" || num == "x") return "22";
+    if (num == "Y" || num == "y") return "23";
+    if (num.length() <= 2) return num;
+    // if not a valid chr1, chr2 ... notation
+    else return 0;
+}
 
 QString VCFline::getPos() const
 {
@@ -124,4 +133,12 @@ void VCFline::setAnno(const QString &value)
     anno = value;
 }
 
+int VCFline::getIndex() const
+{
+    return index;
+}
+void VCFline::setIndex(const int value)
+{
+    index = value;
+}
 

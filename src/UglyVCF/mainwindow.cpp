@@ -10,9 +10,15 @@
 #include <string>
 #include <QTableWidget>
 #include <QProcess>
+
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
+#include <QJsonObject>
+#include <QJsonDocument>
+
+#include <QDebug>
+#include <QThread>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -50,6 +56,8 @@ void MainWindow::parseVCF(QString filename)
     {
         currLine = tableObj.getLine(i);
         QTableWidgetItem *newItem;
+        // fill line
+        currLine.setIndex(i);
         for (int k = 0; k < NUM_COLS; k++)
         {
             newItem = new QTableWidgetItem(currLine.getDataField(k));
@@ -63,31 +71,40 @@ void MainWindow::parseVCF(QString filename)
  * @brief MainWindow::makeVEPrequest make a request to VEP with given line, save annotation in line obj
  * @param line the VCFline, you want the mutation to be checked
  */
-void MainWindow::makeVEPrequest(VCFline line)
+void MainWindow::makeVEPrequest(VCFline& line)
 {
+    // TODO check connectivity, prevent programm from crashing
     // get annotations
     QNetworkAccessManager *manager = new QNetworkAccessManager(this);
     QString URL = "http://grch37.rest.ensembl.org/vep/homo_sapiens/hgvs/";
-    // hgvs notation: NG_0000 CHR .10:g.POS REF>ALT (no spaces)
-    QString endpoint = line.getChr().remove(0,3) + ":g." + line.getPos() + line.getRef() + ">" + line.getAlt(); //"NG_0000" + .10
-    // make request
-    QNetworkRequest *request = new QNetworkRequest(QUrl(URL + endpoint));
-    manager->get(*request);
-    connect(manager, &QNetworkAccessManager::finished, this, [&](QNetworkReply *reply)
+    // hgvs notation: CHR :g. POS REF>ALT (no spaces)
+    QString endpoint = line.getChrNum() + ":g." + line.getPos() + line.getRef() + ">" + line.getAlt() + "?"; //"NG_0000" + .10
+    QString optionJson = "content-type=application/json";
+    QNetworkRequest *request = new QNetworkRequest(QUrl(URL + endpoint + optionJson));
+    // check connectivity
+    if (QNetworkAccessManager::NetworkAccessibility networkAccess = manager->networkAccessible())
     {
-        QByteArray data = reply->readAll();
-        QString str = QString::fromLatin1(data);
-        // write annotations to line obj
-        line.setAnno(str);
-        // FIX: is anno really set??
-    });
+        // make request
+        manager->get(*request);
+        connect(manager, &QNetworkAccessManager::finished, this, [&](QNetworkReply *reply)
+        {
+            QByteArray data = reply->readAll();
+            QString str = QString::fromLatin1(data);
+            QJsonDocument jsmin = QJsonDocument::fromRawData(data, data.size());
+            // show annotations
+            line.setAnno(str);
+            qDebug() << "makeVEPrequest: " + str;
+        });
+    } else {
+        QMessageBox::information(this, tr("no connection to network"),
+                                 tr("unable to connect to network, see internet settings."));
+    }
 }
 
 void MainWindow::on_actionVCF_file_triggered()
 {
     QString fileName = QFileDialog::getOpenFileName(this, "Open Vcf file", QDir::homePath(), tr("VCF files (*.vcf)"));
-    // FIX: crashes when clicking "abbrechen" in file explorer
-    parseVCF(fileName);
+    if (fileName != "") parseVCF(fileName);
 }
 
 void MainWindow::on_actionset_pipeline_triggered()
@@ -131,17 +148,20 @@ void MainWindow::on_actionFastQ_file_triggered()
         }
         else
         {
-            // start pipeline
+            // make process and formulate command
             QMessageBox::information(this, tr("Caution"), tr("starting pipeline, this may take a while"));
             QString command = pipelinePath + " " + read1 + " " + read2 + " " + refGenPath;
+            int lastSlash = pipelinePath.lastIndexOf('/');
+            QString wdPipeline = pipelinePath;
+            wdPipeline.chop(wdPipeline.length() - lastSlash);
+            QProcess *process = new QProcess(this);
+            process->setWorkingDirectory(wdPipeline);
+
+            // start pipeline
             QProcess::execute(command);
             if (QProcess::ExitStatus()==EXIT_SUCCESS){
                 //automatically open new vcf
-                int lastSlash = pipelinePath.lastIndexOf('/');
-                QString vcfPath = pipelinePath;
-                vcfPath.chop(vcfPath.length() - lastSlash);
-                vcfPath.append("/cache/leftvar.vcf");
-                parseVCF(vcfPath);
+                parseVCF(wdPipeline + "/cache/final.vcf");
             }
             if(QProcess::ExitStatus()==EXIT_FAILURE){
                 QMessageBox::warning(this, tr("Error"), tr("pipeline could not be executed"));
@@ -181,31 +201,41 @@ void MainWindow::on_tableWidget_cellClicked(int row, int column)
 {
     // method, when makeVEPrequest works
     // TODO: find a different way to access clicked lineObj (sorting may mess up the order, so row is not equal to i in getLine(i) )
-    /*
-    VCFline line = this->tableObj.getLine(row);
+
+    VCFline &line = this->tableObj.getLine(row);
     makeVEPrequest(line);
+    qDebug() << "cell_clicked: " << line.getAnno();
     ui->annoWidget->setText(line.getAnno());
     ui->annoWidget->show();
-    */
+/*
     // get annotations
     QNetworkAccessManager *manager = new QNetworkAccessManager(this);
     QString URL = "http://grch37.rest.ensembl.org/vep/homo_sapiens/hgvs/";
-    // get chr, pos, ref, alt
-    VCFline line = this->tableObj.getLine(row);
+    VCFline &line = this->tableObj.getLine(row);
     // hgvs notation: NG_0000 CHR .10:g.POS REF>ALT (no spaces)
-    QString endpoint = line.getChr().remove(0,3) + ":g." + line.getPos() + line.getRef() + ">" + line.getAlt(); //"NG_0000" + .10
-    // make request
+    QString endpoint = line.getChrNum() + ":g." + line.getPos() + line.getRef() + ">" + line.getAlt() + "?"; //"NG_0000" + .10
+    QString headerParameter = "content-type=application/json";
     QNetworkRequest *request = new QNetworkRequest(QUrl(URL + endpoint));
-    manager->get(*request);
-    connect(manager, &QNetworkAccessManager::finished, this, [&](QNetworkReply *reply)
+    // check connectivity
+    if (QNetworkAccessManager::NetworkAccessibility networkAccess = manager->networkAccessible())
     {
-        QByteArray data = reply->readAll();
-        QString str = QString::fromLatin1(data);
-        // show annotations
-        line.setAnno(str);
-        ui->annoWidget->setText(line.getAnno());
-        ui->annoWidget->show();
-    });
+        // make request
+        manager->get(*request);
+        connect(manager, &QNetworkAccessManager::finished, this, [&](QNetworkReply *reply)
+        {
+            QByteArray data = reply->readAll();
+            QString str = QString::fromLatin1(data);
+            // show annotations
+            line.setAnno(str);
+            ui->annoWidget->setText(line.getAnno());
+            ui->annoWidget->show();
+            qDebug() << "In Funktion: \n" + str;
+        });
+    } else {
+        QMessageBox::information(this, tr("no connection to network"),
+                                 tr("unable to connect to network, see internet settings."));
+    }
+*/
 }
 
 void MainWindow::on_actionhide_annotations_triggered()

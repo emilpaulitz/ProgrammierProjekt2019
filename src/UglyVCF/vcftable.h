@@ -21,7 +21,7 @@ public:
 
     // methods
     QList<VCFline> getLines();
-    VCFline getLine(int i);
+    VCFline &getLine(int i);
     void addLine(VCFline newline);
     void parse(std::string filename);
 };

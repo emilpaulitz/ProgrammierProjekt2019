@@ -17,7 +17,7 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    void makeVEPrequest(VCFline line);
+    void makeVEPrequest(VCFline& line);
 
     QString pipelinePath;
     QString refGenPath;

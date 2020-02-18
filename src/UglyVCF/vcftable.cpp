@@ -30,10 +30,11 @@ QList<VCFline> VCFtable::getLines()
     return this->listOfLines;
 }
 
-VCFline VCFtable::getLine(int i)
+VCFline& VCFtable::getLine(int i)
 {
-    return this->listOfLines.at(i);
+    return this->listOfLines[i];
 }
+
 
 void VCFtable::addLine(VCFline newline)
 {
