@@ -1,4 +1,5 @@
-QT       += core gui network
+QT       += core gui network sql
+QTPLUGIN += QPSQL
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -17,6 +18,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     annotationservice.cpp \
+    datenbank.cpp \
     main.cpp \
     mainwindow.cpp \
     vcfline.cpp \
@@ -24,6 +26,7 @@ SOURCES += \
 
 HEADERS += \
     annotationservice.h \
+    datenbank.h \
     mainwindow.h \
     vcfline.h \
     vcftable.h
