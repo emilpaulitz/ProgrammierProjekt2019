@@ -71,6 +71,7 @@ void VCFtable::parse(string filename)
             }
             // fill tokens into line
             VCFline vcfline = VCFline();
+           if ((QString::fromStdString(tokens[0]).size()) <= 5){
             vcfline.setChr(QString::fromStdString(tokens[0]));
             vcfline.setPos(QString::fromStdString(tokens[1]));
             vcfline.setId(QString::fromStdString(tokens[2]));
@@ -88,8 +89,11 @@ void VCFtable::parse(string filename)
                 }
             }
             ///vcfline.setSize(tokens.size());
+            ///
+
             // append line to table
             this->addLine(vcfline);
+           }
         }
     }
 }
