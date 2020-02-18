@@ -2,6 +2,10 @@
 #include "ui_mainwindow.h"
 #include "vcftable.h"
 #include "vcfline.h"
+#include "transcriptcons.h"
+#include "annotationservice.h"
+#include <annotationservice.cpp>
+#include <transcriptcons.cpp>
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -95,19 +99,25 @@ void MainWindow::makeVEPrequest(VCFline& line)
             //unwichtig
             QString str = QString::fromLatin1(data);
 
+
             QJsonDocument jsmin = QJsonDocument::fromJson(data);
             QJsonArray jarray = jsmin.array();
             QString key = "transcript_consequences";
             QJsonObject jobject = jarray[0].toObject();
             QJsonDocument secjson = QJsonDocument::fromJson(data);
             QString strJson(secjson.toJson(QJsonDocument::Indented));
-            qWarning() << strJson;
+            //qWarning() << strJson;
             //qWarning() << "Jarray is :" << jobject.value(key).toString();
+
 
             //unwichtig
 
-                        // show annotations
-            line.setAnno(strJson);
+
+            QList<transcriptcons> toshow = parse_totranscrictionlist(jsmin);
+           // qWarning() << printtranscons(toshow);
+
+            // show annotations
+            line.setAnno(printtranscons(toshow));
            // qDebug() << "makeVEPrequest: " + str;
         });
     } else {
