@@ -52,7 +52,7 @@ void AnnotationService::makeVEPrequest(VCFline &line)
         // TODO: pop warning: no internet
         emit no_connection();
     }
-    manager->deleteLater();
+    ///manager->deleteLater();
 }
 
 
