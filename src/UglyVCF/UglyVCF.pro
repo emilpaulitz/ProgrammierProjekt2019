@@ -17,19 +17,23 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    Annotation.cpp \
+    Frequencies.cpp \
+    Transcriptcons.cpp \
     annotationservice.cpp \
     datenbank.cpp \
     main.cpp \
     mainwindow.cpp \
-    transcriptcons.cpp \
     vcfline.cpp \
     vcftable.cpp
 
 HEADERS += \
+    Annotation.h \
+    Frequencies.h \
+    Transcriptcons.h \
     annotationservice.h \
     datenbank.h \
     mainwindow.h \
-    transcriptcons.h \
     vcfline.h \
     vcftable.h
 

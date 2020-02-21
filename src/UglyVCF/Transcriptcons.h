@@ -2,14 +2,26 @@
 #define TRANSCRIPTCONS_H
 #include <QString>
 #include <QList>
+#include <QJsonDocument>
 
-class transcriptcons
+class Transcriptcons
+
 {
-public:
-    transcriptcons();
+private:
+QString transcript_id,impact, variant_allele,gene_symbole,gene_symbol_source,gene_id
+    ,hgnc_id,strand,biotype,distance;
 
-    transcriptcons(QString transcript_id,QString impact,QString variant_allele,QString gene_symbole,QString gene_symbol_source,
+QList<QString> consequence_terms;
+
+
+
+public:
+    Transcriptcons();
+
+    Transcriptcons(QString transcript_id,QString impact,QString variant_allele,QString gene_symbole,QString gene_symbol_source,
                     QString gene_id,QString hgnc_id,QString strand,QString biotype,QString distance,QList<QString> consequence_terms);
+
+
 
     QString getTranscript_id() const;
     void setTranscript_id(const QString &value);
@@ -20,6 +32,9 @@ public:
     QString getVariant_allele() const;
     void setVariant_allele(const QString &value);
 
+    QString getGene_symbole() const;
+    void setGene_symbole(const QString &value);
+
     QString getGene_symbol_source() const;
     void setGene_symbol_source(const QString &value);
 
@@ -28,9 +43,6 @@ public:
 
     QString getHgnc_id() const;
     void setHgnc_id(const QString &value);
-
-    QString getGene_symbole() const;
-    void setGene_symbole(const QString &value);
 
     QString getStrand() const;
     void setStrand(const QString &value);
@@ -44,11 +56,11 @@ public:
     QList<QString> getConsequence_terms() const;
     void setConsequence_terms(const QList<QString> &value);
 
-private:
-    QString transcript_id,impact, variant_allele,gene_symbole,gene_symbol_source,gene_id
-    ,hgnc_id,strand,biotype,distance;
+    static QList<Transcriptcons> parse_totranscrictionlist(QJsonDocument doc);
 
-QList<QString> consequence_terms;
+    static QString printtranscons(Transcriptcons trans);
+
+    static QString printtranscons(QList<Transcriptcons> trans);
 };
 
 #endif // TRANSCRIPTCONS_H

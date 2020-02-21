@@ -2,10 +2,14 @@
 #include "ui_mainwindow.h"
 #include "vcftable.h"
 #include "vcfline.h"
-#include "transcriptcons.h"
+#include "Transcriptcons.h"
 #include "annotationservice.h"
-#include <annotationservice.cpp>
-#include <transcriptcons.cpp>
+#include "Frequencies.h"
+#include "Annotation.h"
+
+//#include <annotationservice.cpp>
+//#include <Transcriptcons.cpp>
+//#include <Frequencies.cpp>
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -101,23 +105,22 @@ void MainWindow::makeVEPrequest(VCFline& line)
 
 
             QJsonDocument jsmin = QJsonDocument::fromJson(data);
-            QJsonArray jarray = jsmin.array();
-            QString key = "transcript_consequences";
-            QJsonObject jobject = jarray[0].toObject();
-            QJsonDocument secjson = QJsonDocument::fromJson(data);
-            QString strJson(secjson.toJson(QJsonDocument::Indented));
-            //qWarning() << strJson;
-            //qWarning() << "Jarray is :" << jobject.value(key).toString();
 
+
+            QString strJson(jsmin.toJson(QJsonDocument::Indented));
+             /*
 
             //unwichtig
 
+               */
+           // QList<transcriptcons> toshow = parse_totranscrictionlist(jsmin);
 
-            QList<transcriptcons> toshow = parse_totranscrictionlist(jsmin);
            // qWarning() << printtranscons(toshow);
 
             // show annotations
-            line.setAnno(printtranscons(toshow));
+           // line.setAnno(printtranscons( parse_totranscrictionlist(jsmin)));
+           //line.setAnno(print_frequencies(pars_frequencies(jsmin)));
+           line.setAnno(Annotation::print_Annotation(Annotation::pars_Annotation(jsmin)));
            // qDebug() << "makeVEPrequest: " + str;
         });
     } else {
