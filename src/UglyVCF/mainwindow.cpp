@@ -2,10 +2,10 @@
 #include "ui_mainwindow.h"
 #include "vcftable.h"
 #include "vcfline.h"
-#include "transcriptcons.h"
+#include "Transcriptcons.h"
 #include "annotationservice.h"
-#include <annotationservice.cpp>
-#include <transcriptcons.cpp>
+#include "Frequencies.h"
+#include "Annotation.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
