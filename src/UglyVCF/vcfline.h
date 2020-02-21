@@ -2,6 +2,7 @@
 #define VCFLINE_H
 
 #include <QString>
+#include <QObject>
 
 class VCFline
 {
@@ -15,6 +16,7 @@ private:
 public:
     VCFline();
 
+    // getter & setter
     QString getDataField(int i);
     int getSize();
 
@@ -49,6 +51,9 @@ public:
     void setSize(int value);
     int getIndex() const;
     void setIndex(const int value);
+
+    // methods
+    QString getHgvsNotation();
 
 };
 

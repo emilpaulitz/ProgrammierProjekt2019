@@ -32,11 +32,13 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     ui->annoWidget->hide();
+    annotationService = new AnnotationService(&tableObj);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete annotationService;
 }
 
 /**
@@ -57,74 +59,35 @@ void MainWindow::parseVCF(QString filename)
     ui->tableWidget->setHorizontalHeaderLabels(headerLabels);
 
     // fill table
-    VCFline currLine;
+    VCFline *currLine;
     for (int i = 0; i < NUM_LINES; i++)
     {
-        currLine = tableObj.getLine(i);
+        currLine = &tableObj.getLine(i);
         QTableWidgetItem *newItem;
         // fill line
-        currLine.setIndex(i);
+        currLine->setIndex(i);
         for (int k = 0; k < NUM_COLS; k++)
         {
-            newItem = new QTableWidgetItem(currLine.getDataField(k));
+            newItem = new QTableWidgetItem(currLine->getDataField(k));
             ui->tableWidget->setItem(i, k, newItem);
+            // set line index (from VCFtable) to cell (hidden, dataRole: UserRole)
+            newItem->setData(Qt::UserRole, i);
         }
     }
     ui->tableWidget->show();
 }
 
 /**
- * @brief MainWindow::makeVEPrequest make a request to VEP with given line, save annotation in line obj
- * @param line the VCFline, you want the mutation to be checked
+ * @brief MainWindow::getObjIndex translates QTableWidget row to VCFtable index of VCFline visualised in certain row.
+ * -> you can use tableObj.getLine(getObjIndex(qTableRow))
+ * @param qTableRow the row of an QTableItem (cell)
+ * @return the index of that row in tableObj
  */
-void MainWindow::makeVEPrequest(VCFline& line)
+int MainWindow::getObjIndex(int qTableRow)
 {
-    // TODO check connectivity, prevent programm from crashing
-    // get annotations
-    QNetworkAccessManager *manager = new QNetworkAccessManager(this);
-    QString URL = "http://grch37.rest.ensembl.org/vep/homo_sapiens/hgvs/";
-    // hgvs notation: CHR :g. POS REF>ALT (no spaces)
-    QString endpoint = line.getChrNum() + ":g." + line.getPos() + line.getRef() + ">" + line.getAlt() + "?"; //"NG_0000" + .10
-    QString optionJson = "content-type=application/json";
-    QNetworkRequest *request = new QNetworkRequest(QUrl(URL + endpoint + optionJson));
-    // check connectivity
-    if (QNetworkAccessManager::NetworkAccessibility networkAccess = manager->networkAccessible())
-    {
-        // make request
-        manager->get(*request);
-        connect(manager, &QNetworkAccessManager::finished, this, [&](QNetworkReply *reply)
-        {
-            QByteArray data = reply->readAll();
-
-            //unwichtig
-            QString str = QString::fromLatin1(data);
-
-
-            QJsonDocument jsmin = QJsonDocument::fromJson(data);
-            QJsonArray jarray = jsmin.array();
-            QString key = "transcript_consequences";
-            QJsonObject jobject = jarray[0].toObject();
-            QJsonDocument secjson = QJsonDocument::fromJson(data);
-            QString strJson(secjson.toJson(QJsonDocument::Indented));
-            //qWarning() << strJson;
-            //qWarning() << "Jarray is :" << jobject.value(key).toString();
-
-
-            //unwichtig
-
-
-            QList<transcriptcons> toshow = parse_totranscrictionlist(jsmin);
-           // qWarning() << printtranscons(toshow);
-
-            // show annotations
-            line.setAnno(printtranscons(toshow));
-           // qDebug() << "makeVEPrequest: " + str;
-        });
-    } else {
-        QMessageBox::information(this, tr("no connection to network"),
-                                 tr("unable to connect to network, see internet settings."));
-    }
+    return ui->tableWidget->item(qTableRow, 0)->data(Qt::UserRole).toInt();
 }
+
 
 void MainWindow::on_actionVCF_file_triggered()
 {
@@ -148,6 +111,7 @@ void MainWindow::on_actionset_reference_genome_triggered()
     refGenPath = QFileDialog::getOpenFileName(this, "set reference genome", QDir::homePath(), tr("FastA files (*.fasta *.fa)"));
 }
 
+// TODO: check if this works
 void MainWindow::on_actionFastQ_file_triggered()
 {
     // check if pipelinePath is set
@@ -195,18 +159,10 @@ void MainWindow::on_actionFastQ_file_triggered()
     }
 }
 
-//TODO: what do we need this method for?
+//TODO: add some visualisation of loading process (bar or little circle thingys in each line...)
 void MainWindow::on_actionpull_annotations_triggered()
 {
-    QNetworkAccessManager *manager = new QNetworkAccessManager(this);
-    manager->get(QNetworkRequest(QUrl("http://grch37.rest.ensembl.org/lookup/symbol/homo_sapiens/BRCA2?")));
-    connect(manager, &QNetworkAccessManager::finished, this, [&](QNetworkReply *reply)
-    {
-        QByteArray data = reply->readAll();
-        QString str = QString::fromLatin1(data);
-        ui->annoWidget->setText(str);
-        ui->annoWidget->show();
-    });
+    annotationService->pullAnnotations(tableObj);
 }
 
 //TODO: what do we need this method for?
@@ -217,53 +173,30 @@ void MainWindow::on_actionpull_all_annotations_triggered()
         // TODO: pull annotation for lines
         ++i;
     }
-    std::string msg = "Number of lines: " + std::to_string(i);
+    std::string msg = "Number of lines: " + std::to_string(tableObj.getLines().size());
     QMessageBox::information(this, tr("Caution"), tr(&msg[0]));
 }
 
 
-void MainWindow::on_tableWidget_cellClicked(int row, int column)
+void MainWindow::on_tableWidget_cellClicked(int row, int)
 {
-    // method, when makeVEPrequest works
-    // TODO: find a different way to access clicked lineObj (sorting may mess up the order, so row is not equal to i in getLine(i) )
-
+    qDebug() << __FUNCTION__;
     VCFline &line = this->tableObj.getLine(row);
-    makeVEPrequest(line);
-    qDebug() << "cell_clicked: " << line.getAnno();
+    // enqueue job
+    annotationService->makeSingleRequest(row);
+
+    qDebug() << "cell_clicked: " << row;
     ui->annoWidget->setText(line.getAnno());
     ui->annoWidget->show();
-/*
-    // get annotations
-    QNetworkAccessManager *manager = new QNetworkAccessManager(this);
-    QString URL = "http://grch37.rest.ensembl.org/vep/homo_sapiens/hgvs/";
-    VCFline &line = this->tableObj.getLine(row);
-    // hgvs notation: NG_0000 CHR .10:g.POS REF>ALT (no spaces)
-    QString endpoint = line.getChrNum() + ":g." + line.getPos() + line.getRef() + ">" + line.getAlt() + "?"; //"NG_0000" + .10
-    QString headerParameter = "content-type=application/json";
-    QNetworkRequest *request = new QNetworkRequest(QUrl(URL + endpoint));
-    // check connectivity
-    if (QNetworkAccessManager::NetworkAccessibility networkAccess = manager->networkAccessible())
-    {
-        // make request
-        manager->get(*request);
-        connect(manager, &QNetworkAccessManager::finished, this, [&](QNetworkReply *reply)
-        {
-            QByteArray data = reply->readAll();
-            QString str = QString::fromLatin1(data);
-            // show annotations
-            line.setAnno(str);
-            ui->annoWidget->setText(line.getAnno());
-            ui->annoWidget->show();
-            qDebug() << "In Funktion: \n" + str;
-        });
-    } else {
-        QMessageBox::information(this, tr("no connection to network"),
-                                 tr("unable to connect to network, see internet settings."));
-    }
-*/
+
 }
 
 void MainWindow::on_actionhide_annotations_triggered()
 {
     ui->annoWidget->hide();
+}
+
+void MainWindow::pop_no_connection()
+{
+    QMessageBox::warning(this, tr("no connectioin"), tr("no connection, see internet settings"));
 }

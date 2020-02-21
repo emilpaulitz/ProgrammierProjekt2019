@@ -33,15 +33,6 @@ void VCFline::setChr(const QString &value)
 {
     dataFields[0] = value;
 }
-QString VCFline::getChrNum()
-{
-    QString num = this->getChr().remove(0,3);
-    if (num == "X" || num == "x") return "22";
-    if (num == "Y" || num == "y") return "23";
-    if (num.length() <= 2) return num;
-    // if not a valid chr1, chr2 ... notation
-    else return 0;
-}
 
 QString VCFline::getPos() const
 {
@@ -142,3 +133,33 @@ void VCFline::setIndex(const int value)
     index = value;
 }
 
+QString VCFline::getHgvsNotation()
+{
+    if (getAlt().length() == 1 && getRef().length() == 1)
+    {
+        // case SUBSTITUTION notation: CHR :g. POS REF>ALT (no spaces)
+        QString notation = getChrNum() + ":g." + getPos() + getRef() + ">" + getAlt() + "?";
+        return notation;
+    }
+    if (getAlt().length() > getRef().length())
+    {
+        //case INSERTION notation:
+        ///TODO
+    }
+    if (getAlt().length() < getRef().length())
+    {
+        // case DELETION notation:
+        ///TODO
+    }
+    return "";
+}
+
+QString VCFline::getChrNum()
+{
+    QString num = this->getChr().remove(0,3);
+    if (num == "X" || num == "x") return "22";
+    if (num == "Y" || num == "y") return "23";
+    if (num.length() <= 2) return num;
+    // if not a valid chr1, chr2 ... notation
+    else return nullptr;
+}

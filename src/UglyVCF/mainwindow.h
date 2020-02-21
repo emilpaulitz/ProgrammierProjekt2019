@@ -1,9 +1,11 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "annotationservice.h"
+#include "vcftable.h"
+
 #include <QMainWindow>
 #include <QtWidgets>
-#include "vcftable.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -13,12 +15,23 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+private:
+
+    void parseVCF(QString filename);
+
+    Ui::MainWindow *ui;
+
+    AnnotationService * annotationService;
+
+    VCFtable tableObj;
+
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    void makeVEPrequest(VCFline& line);
+    int getObjIndex(int qTableRow);
 
+    //TODO: maybe make these private?
     QString pipelinePath;
     QString refGenPath;
 
@@ -36,17 +49,14 @@ private slots:
 
     void on_actionpull_all_annotations_triggered();
 
-    void on_tableWidget_cellClicked(int row, int column);
+    void on_tableWidget_cellClicked(int row, int);
 
     void on_actionhide_annotations_triggered();
 
-private:
+    void pop_no_connection();
 
-    void parseVCF(QString filename);
 
-    Ui::MainWindow *ui;
 
-    VCFtable tableObj;
 
 };
 #endif // MAINWINDOW_H
