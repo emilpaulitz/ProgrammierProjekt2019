@@ -141,6 +141,13 @@ QString VCFline::getHgvsNotation()
         QString notation = getChrNum() + ":g." + getPos() + getRef() + ">" + getAlt() + "?";
         return notation;
     }
+    // INDEL notation covers Ins and Dels and yields the same results
+    if (getAlt().length() > 1 || getRef().length() > 1){
+        // case INDEL notation:
+        QString endPos = QString::number(getPos().toInt() + getRef().length() - 1);
+        QString notation = getChrNum() + ":g." + getPos() + "_" + endPos + "delins" + getAlt() + "?";
+        return notation;
+    }/*
     if (getAlt().length() > getRef().length())
     {
         //case INSERTION notation:
@@ -150,7 +157,7 @@ QString VCFline::getHgvsNotation()
     {
         // case DELETION notation:
         ///TODO
-    }
+    }*/
     return "";
 }
 

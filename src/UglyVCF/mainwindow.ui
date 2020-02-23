@@ -62,7 +62,7 @@
     <property name="title">
      <string>Analysis</string>
     </property>
-    <addaction name="actionpull_annotations"/>
+    <addaction name="actionSpace_for_Testing"/>
     <addaction name="actionpull_all_annotations"/>
     <addaction name="actionhide_annotations"/>
    </widget>
@@ -114,13 +114,13 @@
     <string>set reference genome</string>
    </property>
   </action>
-  <action name="actionpull_annotations">
+  <action name="actionSpace_for_Testing">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/icons/rsc/pull_annotation.ico</normaloff>:/icons/rsc/pull_annotation.ico</iconset>
+     <normaloff>:/icons/rsc/vcf_icon.png</normaloff>:/icons/rsc/vcf_icon.png</iconset>
    </property>
    <property name="text">
-    <string>pull annotations...</string>
+    <string>Space for Testing</string>
    </property>
   </action>
   <action name="actionpull_all_annotations">

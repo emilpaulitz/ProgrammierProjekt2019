@@ -159,22 +159,27 @@ void MainWindow::on_actionFastQ_file_triggered()
     }
 }
 
-//TODO: add some visualisation of loading process (bar or little circle thingys in each line...)
-void MainWindow::on_actionpull_annotations_triggered()
+// Irgendwo wo man temporäre automatische Tests implementieren kann
+void MainWindow::on_actionSpace_for_Testing_triggered()
 {
-    annotationService->pullAnnotations(tableObj);
-}
-
-//TODO: what do we need this method for?
-void MainWindow::on_actionpull_all_annotations_triggered()
-{
-    int i = 0;
+    // Gibt es Zeilen, in denen Alt und Ref mehrere Zeichen haben? -> nein
+    QString i = "";
     for (VCFline line : this->tableObj.getLines()) {
         // TODO: pull annotation for lines
-        ++i;
+        if (line.getAlt().length() > 1){
+            if (line.getRef().length() > 1) {
+                i = "Chr: " + line.getChrNum() + ", Pos: " + line.getPos();
+            }
+        }
     }
-    std::string msg = "Number of lines: " + std::to_string(tableObj.getLines().size());
+    std::string msg = i.toStdString();
     QMessageBox::information(this, tr("Caution"), tr(&msg[0]));
+}
+
+//TODO: add some visualisation of loading process (bar or little circle thingys in each line...)
+void MainWindow::on_actionpull_all_annotations_triggered()
+{
+    annotationService->pullAnnotations(tableObj);
 }
 
 
