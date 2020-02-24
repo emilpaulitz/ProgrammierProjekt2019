@@ -35,6 +35,7 @@ MainWindow::MainWindow(QWidget *parent)
     annotationService = new AnnotationService(&tableObj);
     connect(annotationService, SIGNAL(no_connection()),
             this, SLOT(pop_no_connection()));
+    connect(annotationService, &AnnotationService::annotation_set,this,&MainWindow::openAnnoWidget);
 }
 
 MainWindow::~MainWindow()
@@ -187,15 +188,28 @@ void MainWindow::on_actionpull_all_annotations_triggered()
 
 void MainWindow::on_tableWidget_cellClicked(int row, int)
 {
-    qDebug() << __FUNCTION__;
-    VCFline &line = this->tableObj.getLine(row);
-    // enqueue job
-    annotationService->makeSingleRequest(row);
-
     qDebug() << "cell_clicked: " << row;
-    ui->annoWidget->setText(line.getAnno());
-    ui->annoWidget->show();
+    this->cellClicked = row;
 
+    if(this->tableObj.getLine(row).getAnno().isEmpty()) {
+
+        // enqueue job
+        annotationService->makeSingleRequest(row);
+        ui->annoWidget->setText("Making a VEP Request, please stand by...");
+        ui->annoWidget->show();
+    } else {
+
+        // pull annotation from memory
+        // TODO pull this out of the database, it should not have to stay in temporary memory (right?)
+        ui->annoWidget->setText(this->tableObj.getLine(cellClicked).getAnno());
+        ui->annoWidget->show();
+    }
+}
+
+void MainWindow::openAnnoWidget(int index){
+    qDebug() << __FUNCTION__ << "on line " << index;
+    ui->annoWidget->setText(this->tableObj.getLine(cellClicked).getAnno());
+    ui->annoWidget->show();
 }
 
 void MainWindow::on_actionhide_annotations_triggered()

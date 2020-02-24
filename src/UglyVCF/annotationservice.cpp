@@ -31,7 +31,6 @@ AnnotationService::AnnotationService(VCFtable *table)
     connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(set_annotation(QNetworkReply*)));
 }
 
-//TODO: find a way that manager does not need to be initialized every time (e.g. makeVEPrequest(manager, &line)
 void AnnotationService::makeVEPrequest(QNetworkAccessManager &manager, VCFline &line)
 {
     qDebug() << __FUNCTION__;
@@ -52,7 +51,6 @@ void AnnotationService::makeVEPrequest(QNetworkAccessManager &manager, VCFline &
     }
 }
 
-
 /**
  * @brief AnnotationService::pullAnnotations get annotations for the whole table and write to VCFlines
  * @param table reference to the VCFtable Object
@@ -67,7 +65,7 @@ void AnnotationService::pullAnnotations(VCFtable &table)
     }
 
     // make requests
-    connect(this, SIGNAL(annotation_set()), this, SLOT(handle_queue()));
+    connect(this, &AnnotationService::annotation_set, this, &AnnotationService::handle_queue);
     handle_queue();
 }
 
@@ -82,14 +80,15 @@ void AnnotationService::makeSingleRequest(int row)
 // SLOTS
 void AnnotationService::set_annotation(QNetworkReply *reply)
 {
-    qDebug() << __FUNCTION__ << currentIndex;
+    int index = currentIndex;
+    qDebug() << __FUNCTION__ << index;
     QByteArray data = reply->readAll();
     QString str = QString::fromLatin1(data);
-    annoTableObj->getLine(currentIndex).setAnno(str);
+    annoTableObj->getLine(index).setAnno(str);
     reply->deleteLater();
 
     // trigger handle_queue()
-    emit annotation_set();
+    emit annotation_set(index);
 }
 
 /**

@@ -25,6 +25,8 @@ private:
 
     VCFtable tableObj;
 
+    int cellClicked;
+
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
@@ -54,5 +56,7 @@ private slots:
     void on_actionhide_annotations_triggered();
 
     void pop_no_connection();
+
+    void openAnnoWidget(int index);
 };
 #endif // MAINWINDOW_H

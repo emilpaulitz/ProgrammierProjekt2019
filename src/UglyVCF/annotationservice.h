@@ -44,7 +44,7 @@ public slots:
     void handle_queue();
 
 signals:
-    void annotation_set();
+    void annotation_set(int index);
     void no_connection();
 };
 
