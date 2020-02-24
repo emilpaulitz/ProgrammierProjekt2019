@@ -17,6 +17,7 @@ private :
     // Queue of line indices (for tableObj)
     QQueue<int> queue;
     VCFtable * annoTableObj;
+    QNetworkAccessManager * manager;
 
     int currentIndex;
 
@@ -25,7 +26,7 @@ public:
     AnnotationService(VCFtable* table);
 
     // methods
-    void makeVEPrequest(VCFline &line);
+    void makeVEPrequest(QNetworkAccessManager &manager, VCFline &line);
     void makeVEPrequest(QString notation);
     void pullAnnotations(VCFtable &table);
     ///void handleQueue();

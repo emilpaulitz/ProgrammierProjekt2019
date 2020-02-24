@@ -33,6 +33,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     ui->annoWidget->hide();
     annotationService = new AnnotationService(&tableObj);
+    connect(annotationService, SIGNAL(no_connection()),
+            this, SLOT(pop_no_connection()));
 }
 
 MainWindow::~MainWindow()

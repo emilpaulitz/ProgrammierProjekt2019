@@ -1,10 +1,11 @@
 #include "annotationservice.h"
-#include "transcriptcons.h"
+#include "Transcriptcons.h"
 
 #include <QObject>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <mainwindow.h>
 
 #include <QJsonObject>
 #include <QJsonDocument>
@@ -13,10 +14,6 @@
 
 #include <string>
 #include <QMessageBox>
-
-
-
-
 
 QQueue<int> AnnotationService::getQueue() const
 {
@@ -30,29 +27,29 @@ AnnotationService::AnnotationService()
 AnnotationService::AnnotationService(VCFtable *table)
 {
     annoTableObj = table;
+    manager = new QNetworkAccessManager();
+    connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(set_annotation(QNetworkReply*)));
 }
 
-//TODO: find a way that manager does not need to be initialized every time (z.B. makeVEPrequest(manager, &line)
-void AnnotationService::makeVEPrequest(VCFline &line)
+//TODO: find a way that manager does not need to be initialized every time (e.g. makeVEPrequest(manager, &line)
+void AnnotationService::makeVEPrequest(QNetworkAccessManager &manager, VCFline &line)
 {
     qDebug() << __FUNCTION__;
     // get annotations
-    QNetworkAccessManager *manager = new QNetworkAccessManager();
+    //QNetworkAccessManager *manager = new QNetworkAccessManager();
     QString URL = "http://grch37.rest.ensembl.org/vep/homo_sapiens/hgvs/";
     QString notation = line.getHgvsNotation();
     QString optionJson = "content-type=application/json";
     QNetworkRequest *request = new QNetworkRequest(QUrl(URL + notation + optionJson));
     // check connectivity
-    if (manager->networkAccessible())
+    if (manager.networkAccessible())
     {
-        connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(set_annotation(QNetworkReply*)));
-        // make request
-        manager->get(*request);
+        manager.get(*request);
     } else {
-        // TODO: pop warning: no internet
+
+        // emit signal to MainWindow to warn the user
         emit no_connection();
     }
-    ///manager->deleteLater();
 }
 
 
@@ -68,6 +65,7 @@ void AnnotationService::pullAnnotations(VCFtable &table)
         //TODO: check database, only add necessary lines
         queue.enqueue(index);
     }
+
     // make requests
     connect(this, SIGNAL(annotation_set()), this, SLOT(handle_queue()));
     handle_queue();
@@ -87,9 +85,10 @@ void AnnotationService::set_annotation(QNetworkReply *reply)
     qDebug() << __FUNCTION__ << currentIndex;
     QByteArray data = reply->readAll();
     QString str = QString::fromLatin1(data);
-    // get line
     annoTableObj->getLine(currentIndex).setAnno(str);
     reply->deleteLater();
+
+    // trigger handle_queue()
     emit annotation_set();
 }
 
@@ -101,6 +100,6 @@ void AnnotationService::handle_queue()
     if (!queue.isEmpty())
     {
         currentIndex = queue.dequeue();
-        makeVEPrequest(annoTableObj->getLine(currentIndex));
+        makeVEPrequest(*this->manager, annoTableObj->getLine(currentIndex));
     }
 }

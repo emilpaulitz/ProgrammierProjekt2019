@@ -54,9 +54,5 @@ private slots:
     void on_actionhide_annotations_triggered();
 
     void pop_no_connection();
-
-
-
-
 };
 #endif // MAINWINDOW_H
