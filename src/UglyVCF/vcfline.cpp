@@ -147,26 +147,18 @@ QString VCFline::getHgvsNotation()
         QString endPos = QString::number(getPos().toInt() + getRef().length() - 1);
         QString notation = getChrNum() + ":g." + getPos() + "_" + endPos + "delins" + getAlt() + "?";
         return notation;
-    }/*
-    if (getAlt().length() > getRef().length())
-    {
-        //case INSERTION notation:
-        ///TODO
     }
-    if (getAlt().length() < getRef().length())
-    {
-        // case DELETION notation:
-        ///TODO
-    }*/
     return "";
 }
 
 QString VCFline::getChrNum()
 {
-    QString num = this->getChr().remove(0,3);
-    if (num == "X" || num == "x") return "22";
-    if (num == "Y" || num == "y") return "23";
-    if (num.length() <= 2) return num;
-    // if not a valid chr1, chr2 ... notation
-    else return nullptr;
+    if (this->getChr().left(3) == "chr"){
+        QString num = this->getChr().remove(0,3);
+        if (num == "X" || num == "x") return "22";
+        if (num == "Y" || num == "y") return "23";
+        if (num.length() <= 2) return num;
+    }
+    // not a valid chr1, chr2 ... notation
+    return getChr();
 }

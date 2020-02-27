@@ -31,6 +31,16 @@ AnnotationService::AnnotationService(VCFtable *table)
     connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(set_annotation(QNetworkReply*)));
 }
 
+// To be called when the job to pull every annotation has been enqueued
+void AnnotationService::setPullingAllAnnosTrue(){
+    this->pullingAllAnnos = true;
+}
+
+// Returns true if the job to pull all annotations has been enqueued (maybe finished)
+bool AnnotationService::isPullingAllAnnos() const{
+    return this->pullingAllAnnos;
+}
+
 void AnnotationService::makeVEPrequest(QNetworkAccessManager &manager, VCFline &line)
 {
     qDebug() << __FUNCTION__;
@@ -52,7 +62,8 @@ void AnnotationService::makeVEPrequest(QNetworkAccessManager &manager, VCFline &
 }
 
 /**
- * @brief AnnotationService::pullAnnotations get annotations for the whole table and write to VCFlines
+ * @brief AnnotationService::pullAnnotations get annotations for the whole table and write to Anno field of
+ * VCFlines
  * @param table reference to the VCFtable Object
  */
 void AnnotationService::pullAnnotations(VCFtable &table)
@@ -63,6 +74,8 @@ void AnnotationService::pullAnnotations(VCFtable &table)
         //TODO: check database, only add necessary lines
         queue.enqueue(index);
     }
+
+    setPullingAllAnnosTrue();
 
     // make requests
     connect(this, &AnnotationService::annotation_set, this, &AnnotationService::handle_queue);
@@ -101,4 +114,8 @@ void AnnotationService::handle_queue()
         currentIndex = queue.dequeue();
         makeVEPrequest(*this->manager, annoTableObj->getLine(currentIndex));
     }
+}
+
+int AnnotationService::getQueueSize() const {
+    return this->getQueue().size();
 }

@@ -25,6 +25,7 @@ private:
 
     VCFtable tableObj;
 
+    // gives the row of the cell currently clicked on
     int cellClicked;
 
 public:
@@ -57,6 +58,10 @@ private slots:
 
     void pop_no_connection();
 
-    void openAnnoWidget(int index);
+    void openAnnoWidget();
+
+    void showAnnoProgress();
+
+    void updateAnnoProgress();
 };
 #endif // MAINWINDOW_H

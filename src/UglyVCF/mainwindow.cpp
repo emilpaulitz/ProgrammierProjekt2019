@@ -32,10 +32,12 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     ui->annoWidget->hide();
+    ui->progressPullingAll->hide();
     annotationService = new AnnotationService(&tableObj);
     connect(annotationService, SIGNAL(no_connection()),
             this, SLOT(pop_no_connection()));
     connect(annotationService, &AnnotationService::annotation_set,this,&MainWindow::openAnnoWidget);
+    connect(annotationService, &AnnotationService::annotation_set,this,&MainWindow::updateAnnoProgress);
 }
 
 MainWindow::~MainWindow()
@@ -183,6 +185,7 @@ void MainWindow::on_actionSpace_for_Testing_triggered()
 void MainWindow::on_actionpull_all_annotations_triggered()
 {
     annotationService->pullAnnotations(tableObj);
+    this->showAnnoProgress();
 }
 
 
@@ -191,33 +194,59 @@ void MainWindow::on_tableWidget_cellClicked(int row, int)
     qDebug() << "cell_clicked: " << row;
     this->cellClicked = row;
 
-    if(this->tableObj.getLine(row).getAnno().isEmpty()) {
-
-        // enqueue job
+    // TODO incorporate pulling database instead from temporary memory!
+    // Enqueue job unless every anno is being pulled anyway or annotation already known
+    if (!annotationService->isPullingAllAnnos() && this->tableObj.getLine(cellClicked).getAnno().isEmpty()) {
         annotationService->makeSingleRequest(row);
-        ui->annoWidget->setText("Making a VEP Request, please stand by...");
-        ui->annoWidget->show();
-    } else {
-
-        // pull annotation from memory
-        // TODO pull this out of the database, it should not have to stay in temporary memory (right?)
-        ui->annoWidget->setText(this->tableObj.getLine(cellClicked).getAnno());
-        ui->annoWidget->show();
     }
+
+    this->openAnnoWidget();
 }
 
-void MainWindow::openAnnoWidget(int index){
-    qDebug() << __FUNCTION__ << "on line " << index;
-    ui->annoWidget->setText(this->tableObj.getLine(cellClicked).getAnno());
+// Triggered by: AnnotationService::annotation_set
+// Shows either waiting text or annotation of cellClicked
+void MainWindow::openAnnoWidget(){
+    qDebug() << __FUNCTION__ << "on line " << cellClicked;
+
+    if (this->tableObj.getLine(cellClicked).getAnno().isEmpty()){
+
+        ui->annoWidget->setText("Making a VEP Request, please stand by...");
+    } else {
+
+        ui->annoWidget->setText(this->tableObj.getLine(cellClicked).getAnno());
+    }
+
     ui->annoWidget->show();
 }
 
+// Open Progress bar showing progress of pulling all annotations
+void MainWindow::showAnnoProgress() {
+    ui->progressPullingAll->setMinimum(0);
+    ui->progressPullingAll->setMaximum(this->tableObj.getNumLines());
+    this->updateAnnoProgress();
+    ui->progressPullingAll->show();
+}
+
+// Triggered by: AnnotationService::annotation_set
+// Updates progress bar or hides it if all annotations are pulled
+void MainWindow::updateAnnoProgress() {
+    if (this->annotationService->isPullingAllAnnos()) {
+        if (annotationService->getQueue().isEmpty()) {
+            ui->progressPullingAll->hide();
+        } else {
+        ui->progressPullingAll->setValue(this->tableObj.getNumLines() - annotationService->getQueueSize());
+        }
+    }
+}
+
+// Hides anotationwidget
 void MainWindow::on_actionhide_annotations_triggered()
 {
     ui->annoWidget->hide();
 }
 
+// Shows a warning that there is no internet connection
 void MainWindow::pop_no_connection()
 {
-    QMessageBox::warning(this, tr("no connectioin"), tr("no connection, see internet settings"));
+    QMessageBox::warning(this, tr("No Connectioin"), tr("No connection available, check your internet settings!"));
 }

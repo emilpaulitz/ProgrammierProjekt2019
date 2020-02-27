@@ -24,6 +24,7 @@ public:
     VCFline &getLine(int i);
     void addLine(VCFline &newline);
     void parse(std::string filename);
+    int getNumLines() const;
 };
 
 

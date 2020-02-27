@@ -41,6 +41,10 @@ void VCFtable::addLine(VCFline& newline)
     this->listOfLines.append(newline);
 }
 
+int VCFtable::getNumLines() const {
+    return this->listOfLines.size();
+}
+
 /* parse a vcf file to VCFtable and VCFline objects
  * @param filename of .vcf file
  */

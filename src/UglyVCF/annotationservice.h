@@ -20,6 +20,8 @@ private :
     QNetworkAccessManager * manager;
 
     int currentIndex;
+    bool pullingAllAnnos = false;
+    void setPullingAllAnnosTrue();
 
 public:
     AnnotationService();
@@ -38,6 +40,8 @@ public:
     AnnotationService(AnnotationService& rhs) = delete;
 
     QQueue<int> getQueue() const;
+    bool isPullingAllAnnos() const;
+    int getQueueSize() const;
 
 public slots:
     void set_annotation(QNetworkReply *reply);
