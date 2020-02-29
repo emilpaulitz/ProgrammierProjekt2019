@@ -133,6 +133,10 @@ void VCFline::setIndex(const int value)
     index = value;
 }
 
+/**
+ * @brief VCFline::getHgvsNotation returns HGVS Notation of the mutation in this VCFline
+ * @return HGVS Notation of the mutation in this VCFline
+ */
 QString VCFline::getHgvsNotation()
 {
     if (getAlt().length() == 1 && getRef().length() == 1)
@@ -151,6 +155,7 @@ QString VCFline::getHgvsNotation()
     return "";
 }
 
+// TODO: Improve error handling, e.g. show a warning
 QString VCFline::getChrNum()
 {
     if (this->getChr().left(3) == "chr"){

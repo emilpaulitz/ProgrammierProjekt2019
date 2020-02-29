@@ -28,10 +28,12 @@ AnnotationService::AnnotationService(VCFtable *table)
 {
     annoTableObj = table;
     manager = new QNetworkAccessManager();
-    connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(set_annotation(QNetworkReply*)));
+    connect(manager, &QNetworkAccessManager::finished, this, &AnnotationService::set_annotation);
+    connect(this, &AnnotationService::annotation_set, this, &AnnotationService::handle_queue);
 }
 
 // To be called when the job to pull every annotation has been enqueued
+// pullingAllAnnos should never be set to false -> enough reason to make this a new function?
 void AnnotationService::setPullingAllAnnosTrue(){
     this->pullingAllAnnos = true;
 }
@@ -41,6 +43,12 @@ bool AnnotationService::isPullingAllAnnos() const{
     return this->pullingAllAnnos;
 }
 
+//
+/**
+ * @brief AnnotationService::makeVEPrequest Builds correct URL and sends a request if connected with the internet
+ * @param manager referenece to QNetworkAccessManager of this AnnotationService object
+ * @param line reference to the VCFline to which the annotation should be pulled
+ */
 void AnnotationService::makeVEPrequest(QNetworkAccessManager &manager, VCFline &line)
 {
     qDebug() << __FUNCTION__;
@@ -77,12 +85,14 @@ void AnnotationService::pullAnnotations(VCFtable &table)
 
     setPullingAllAnnosTrue();
 
-    // make requests
-    connect(this, &AnnotationService::annotation_set, this, &AnnotationService::handle_queue);
+    // start queue
     handle_queue();
 }
 
-
+/**
+ * @brief AnnotationService::makeSingleRequest enqueues a single annotation pulling job
+ * @param row int specifying the row of the line to which the annoation should be pulled
+ */
 void AnnotationService::makeSingleRequest(int row)
 {
     qDebug() << __FUNCTION__;
@@ -91,9 +101,15 @@ void AnnotationService::makeSingleRequest(int row)
 }
 
 // SLOTS
+
+/**
+ * @brief AnnotationService::set_annotation recieved reply is set as annotation onto the line in
+ * this->currentIndex. TRIGGERED by: "finished"-signal from this->manager
+ * @param reply The QNetorkReply recieved from VEP service
+ */
 void AnnotationService::set_annotation(QNetworkReply *reply)
 {
-    int index = currentIndex;
+    int index = this->currentIndex;
     qDebug() << __FUNCTION__ << index;
     QByteArray data = reply->readAll();
     QString str = QString::fromLatin1(data);
@@ -106,13 +122,14 @@ void AnnotationService::set_annotation(QNetworkReply *reply)
 
 /**
  * @brief AnnotationService::handleQueue works through Queue, calls makeVEPrequest for every queue element
+ * TRIGGRED by: "annotation_set"-signal from this
  */
 void AnnotationService::handle_queue()
 {
     if (!queue.isEmpty())
     {
-        currentIndex = queue.dequeue();
-        makeVEPrequest(*this->manager, annoTableObj->getLine(currentIndex));
+        this->currentIndex = queue.dequeue();
+        makeVEPrequest(*this->manager, annoTableObj->getLine(this->currentIndex));
     }
 }
 

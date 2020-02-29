@@ -34,10 +34,10 @@ MainWindow::MainWindow(QWidget *parent)
     ui->annoWidget->hide();
     ui->progressPullingAll->hide();
     annotationService = new AnnotationService(&tableObj);
-    connect(annotationService, SIGNAL(no_connection()),
-            this, SLOT(pop_no_connection()));
-    connect(annotationService, &AnnotationService::annotation_set,this,&MainWindow::openAnnoWidget);
-    connect(annotationService, &AnnotationService::annotation_set,this,&MainWindow::updateAnnoProgress);
+    // connect signals from annotationservice with corresponding slots from this class
+    connect(annotationService, &AnnotationService::no_connection, this, &MainWindow::pop_no_connection);
+    connect(annotationService, &AnnotationService::annotation_set,this, &MainWindow::openAnnoWidget);
+    connect(annotationService, &AnnotationService::annotation_set,this, &MainWindow::updateAnnoProgress);
 }
 
 MainWindow::~MainWindow()
@@ -102,9 +102,9 @@ void MainWindow::on_actionVCF_file_triggered()
 
 void MainWindow::on_actionset_pipeline_triggered()
 {
-    // open path to pipeline.sh
+    // user sets path to pipeline.sh
     pipelinePath = QFileDialog::getOpenFileName(this, "set pipeline script", QDir::homePath(), tr("shell scripts (*sh)"));
-    // indicate, that pipelinePath is set -> change icon
+    // indicate that pipelinePath is set and change icon
     if (pipelinePath != "")
     {
         ui->actionset_pipeline->setIcon(QIcon(":/icons/rsc/pipelineSet2_icon.png"));
@@ -117,6 +117,9 @@ void MainWindow::on_actionset_reference_genome_triggered()
 }
 
 // TODO: check if this works
+/**
+ * @brief MainWindow::on_actionFastQ_file_triggered Read necessary inputs and execute the pipeline
+ */
 void MainWindow::on_actionFastQ_file_triggered()
 {
     // check if pipelinePath is set
@@ -143,58 +146,73 @@ void MainWindow::on_actionFastQ_file_triggered()
         else
         {
             // make process and formulate command
-            QMessageBox::information(this, tr("Caution"), tr("starting pipeline, this may take a while"));
+            QMessageBox::information(this, tr("Caution"), tr("Starting pipeline, this may take a while!"));
             QString command = pipelinePath + " " + read1 + " " + read2 + " " + refGenPath;
             int lastSlash = pipelinePath.lastIndexOf('/');
-            QString wdPipeline = pipelinePath;
-            wdPipeline.chop(wdPipeline.length() - lastSlash);
-            QProcess *process = new QProcess(this);
-            process->setWorkingDirectory(wdPipeline);
+            pipelineWD = pipelinePath.left(lastSlash);
+            this->process = new QProcess(this);
+            this->process->setWorkingDirectory(pipelineWD);
 
-            // start pipeline
-            QProcess::execute(command);
-            if (QProcess::ExitStatus()==EXIT_SUCCESS){
+            // connect to finshing handler to be independent from duration of pipeline
+            connect(this->process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+                    this, &MainWindow::handlePipelineFinished);
+            this->process->execute(command);
+
+            // So war es vorher, falls das oben nicht funktioniert:
+            // QProcess::execute(command);
+            /*if (QProcess::ExitStatus()==EXIT_SUCCESS){
                 //automatically open new vcf
                 parseVCF(wdPipeline + "/cache/final.vcf");
             }
             if(QProcess::ExitStatus()==EXIT_FAILURE){
                 QMessageBox::warning(this, tr("Error"), tr("pipeline could not be executed"));
-            }
+            }*/
         }
     }
 }
 
-// Irgendwo wo man temporäre automatische Tests implementieren kann
+/**
+ * @brief MainWindow::handlePipelineFinished depending on the outcome of the pipeline execution:
+ * opens the created VCF file or shows a warning. TRIGGERED by: this->process's "finished" signal
+ * @param status ExitStatus of the Process
+ */
+void MainWindow::handlePipelineFinished(int, QProcess::ExitStatus status){
+    // automatically open new vcf
+    if (status==EXIT_SUCCESS){
+        parseVCF(this->pipelineWD + "/cache/final.vcf");
+    } else if(status==EXIT_FAILURE){
+        QMessageBox::warning(this, tr("Error"), tr("Pipeline terminated with an error!"));
+    }
+}
+
+// TODO delete
+// Platz wo man automatische Tests implementieren kann
 void MainWindow::on_actionSpace_for_Testing_triggered()
 {
-    // Gibt es Zeilen, in denen Alt und Ref mehrere Zeichen haben? -> nein
-    QString i = "";
-    for (VCFline line : this->tableObj.getLines()) {
-        // TODO: pull annotation for lines
-        if (line.getAlt().length() > 1){
-            if (line.getRef().length() > 1) {
-                i = "Chr: " + line.getChrNum() + ", Pos: " + line.getPos();
-            }
-        }
-    }
+    QString i = "ABCDEFGHIJ";
+    i.chop(1);
     std::string msg = i.toStdString();
     QMessageBox::information(this, tr("Caution"), tr(&msg[0]));
 }
 
-//TODO: add some visualisation of loading process (bar or little circle thingys in each line...)
+
 void MainWindow::on_actionpull_all_annotations_triggered()
 {
     annotationService->pullAnnotations(tableObj);
     this->showAnnoProgress();
 }
 
-
+/**
+ * @brief MainWindow::on_tableWidget_cellClicked updates this->cellClicked, makes VEP request
+ * if appropriate and updates annotation widget
+ * @param row row the user clicked on
+ */
 void MainWindow::on_tableWidget_cellClicked(int row, int)
 {
     qDebug() << "cell_clicked: " << row;
     this->cellClicked = row;
 
-    // TODO incorporate pulling database instead from temporary memory!
+    // TODO incorporate pulling from database instead from temporary memory!
     // Enqueue job unless every anno is being pulled anyway or annotation already known
     if (!annotationService->isPullingAllAnnos() && this->tableObj.getLine(cellClicked).getAnno().isEmpty()) {
         annotationService->makeSingleRequest(row);
@@ -203,8 +221,10 @@ void MainWindow::on_tableWidget_cellClicked(int row, int)
     this->openAnnoWidget();
 }
 
-// Triggered by: AnnotationService::annotation_set
-// Shows either waiting text or annotation of cellClicked
+/**
+ * @brief MainWindow::openAnnoWidget Shows either waiting text or annotation of this->cellClicked
+ * TRIGGERED by: AnnotationService::annotation_set
+ */
 void MainWindow::openAnnoWidget(){
     qDebug() << __FUNCTION__ << "on line " << cellClicked;
 
@@ -219,7 +239,9 @@ void MainWindow::openAnnoWidget(){
     ui->annoWidget->show();
 }
 
-// Open Progress bar showing progress of pulling all annotations
+/**
+ * @brief MainWindow::showAnnoProgress Open a progress bar showing progress of pulling all annotations
+ */
 void MainWindow::showAnnoProgress() {
     ui->progressPullingAll->setMinimum(0);
     ui->progressPullingAll->setMaximum(this->tableObj.getNumLines());
@@ -227,8 +249,10 @@ void MainWindow::showAnnoProgress() {
     ui->progressPullingAll->show();
 }
 
-// Triggered by: AnnotationService::annotation_set
-// Updates progress bar or hides it if all annotations are pulled
+/**
+ * @brief MainWindow::updateAnnoProgress Updates progress bar or hides it if all annotations are pulled
+ * TRIGGERED by: AnnotationService::annotation_set
+ */
 void MainWindow::updateAnnoProgress() {
     if (this->annotationService->isPullingAllAnnos()) {
         if (annotationService->getQueue().isEmpty()) {

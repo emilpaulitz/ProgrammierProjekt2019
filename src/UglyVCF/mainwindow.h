@@ -25,6 +25,10 @@ private:
 
     VCFtable tableObj;
 
+    QProcess * process;
+
+    QString pipelineWD;
+
     // gives the row of the cell currently clicked on
     int cellClicked;
 
@@ -45,6 +49,8 @@ private slots:
     void on_actionset_pipeline_triggered();
 
     void on_actionFastQ_file_triggered();
+
+    void handlePipelineFinished(int, QProcess::ExitStatus status);
 
     void on_actionset_reference_genome_triggered();
 
