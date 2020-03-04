@@ -112,7 +112,14 @@ void AnnotationService::set_annotation(QNetworkReply *reply)
     int index = this->currentIndex;
     qDebug() << __FUNCTION__ << index;
     QByteArray data = reply->readAll();
-    QString str = QString::fromLatin1(data);
+
+    // parse into transcriptcon object
+    QJsonDocument jsondoc = QJsonDocument::fromJson(data);
+    QList<Transcriptcons> tlist = Transcriptcons::parse_totranscrictionlist(jsondoc);
+
+    // print into pretty string
+    QString str = Transcriptcons::printtranscons(tlist);
+
     annoTableObj->getLine(index).setAnno(str);
     reply->deleteLater();
 

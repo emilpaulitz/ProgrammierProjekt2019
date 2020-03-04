@@ -154,7 +154,7 @@ QString key = "transcript_consequences";
 QJsonArray transarray = jobject.value(key).toArray();
 int listlength = transarray.size();
 
-//fill the qlist with all aviable trans...cons objects
+//fill the qlist with all available trans...cons objects
 for(int i = 0; i < listlength; i++){
     QJsonObject ob = transarray[i].toObject();
     QJsonArray ja = ob.value("consequence_terms").toArray();

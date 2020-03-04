@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     MainWindow w;
     w.centralWidget();
-    w.showNormal();
+    w.showMaximized();
     w.setWindowIcon(QIcon(":/icons/rsc/uglyVCF_icon6.ico"));
     //w.resize(800,800);
     //w.showFullScreen();
