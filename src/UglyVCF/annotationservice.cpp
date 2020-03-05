@@ -53,7 +53,6 @@ void AnnotationService::makeVEPrequest(QNetworkAccessManager &manager, VCFline &
 {
     qDebug() << __FUNCTION__;
     // get annotations
-    //QNetworkAccessManager *manager = new QNetworkAccessManager();
     QString URL = "http://grch37.rest.ensembl.org/vep/homo_sapiens/hgvs/";
     QString notation = line.getHgvsNotation();
     QString optionJson = "content-type=application/json";
@@ -113,14 +112,11 @@ void AnnotationService::set_annotation(QNetworkReply *reply)
     qDebug() << __FUNCTION__ << index;
     QByteArray data = reply->readAll();
 
-    // parse into transcriptcon object
+    // parse into annotation object
     QJsonDocument jsondoc = QJsonDocument::fromJson(data);
-    QList<Transcriptcons> tlist = Transcriptcons::parse_totranscrictionlist(jsondoc);
+    Annotation* anno = new Annotation(jsondoc);
 
-    // print into pretty string
-    QString str = Transcriptcons::printtranscons(tlist);
-
-    annoTableObj->getLine(index).setAnno(str);
+    annoTableObj->getLine(index).setAnno(*anno);
     reply->deleteLater();
 
     // trigger handle_queue()

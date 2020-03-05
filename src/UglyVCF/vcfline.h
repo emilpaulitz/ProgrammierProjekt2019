@@ -3,12 +3,14 @@
 
 #include <QString>
 #include <QObject>
+#include <Annotation.h>
 
 class VCFline
 {
 private:
     QString dataFields[10];
-    QString header, chr, pos, id, ref, alt, qual, filter, info, format, sample, anno;
+    QString header, chr, pos, id, ref, alt, qual, filter, info, format, sample;
+    Annotation anno;
     int size = 10;
     int index;
 
@@ -42,8 +44,8 @@ public:
     QString getFormat() const;
     void setFormat(const QString &value);
 
-    QString getAnno() const;
-    void setAnno(const QString &value);
+    Annotation getAnno() const;
+    void setAnno(const Annotation &value);
     QString getSample() const;
     void setSample(const QString &value);
 

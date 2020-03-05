@@ -189,8 +189,7 @@ void MainWindow::handlePipelineFinished(int, QProcess::ExitStatus status){
 // Platz wo man automatische Tests implementieren kann
 void MainWindow::on_actionSpace_for_Testing_triggered()
 {
-    QString i = "ABCDEFGHIJ";
-    i.chop(1);
+    QString i = this->tableObj.getLine(cellClicked).getAnno().getId();
     std::string msg = i.toStdString();
     QMessageBox::information(this, tr("Caution"), tr(&msg[0]));
 }
@@ -221,6 +220,8 @@ void MainWindow::on_tableWidget_cellClicked(int row, int)
     this->openAnnoWidget();
 }
 
+// NOTE: dont open anno widget when its closed and you pull all annotations
+
 /**
  * @brief MainWindow::openAnnoWidget Shows either waiting text or annotation of this->cellClicked
  * TRIGGERED by: AnnotationService::annotation_set
@@ -233,7 +234,7 @@ void MainWindow::openAnnoWidget(){
         ui->annoWidget->setText("Making a VEP Request, please stand by...");
     } else {
 
-        ui->annoWidget->setText(this->tableObj.getLine(cellClicked).getAnno());
+        ui->annoWidget->setText(this->tableObj.getLine(cellClicked).getAnno().print_Annotation());
     }
 
     ui->annoWidget->show();

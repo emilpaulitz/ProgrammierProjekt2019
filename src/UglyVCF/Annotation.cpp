@@ -8,9 +8,6 @@
 #include <QJsonArray>
 #include <string>
 
-
-
-
 QString Annotation::getMost_severe_consequence() const
 {
     return most_severe_consequence;
@@ -54,7 +51,14 @@ void Annotation::setId(const QString &value)
 
 Annotation::Annotation()
 {
+}
 
+Annotation::Annotation(QJsonDocument &doc){
+    Annotation anno = pars_Annotation(doc);
+    this->frequencies = anno.getFrequencies();
+    this->transcriptcons = anno.getTranscriptcons();
+    this->id = anno.getId();
+    this->most_severe_consequence = anno.getMost_severe_consequence();
 }
 
 Annotation::Annotation(Frequencies frequencies, QList<Transcriptcons> transcriptcons, QString id, QString most_severe_consequence)
@@ -65,7 +69,7 @@ Annotation::Annotation(Frequencies frequencies, QList<Transcriptcons> transcript
     this->most_severe_consequence = most_severe_consequence;
 }
 
-QString pars_most_severe_consequence(QJsonDocument doc){
+QString pars_most_severe_consequence(QJsonDocument &doc){
     QString key = "most_severe_consequence";
     QJsonArray jarray = doc.array();
     QJsonObject jobject = jarray[0].toObject();
@@ -73,10 +77,9 @@ QString pars_most_severe_consequence(QJsonDocument doc){
     QString restring = jobject.value(key).toString();
 
     return restring;
-
 }
 
-QString pars_id(QJsonDocument doc){
+QString pars_id(QJsonDocument &doc){
 
     QString key = "id";
     QJsonArray jarray = doc.array();
@@ -87,7 +90,7 @@ QString pars_id(QJsonDocument doc){
     return restring;
 }
 
-Annotation Annotation::pars_Annotation(QJsonDocument doc){
+Annotation Annotation::pars_Annotation(QJsonDocument &doc){
 
     QString id = pars_id(doc);
     QString most_severe_consequence = pars_most_severe_consequence(doc);
@@ -98,18 +101,21 @@ Annotation Annotation::pars_Annotation(QJsonDocument doc){
     return reAnno;
 }
 
-QString Annotation::print_Annotation(Annotation anno){
-    QString printcons = Transcriptcons::printtranscons(anno.getTranscriptcons());
-    QString printfrequencies = Frequencies::print_frequencies(anno.getFrequencies());
-    QString id = anno.getId();
-    QString most_severe_consequence = anno.getMost_severe_consequence();
+bool Annotation::isEmpty(){
+    return this->id.isEmpty();
+}
 
-    QString restring = "ANONTATION RESULTS: \n"
+QString Annotation::print_Annotation(){
+    QString printcons = Transcriptcons::printtranscons(this->getTranscriptcons());
+    QString printfrequencies = Frequencies::print_frequencies(this->getFrequencies());
+    QString id = this->getId();
+    QString most_severe_consequence = this->getMost_severe_consequence();
+
+    QString restring = "ANNOTATION RESULTS: \n"
                        "ID: "+id+ " \n\n"+
                        "Most severe consecquences: "+most_severe_consequence+" \n\n"+
                        "Frequnecies: "+printfrequencies+" \n\n"+
                        "Transcription consequences: \n"+printcons;
-
 
     return restring;
 

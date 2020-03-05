@@ -115,11 +115,11 @@ void VCFline::setSample(const QString &value)
     dataFields[9] = value;
 }
 
-QString VCFline::getAnno() const
+Annotation VCFline::getAnno() const
 {
     return anno;
 }
-void VCFline::setAnno(const QString &value)
+void VCFline::setAnno(const Annotation &value)
 {
     anno = value;
 }

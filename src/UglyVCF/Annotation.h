@@ -18,8 +18,9 @@ public:
 
     Annotation();
 
-    Annotation(Frequencies frequencies,QList<Transcriptcons> transcriptcons,QString id,QString most_severe_consequence);
+    Annotation(QJsonDocument &doc);
 
+    Annotation(Frequencies frequencies,QList<Transcriptcons> transcriptcons,QString id,QString most_severe_consequence);
 
     QString getMost_severe_consequence() const;
     void setMost_severe_consequence(const QString &value);
@@ -33,9 +34,11 @@ public:
     QString getId() const;
     void setId(const QString &value);
 
-    static Annotation pars_Annotation(QJsonDocument doc);
+    static Annotation pars_Annotation(QJsonDocument &doc);
 
-    static QString print_Annotation(Annotation anno);
+    bool isEmpty();
+
+    QString print_Annotation();
 };
 
 #endif // ANNOTATION_H
