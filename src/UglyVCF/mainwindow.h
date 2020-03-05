@@ -64,7 +64,7 @@ private slots:
 
     void pop_no_connection();
 
-    void openAnnoWidget();
+    void updateAnnoWidget(int rowUpdated);
 
     void showAnnoProgress();
 

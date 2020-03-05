@@ -36,7 +36,7 @@ MainWindow::MainWindow(QWidget *parent)
     annotationService = new AnnotationService(&tableObj);
     // connect signals from annotationservice with corresponding slots from this class
     connect(annotationService, &AnnotationService::no_connection, this, &MainWindow::pop_no_connection);
-    connect(annotationService, &AnnotationService::annotation_set,this, &MainWindow::openAnnoWidget);
+    connect(annotationService, &AnnotationService::annotation_set,this, &MainWindow::updateAnnoWidget);
     connect(annotationService, &AnnotationService::annotation_set,this, &MainWindow::updateAnnoProgress);
 }
 
@@ -217,17 +217,21 @@ void MainWindow::on_tableWidget_cellClicked(int row, int)
         annotationService->makeSingleRequest(row);
     }
 
-    this->openAnnoWidget();
+    this->updateAnnoWidget(row);
+    ui->annoWidget->show();
 }
 
-// NOTE: dont open anno widget when its closed and you pull all annotations
-
 /**
- * @brief MainWindow::openAnnoWidget Shows either waiting text or annotation of this->cellClicked
+ * @brief MainWindow::updateAnnoWidget Shows either waiting text or annotation of this->cellClicked (!), the parameter specifies row of which the annotation got updated.
  * TRIGGERED by: AnnotationService::annotation_set
  */
-void MainWindow::openAnnoWidget(){
+void MainWindow::updateAnnoWidget(int rowUpdated){
     qDebug() << __FUNCTION__ << "on line " << cellClicked;
+
+    // Dont update if another cell than the one displayed was updated
+    if (rowUpdated != cellClicked){
+        return;
+    }
 
     if (this->tableObj.getLine(cellClicked).getAnno().isEmpty()){
 
@@ -236,8 +240,6 @@ void MainWindow::openAnnoWidget(){
 
         ui->annoWidget->setText(this->tableObj.getLine(cellClicked).getAnno().print_Annotation());
     }
-
-    ui->annoWidget->show();
 }
 
 /**
