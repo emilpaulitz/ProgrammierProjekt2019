@@ -113,8 +113,8 @@ QString Annotation::print_Annotation(){
 
     QString restring = "ANNOTATION RESULTS: \n"
                        "ID: "+id+ " \n\n"+
-                       "Most severe consecquences: "+most_severe_consequence+" \n\n"+
-                       "Frequnecies: "+printfrequencies+" \n\n"+
+                       "Most severe consequences: "+most_severe_consequence+" \n\n"+
+                       "Frequencies: "+printfrequencies+" \n\n"+
                        "Transcription consequences: \n"+printcons;
 
     return restring;

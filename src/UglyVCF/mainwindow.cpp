@@ -209,15 +209,16 @@ void MainWindow::on_actionpull_all_annotations_triggered()
 void MainWindow::on_tableWidget_cellClicked(int row, int)
 {
     qDebug() << "cell_clicked: " << row;
-    this->cellClicked = row;
+    int index = getObjIndex(row);
+    this->cellClicked = index;
 
     // TODO incorporate pulling from database instead from temporary memory!
     // Enqueue job unless every anno is being pulled anyway or annotation already known
     if (!annotationService->isPullingAllAnnos() && this->tableObj.getLine(cellClicked).getAnno().isEmpty()) {
-        annotationService->makeSingleRequest(row);
+        annotationService->makeSingleRequest(index);
     }
 
-    this->updateAnnoWidget(row);
+    this->updateAnnoWidget(index);
     ui->annoWidget->show();
 }
 

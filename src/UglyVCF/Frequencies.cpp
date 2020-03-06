@@ -46,15 +46,15 @@ Frequencies::Frequencies(double afr, double eas, double gnomad_eas, double gnoma
 
   //declare the array
   QJsonArray jarray = doc.array();
-  qWarning() << "is array empt<?: " << jarray.isEmpty();
+  qWarning() << "is array empty? " << jarray.isEmpty();
 
   //go into first (0) compartment of array,and create objet jobcet
   QJsonObject jobject = jarray[0].toObject();
-  qWarning() << "is jobject emoty" << jobject.isEmpty();
+  qWarning() << "is jobject empty? " << jobject.isEmpty();
 
   //take the array value of key colocated_variants of jobject
   QJsonArray jarrayco = jobject.value(key1).toArray();
-  qWarning() << "is jarrayco empty?" << jarray.isEmpty();
+  qWarning() << "is jarrayco empty? " << jarray.isEmpty();
 
   //go into first(0) compartment of array
   int index = 0;
