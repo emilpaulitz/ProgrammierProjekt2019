@@ -149,7 +149,7 @@ QString VCFline::getHgvsNotation()
     if (getAlt().length() > 1 || getRef().length() > 1){
         // case INDEL notation:
         QString endPos = QString::number(getPos().toInt() + getRef().length() - 1);
-        QString notation = getChrNum() + ":g." + getPos() + "_" + endPos + "delins" + getAlt() + "?";
+        QString notation = getChrNum() + ":g." + getPos() + "_" + endPos + getRef() + "delins" + getAlt() + "?";
         return notation;
     }
     return "";

@@ -38,6 +38,8 @@ public:
 
     int getObjIndex(int qTableRow);
 
+    int getWidgetRow(int ObjIndex); //TODO: implement
+
     //TODO: maybe make these private?
     QString pipelinePath;
     QString refGenPath;
@@ -69,5 +71,7 @@ private slots:
     void showAnnoProgress();
 
     void updateAnnoProgress();
+
+    void update_line(int index);
 };
 #endif // MAINWINDOW_H

@@ -38,6 +38,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(annotationService, &AnnotationService::no_connection, this, &MainWindow::pop_no_connection);
     connect(annotationService, &AnnotationService::annotation_set,this, &MainWindow::updateAnnoWidget);
     connect(annotationService, &AnnotationService::annotation_set,this, &MainWindow::updateAnnoProgress);
+    connect(annotationService, &AnnotationService::annotation_set, this, &MainWindow::update_line);
 }
 
 MainWindow::~MainWindow()
@@ -264,6 +265,18 @@ void MainWindow::updateAnnoProgress() {
         } else {
         ui->progressPullingAll->setValue(this->tableObj.getNumLines() - annotationService->getQueueSize());
         }
+    }
+}
+
+void MainWindow::update_line(int index)
+{
+    int row = index;
+    QColor color;
+
+    // color entire row
+    for (int col = 0; col < tableObj.getLine(index).getSize(); col++)
+    {
+        ui->tableWidget->item(row, col)->setBackground(QBrush(Qt::green, Qt::Dense5Pattern));
     }
 }
 
