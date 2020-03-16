@@ -38,7 +38,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(annotationService, &AnnotationService::no_connection, this, &MainWindow::pop_no_connection);
     connect(annotationService, &AnnotationService::annotation_set,this, &MainWindow::updateAnnoWidget);
     connect(annotationService, &AnnotationService::annotation_set,this, &MainWindow::updateAnnoProgress);
-    connect(annotationService, &AnnotationService::annotation_set, this, &MainWindow::update_line);
+    connect(annotationService, &AnnotationService::annotation_set, this, &MainWindow::update_row);
 }
 
 MainWindow::~MainWindow()
@@ -268,15 +268,49 @@ void MainWindow::updateAnnoProgress() {
     }
 }
 
-void MainWindow::update_line(int index)
+void MainWindow::update_row(int index)
 {
     int row = index;
+    QList<QString> severityOptions = {"HIGH", "MODIFIER", "MODERATE", "LOW"};
+    // determine most severe impact
+    Annotation & anno = tableObj.getLine(row).getAnno();
+    QString mostSevereImpact = "";
+    for (Transcriptcons transcript:anno.getTranscriptcons())
+    {
+        qDebug() << mostSevereImpact;
+        if (severityOptions.indexOf(transcript.getImpact()) < severityOptions.indexOf(mostSevereImpact)
+                || mostSevereImpact == "")
+        {
+            mostSevereImpact = transcript.getImpact();
+        }
+    }
+    // choose colour from most severe consequence
     QColor color;
-
+    if (mostSevereImpact == "HIGH")
+    {
+        color = Qt::red;
+    }
+    else if (mostSevereImpact == "MODERATE")
+    {
+        color = Qt::yellow;
+    }
+    else if (mostSevereImpact == "LOW")
+    {
+        color = Qt::green;
+    }
+    else if (mostSevereImpact == "MODIFIER")
+    {
+        color = Qt::cyan;
+    }
+    else
+    {
+        color = Qt::transparent;
+    }
+    qDebug() << color;
     // color entire row
     for (int col = 0; col < tableObj.getLine(index).getSize(); col++)
     {
-        ui->tableWidget->item(row, col)->setBackground(QBrush(Qt::green, Qt::Dense5Pattern));
+        ui->tableWidget->item(row, col)->setBackground(QBrush(color, Qt::Dense5Pattern));
     }
 }
 
@@ -291,3 +325,5 @@ void MainWindow::pop_no_connection()
 {
     QMessageBox::warning(this, tr("No Connectioin"), tr("No connection available, check your internet settings!"));
 }
+
+

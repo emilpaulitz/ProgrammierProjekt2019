@@ -119,6 +119,11 @@ Annotation VCFline::getAnno() const
 {
     return anno;
 }
+
+Annotation &VCFline::getAnno()
+{
+    return anno;
+}
 void VCFline::setAnno(const Annotation &value)
 {
     anno = value;

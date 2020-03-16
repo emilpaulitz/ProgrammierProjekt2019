@@ -72,6 +72,7 @@ private slots:
 
     void updateAnnoProgress();
 
-    void update_line(int index);
+    void update_row(int index);
+
 };
 #endif // MAINWINDOW_H

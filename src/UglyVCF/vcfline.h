@@ -45,6 +45,7 @@ public:
     void setFormat(const QString &value);
 
     Annotation getAnno() const;
+    Annotation & getAnno();
     void setAnno(const Annotation &value);
     QString getSample() const;
     void setSample(const QString &value);
