@@ -120,7 +120,6 @@ void AnnotationService::set_annotation(QNetworkReply *reply)
     annoTableObj->getLine(index).setAnno(*anno);
     reply->deleteLater();
 
-    qDebug() << "Test on line " + QString::fromStdString(std::to_string(index));
     // trigger handle_queue()
     emit annotation_set(index);
 }
