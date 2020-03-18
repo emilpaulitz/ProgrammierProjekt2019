@@ -263,11 +263,16 @@ void MainWindow::updateAnnoProgress() {
         if (annotationService->getQueue().isEmpty()) {
             ui->progressPullingAll->hide();
         } else {
-        ui->progressPullingAll->setValue(this->tableObj.getNumLines() - annotationService->getQueueSize());
+            ui->progressPullingAll->setValue(this->tableObj.getNumLines() - annotationService->getQueueSize());
         }
     }
 }
 
+/**
+ * @brief MainWindow::update_row Updates Color of the row based on severity type.
+ * TRIGGERED by: AnnotationService::annotation_set
+ * @param index row to be updated
+ */
 void MainWindow::update_row(int index)
 {
     int row = index;
@@ -301,8 +306,7 @@ void MainWindow::update_row(int index)
     else if (mostSevereImpact == "MODIFIER")
     {
         color = Qt::cyan;
-    }
-    else
+    } else
     {
         color = Qt::transparent;
     }

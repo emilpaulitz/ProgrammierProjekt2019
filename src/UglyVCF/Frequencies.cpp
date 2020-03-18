@@ -61,17 +61,18 @@ Frequencies::Frequencies(double afr, double eas, double gnomad_eas, double gnoma
   QJsonObject jobjectfre = jarrayco[index].toObject();
   bool freqex = false;
 
-  //go throu all colocated_variant array object till we find one with frequncies,set jobjectfre to this object
-  while(not freqex){
 
+  //go through all colocated_variant array object till we find one with frequncies,set jobjectfre to this object
+  while(not freqex){
+      qDebug() << "Test " + QString::fromStdString(std::to_string(index));
       QJsonObject freqob = jobjectfre.value(key2).toObject();
       if (freqob.isEmpty()){
+          // Grund des BUGs: Schleife terminiert nicht, index wird absurd hoch -> jarrayco.size() benutzen?
 
          //set to new array pos
          jobjectfre = jarrayco[index].toObject();
          index++;
-      }
-      else{
+      } else{
           freqex = true;
       }
   }

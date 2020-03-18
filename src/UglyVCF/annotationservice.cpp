@@ -57,6 +57,7 @@ void AnnotationService::makeVEPrequest(QNetworkAccessManager &manager, VCFline &
     QString notation = line.getHgvsNotation();
     QString optionJson = "content-type=application/json";
     QNetworkRequest *request = new QNetworkRequest(QUrl(URL + notation + optionJson));
+    qDebug() << "Making VEP Request to " + URL + notation + optionJson;
     // check connectivity
     if (manager.networkAccessible())
     {
@@ -119,6 +120,7 @@ void AnnotationService::set_annotation(QNetworkReply *reply)
     annoTableObj->getLine(index).setAnno(*anno);
     reply->deleteLater();
 
+    qDebug() << "Test on line " + QString::fromStdString(std::to_string(index));
     // trigger handle_queue()
     emit annotation_set(index);
 }
