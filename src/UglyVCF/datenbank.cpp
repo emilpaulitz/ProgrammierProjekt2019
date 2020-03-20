@@ -93,34 +93,13 @@ bool addRow(Annotation anno){
  */
 QString preparefreq(Frequencies freq,QString hgvs){
 
-    QString afr,eas,gnomad_eas,gnomad_nfe,gnomad_fin,sas,gnomad,amr,gnomad_sas,
-    aa,gnomad_afr,eur,ea,gnomad_asj,gnomad_amr,gnomad_oth,restring;
+    QString restring = "INSERT INTO frequencies VALUES('"+hgvs;
+    for (int i = 0; i < FilterDialog::LASTENUM; i++) {
+        FilterDialog::Region reg = (FilterDialog::Region) i;
+        restring += "','" + QString::number(freq.getFreq(reg));
+    }
 
-    //get all freq from class
-    char mode = 'f';
-    int presicion = 4;
-
-    afr = QString::number(freq.getAfr(),mode,presicion);
-    eas = QString::number(freq.getEas(),mode,presicion);
-    sas = QString::number(freq.getSas(),mode,presicion);
-    amr = QString::number(freq.getAa(),mode,presicion);
-    aa = QString::number(freq.getAa(),mode,presicion);
-    eur = QString::number(freq.getEur(),mode,presicion);
-    ea = QString::number(freq.getEa(),mode,presicion);
-    gnomad = QString::number(freq.getGnomad(),mode,presicion);
-    gnomad_afr = QString::number(freq.getGnomad_afr(),mode,presicion);
-    gnomad_eas = QString::number(freq.getGnomad_eas(),mode,presicion);
-    gnomad_nfe = QString::number(freq.getGnomad_nfe(),mode,presicion);
-    gnomad_fin = QString::number(freq.getGnomad_fin(),mode,presicion);
-    gnomad_asj = QString::number(freq.getGnomad_asj(),mode,presicion);
-    gnomad_amr = QString::number(freq.getGnomad_amr(),mode,presicion);
-    gnomad_oth = QString::number(freq.getGnomad_oth(),mode,presicion);
-    gnomad_sas = QString::number(freq.getGnomad_sas(),mode,presicion);
-
-    restring = "INSERT INTO frequencies VALUES('"+hgvs+"','"+afr+"','"+eas+"','"+gnomad_eas+"','"+gnomad_nfe+"','"+
-            gnomad_fin+"','"+sas+"','"+gnomad+"','"+amr+"','"+gnomad_sas+"','"+aa+"','"+gnomad_afr+"','"+eur+"','"+ea
-            +"','"+gnomad_asj+"','"+gnomad_amr+"','"+gnomad_oth+"')";
-    return restring;
+    return restring + "')";
 }
 
 

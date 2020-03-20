@@ -255,60 +255,7 @@ void MainWindow::on_actionFilter_by_Frequency_triggered() {
                 continue;
             }
 
-            // determine frequency of specified region
-            switch (region) {
-            case FilterDialog::aa:
-                actualFreq = line.getAnno().getFrequencies().getAa();
-                break;
-            case FilterDialog::ea:
-                actualFreq = line.getAnno().getFrequencies().getEa();
-                break;
-            case FilterDialog::afr:
-                actualFreq = line.getAnno().getFrequencies().getAfr();
-                break;
-            case FilterDialog::amr:
-                actualFreq = line.getAnno().getFrequencies().getAmr();
-                break;
-            case FilterDialog::eas:
-                actualFreq = line.getAnno().getFrequencies().getEas();
-                break;
-            case FilterDialog::eur:
-                actualFreq = line.getAnno().getFrequencies().getEur();
-                break;
-            case FilterDialog::sas:
-                actualFreq = line.getAnno().getFrequencies().getSas();
-                break;
-            case FilterDialog::gnomad:
-                actualFreq = line.getAnno().getFrequencies().getGnomad();
-                break;
-            case FilterDialog::gnomad_afr:
-                actualFreq = line.getAnno().getFrequencies().getGnomad_afr();
-                break;
-            case FilterDialog::gnomad_amr:
-                actualFreq = line.getAnno().getFrequencies().getGnomad_amr();
-                break;
-            case FilterDialog::gnomad_asj:
-                actualFreq = line.getAnno().getFrequencies().getGnomad_asj();
-                break;
-            case FilterDialog::gnomad_eas:
-                actualFreq = line.getAnno().getFrequencies().getGnomad_eas();
-                break;
-            case FilterDialog::gnomad_fin:
-                actualFreq = line.getAnno().getFrequencies().getGnomad_fin();
-                break;
-            case FilterDialog::gnomad_nfe:
-                actualFreq = line.getAnno().getFrequencies().getGnomad_nfe();
-                break;
-            case FilterDialog::gnomad_oth:
-                actualFreq = line.getAnno().getFrequencies().getGnomad_oth();
-                break;
-            case FilterDialog::gnomad_sas:
-                actualFreq = line.getAnno().getFrequencies().getGnomad_sas();
-                break;
-            default:
-                qDebug() << "Region in line " << line.getIndex() << "could not be found!";
-                break;
-            }
+            actualFreq = line.getAnno().getFrequencies().getFreq(region);
 
             // show or hide line depending on frequency
             if(actualFreq > maxFreq){

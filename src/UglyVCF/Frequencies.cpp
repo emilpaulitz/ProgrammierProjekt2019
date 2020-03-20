@@ -11,8 +11,7 @@
 #include <QThread>
 
 
-Frequencies::Frequencies()
-{
+Frequencies::Frequencies(){
 
 }
 
@@ -20,22 +19,22 @@ Frequencies::Frequencies(double afr, double eas, double gnomad_eas, double gnoma
                          double sas, double gnomad, double amr, double gnomad_sas, double aa, double gnomad_afr,
                          double eur, double ea, double gnomad_asj, double gnomad_amr, double gnomad_oth)
 {
-    this->afr = afr;
-    this->eas = eas;
-    this->sas = sas;
-    this->amr = amr;
-    this->aa = aa;
-    this->eur = eur;
-    this->ea = ea;
-    this->gnomad_eas = gnomad_eas;
-    this->gnomad_nfe = gnomad_nfe;
-    this->gnomad_fin = gnomad_fin;
-    this->gnomad_asj = gnomad_asj;
-    this->gnomad_amr = gnomad_amr;
-    this->gnomad_oth = gnomad_oth;
-    this->gnomad_sas = gnomad_sas;
-    this->gnomad_afr = gnomad_afr;
-    this->gnomad = gnomad;
+    this->FreqByRegions[FilterDialog::afr] = afr;
+    this->FreqByRegions[FilterDialog::eas] = eas;
+    this->FreqByRegions[FilterDialog::gnomad_eas] = gnomad_eas;
+    this->FreqByRegions[FilterDialog::gnomad_nfe] = gnomad_nfe;
+    this->FreqByRegions[FilterDialog::gnomad_fin] = gnomad_fin;
+    this->FreqByRegions[FilterDialog::sas] = sas;
+    this->FreqByRegions[FilterDialog::gnomad] = gnomad;
+    this->FreqByRegions[FilterDialog::amr] = amr;
+    this->FreqByRegions[FilterDialog::gnomad_sas] = gnomad_sas;
+    this->FreqByRegions[FilterDialog::aa] = aa;
+    this->FreqByRegions[FilterDialog::gnomad_afr] = gnomad_afr;
+    this->FreqByRegions[FilterDialog::eur] = eur;
+    this->FreqByRegions[FilterDialog::ea] = ea;
+    this->FreqByRegions[FilterDialog::gnomad_asj] = gnomad_asj;
+    this->FreqByRegions[FilterDialog::gnomad_amr] = gnomad_amr;
+    this->FreqByRegions[FilterDialog::gnomad_oth] = gnomad_oth;
 }
 
  Frequencies Frequencies::pars_frequencies(QJsonDocument doc){
@@ -102,7 +101,7 @@ Frequencies::Frequencies(double afr, double eas, double gnomad_eas, double gnoma
   double afr,eas,gnomad_eas,gnomad_nfe,gnomad_fin,sas,gnomad,amr,gnomad_sas,
   aa,gnomad_afr,eur,ea,gnomad_asj,gnomad_amr,gnomad_oth;
 
-  //retriev all the value sto the freq keys
+  //retrieve all the values to the freq keys
   afr = jAllele.value("afr").toDouble();
   eas = jAllele.value("eas").toDouble();
   sas = jAllele.value("sas").toDouble();
@@ -127,203 +126,28 @@ Frequencies::Frequencies(double afr, double eas, double gnomad_eas, double gnoma
   return freq;
 }
 
-//retrieves a freq object and returns as string containing the freq
+//returns a String containing all the regions and their frequency
  QString Frequencies::print_frequencies(Frequencies freq){
 
-    QString afr,eas,gnomad_eas,gnomad_nfe,gnomad_fin,sas,gnomad,amr,gnomad_sas,
-    aa,gnomad_afr,eur,ea,gnomad_asj,gnomad_amr,gnomad_oth,restring;
+    QString restring;
 
-    //get all freq from class
-    char mode = 'f';
-    int presicion = 4;
+    for (int i = 0; i < FilterDialog::LASTENUM; i++) {
 
-    afr = QString::number(freq.getAfr(),mode,presicion);
-    eas = QString::number(freq.getEas(),mode,presicion);
-    sas = QString::number(freq.getSas(),mode,presicion);
-    amr = QString::number(freq.getAa(),mode,presicion);
-    aa = QString::number(freq.getAa(),mode,presicion);
-    eur = QString::number(freq.getEur(),mode,presicion);
-    ea = QString::number(freq.getEa(),mode,presicion);
-    gnomad = QString::number(freq.getGnomad(),mode,presicion);
-    gnomad_afr = QString::number(freq.getGnomad_afr(),mode,presicion);
-    gnomad_eas = QString::number(freq.getGnomad_eas(),mode,presicion);
-    gnomad_nfe = QString::number(freq.getGnomad_nfe(),mode,presicion);
-    gnomad_fin = QString::number(freq.getGnomad_fin(),mode,presicion);
-    gnomad_asj = QString::number(freq.getGnomad_asj(),mode,presicion);
-    gnomad_amr = QString::number(freq.getGnomad_amr(),mode,presicion);
-    gnomad_oth = QString::number(freq.getGnomad_oth(),mode,presicion);
-    gnomad_sas = QString::number(freq.getGnomad_sas(),mode,presicion);
+        FilterDialog::Region reg = (FilterDialog::Region) i;
+        restring += FilterDialog::regionToString(reg) + ": " + QString::number(freq.getFreq(reg));
 
-    //craete return string
-    restring = restring+"AFR:"+afr+",EAS: "+eas+",SAS: "+sas+",AMR: "+amr+",AA: "+aa+",EUR:"+eur+",EA: "+ea
-            +",GNOMAD: "+gnomad+",GNOMAD_AFR: ,"+gnomad_afr+"GNOMAD_EAS: "+gnomad_eas
-            +",GNOMAD_NFE: "+gnomad_nfe+",GNOMAD_FIN: "+gnomad_fin+",GNOOMAD_ASJ: "+gnomad_asj
-            +",GNOMAD_AMR: "+gnomad_amr+",GNOMAD_OTH: "+gnomad_oth+",GNOMAD_SAS: "+gnomad_sas;
-
-
+        // Add comma if not the last entry
+        if (i + 1 != FilterDialog::LASTENUM) {
+            restring += ", ";
+        }
+    }
     return restring;
 }
 
-
-double Frequencies::getAfr() const
-{
-    return afr;
+double Frequencies::getFreq(FilterDialog::Region region){
+    return this->FreqByRegions[(int) region];
 }
 
-void Frequencies::setAfr(double value)
-{
-    afr = value;
+void Frequencies::setFreq(FilterDialog::Region region, double value){
+    this->FreqByRegions[(int) region] = value;
 }
-
-double Frequencies::getEas() const
-{
-    return eas;
-}
-
-void Frequencies::setEas(double value)
-{
-    eas = value;
-}
-
-double Frequencies::getGnomad_eas() const
-{
-    return gnomad_eas;
-}
-
-void Frequencies::setGnomad_eas(double value)
-{
-    gnomad_eas = value;
-}
-
-double Frequencies::getGnomad_nfe() const
-{
-    return gnomad_nfe;
-}
-
-void Frequencies::setGnomad_nfe(double value)
-{
-    gnomad_nfe = value;
-}
-
-double Frequencies::getGnomad_fin() const
-{
-    return gnomad_fin;
-}
-
-void Frequencies::setGnomad_fin(double value)
-{
-    gnomad_fin = value;
-}
-
-double Frequencies::getSas() const
-{
-    return sas;
-}
-
-void Frequencies::setSas(double value)
-{
-    sas = value;
-}
-
-double Frequencies::getGnomad() const
-{
-    return gnomad;
-}
-
-void Frequencies::setGnomad(double value)
-{
-    gnomad = value;
-}
-
-double Frequencies::getAmr() const
-{
-    return amr;
-}
-
-void Frequencies::setAmr(double value)
-{
-    amr = value;
-}
-
-double Frequencies::getGnomad_sas() const
-{
-    return gnomad_sas;
-}
-
-void Frequencies::setGnomad_sas(double value)
-{
-    gnomad_sas = value;
-}
-
-double Frequencies::getAa() const
-{
-    return aa;
-}
-
-void Frequencies::setAa(double value)
-{
-    aa = value;
-}
-
-double Frequencies::getGnomad_afr() const
-{
-    return gnomad_afr;
-}
-
-void Frequencies::setGnomad_afr(double value)
-{
-    gnomad_afr = value;
-}
-
-double Frequencies::getEur() const
-{
-    return eur;
-}
-
-void Frequencies::setEur(double value)
-{
-    eur = value;
-}
-
-double Frequencies::getEa() const
-{
-    return ea;
-}
-
-void Frequencies::setEa(double value)
-{
-    ea = value;
-}
-
-double Frequencies::getGnomad_asj() const
-{
-    return gnomad_asj;
-}
-
-void Frequencies::setGnomad_asj(double value)
-{
-    gnomad_asj = value;
-}
-
-double Frequencies::getGnomad_amr() const
-{
-    return gnomad_amr;
-}
-
-void Frequencies::setGnomad_amr(double value)
-{
-    gnomad_amr = value;
-}
-
-double Frequencies::getGnomad_oth() const
-{
-    return gnomad_oth;
-}
-
-void Frequencies::setGnomad_oth(double value)
-{
-    gnomad_oth = value;
-}
-
-
-

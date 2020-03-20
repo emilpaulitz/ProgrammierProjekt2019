@@ -1,6 +1,7 @@
 #ifndef FREQUENCIES_H
 #define FREQUENCIES_H
 #include <QJsonDocument>
+#include "filterdialog.h"
 
 
 
@@ -9,8 +10,10 @@ class Frequencies
 {
 
 private:
-double afr,eas,gnomad_eas,gnomad_nfe,gnomad_fin,sas,gnomad,amr,gnomad_sas,
-aa,gnomad_afr,eur,ea,gnomad_asj,gnomad_amr,gnomad_oth;
+double FreqByRegions[(int) FilterDialog::LASTENUM];
+
+// afr,eas,gnomad_eas,gnomad_nfe,gnomad_fin,sas,gnomad,amr,gnomad_sas,
+//aa,gnomad_afr,eur,ea,gnomad_asj,gnomad_amr,gnomad_oth;
 
 public:
     Frequencies();
@@ -19,9 +22,10 @@ public:
                 double amr, double gnomad_sas, double aa, double gnomad_afr, double eur, double ea, double gnomad_asj,
                 double gnomad_amr, double gnomad_oth);
 
+    double getFreq(FilterDialog::Region region);
+    void setFreq(FilterDialog::Region region, double value);
 
-
-
+/*
 
     double getAfr() const;
     void setAfr(double value);
@@ -69,7 +73,7 @@ public:
     void setGnomad_amr(double value);
 
     double getGnomad_oth() const;
-    void setGnomad_oth(double value);
+    void setGnomad_oth(double value);*/
 
    static Frequencies pars_frequencies(QJsonDocument doc);
 
