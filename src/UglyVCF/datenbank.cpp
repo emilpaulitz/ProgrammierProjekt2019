@@ -1,4 +1,5 @@
 #include "datenbank.h"
+#include "Annotation.h"
 #include <QCoreApplication>
 #include <QSqlDatabase>
 #include <QtSql>
@@ -13,8 +14,10 @@ databank::databank()
 {
 
 }
-// connects to the psql database
-static void connect(){
+/**
+ * @brief connect, connects to the local host database "varianten" with usr "variantusr"
+ */
+void connect(){
 
 QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL");
 db.setHostName("localhost");
@@ -26,24 +29,201 @@ db.open();
 qDebug() << "Testing if open: " << db.open();
 }
 
-//addrow adds a row with given parameters to a table
-static void addrow(QSqlQuery query, QString table, QString chrom, QString pos, QString id,
-                   QString ref, QString alt,QString anno){
 
+/**
+ * @brief createTable, creats three tables in the connected databank, annotation,frequencies and transcriptcons.
+ * Key in annotation is hgvs, is foreign key in frequencies und trancriptcons
+ * @return void
+ */
+static void createTable()
+{
+   QSqlQuery query;
 
-    QString querys = "INSERT INTO "+table+" VALUES ('"+chrom+"',"+pos+",'"+id+"','"+ref+"','"+alt+"',"+anno+")";
-    //creates a string to be used as an query request
-    qDebug() << "Your query: " << querys;
-    query.prepare(querys);
-    if (query.exec(querys)){ //run query and check if successfull if yes coinfirm to user
-        qDebug() << "input succsesfull";
-    }
-    else {
-        qDebug() << query.lastError();
-    }
+   QString query1 = "CREATE TABLE annotation (hgvs text,most_severe_consequence text)";
+
+   QString query2 = "CREATE TABLE frequencies (hgvs text,afr real,eas real,gnomad_eas real,gnomad_nfe real,"
+                    "gnomad_fin real,sas real,gnomad real,amr real,gnomad_sas real,"
+                    "aa real ,gnomad_afr real,eur real,ea real,gnomad_asj real,gnomad_amr real ,gnomad_oth real)";
+
+   QString query3 = "CREATE TABLE transcripscons (hgvs text,transcript_id text,impact text,variant_allele text,"
+                    "gene_symbole text,gene_symbol_source text,gene_id text,"
+                    "hgnc_id text,strand text,biotype text,distance text)";
+   query.prepare(query1);
+   query.exec(query1);
+   query.prepare(query2);
+   query.exec(query2);
+   query.prepare(query3);
+   query.exec(query3);
+}
+/**
+ * @brief addRow,adds a new anotation to the databse from a given Annotation object
+ * @param Annotation object
+ * @return true if insertion successful, false if not
+ */
+bool addRow(Annotation anno){
+
+    QSqlQuery query;
+    QString mostsevercons = anno.getMost_severe_consequence();
+    QString hgvs = anno.getId();
+    Frequencies freq = anno.getFrequencies();
+    QList<Transcriptcons> transcons = anno.getTranscriptcons();
+
+    //prepares query and adds a row to annotation table
+    QString toquery = "INSERT INTO annotation VALUES('"+hgvs+"','"+mostsevercons+"')";
+    query.exec(toquery);
+    qDebug() << query.lastError();
+
+    //prepares query and adds a row to the frequencies tabel with hgvs a forein key
+    QString frequery = preparefreq(freq,hgvs);
+    query.exec(frequery);
+    qDebug() << query.lastError();
+
+    //prepares and a
+    QString consquery = preparetranscons(transcons,hgvs);
+    query.exec(consquery);
+    qDebug() << query.lastError();
 
 }
 
+/**
+ * @brief preparefreq, creates a QString to be used in Addrow
+ * @param Frequencies object freq,
+ * @param QString hgvs as forein key
+ * @return Qstring
+ */
+QString preparefreq(Frequencies freq,QString hgvs){
+
+    QString afr,eas,gnomad_eas,gnomad_nfe,gnomad_fin,sas,gnomad,amr,gnomad_sas,
+    aa,gnomad_afr,eur,ea,gnomad_asj,gnomad_amr,gnomad_oth,restring;
+
+    //get all freq from class
+    char mode = 'f';
+    int presicion = 4;
+
+    afr = QString::number(freq.getAfr(),mode,presicion);
+    eas = QString::number(freq.getEas(),mode,presicion);
+    sas = QString::number(freq.getSas(),mode,presicion);
+    amr = QString::number(freq.getAa(),mode,presicion);
+    aa = QString::number(freq.getAa(),mode,presicion);
+    eur = QString::number(freq.getEur(),mode,presicion);
+    ea = QString::number(freq.getEa(),mode,presicion);
+    gnomad = QString::number(freq.getGnomad(),mode,presicion);
+    gnomad_afr = QString::number(freq.getGnomad_afr(),mode,presicion);
+    gnomad_eas = QString::number(freq.getGnomad_eas(),mode,presicion);
+    gnomad_nfe = QString::number(freq.getGnomad_nfe(),mode,presicion);
+    gnomad_fin = QString::number(freq.getGnomad_fin(),mode,presicion);
+    gnomad_asj = QString::number(freq.getGnomad_asj(),mode,presicion);
+    gnomad_amr = QString::number(freq.getGnomad_amr(),mode,presicion);
+    gnomad_oth = QString::number(freq.getGnomad_oth(),mode,presicion);
+    gnomad_sas = QString::number(freq.getGnomad_sas(),mode,presicion);
+
+    restring = "INSERT INTO frequencies VALUES('"+hgvs+"','"+afr+"','"+eas+"','"+gnomad_eas+"','"+gnomad_nfe+"','"+
+            gnomad_fin+"','"+sas+"','"+gnomad+"','"+amr+"','"+gnomad_sas+"','"+aa+"','"+gnomad_afr+"','"+eur+"','"+ea
+            +"','"+gnomad_asj+"','"+gnomad_amr+"','"+gnomad_oth+"')";
+    return restring;
+}
+
+
+/**
+ * @brief preparetranscons, creates a Qstring of all transcrip cons to be used in Addrow
+ * @param transcons, QList<Transcriptcons> object
+ * @param hgvs QString
+ * @return a QString with all transcript consequnces to be loaded into database
+ */
+QString preparetranscons(QList<Transcriptcons> transcons,QString hgvs){
+
+    QString transcript_id,impact, variant_allele,
+            gene_symbole,gene_symbol_source,gene_id,
+            hgnc_id,strand,biotype,distance;
+
+    //First row of values,rows of values are appended later;
+    QString restring = "INSERT INTO transcripscons VALUES";
+
+    //iterate over list and create a new row of values, add to restring
+    for(int i = 0; i < transcons.size(); i++){
+        Transcriptcons singlecons = transcons[i];
+
+        //pull all values from current Transcriptcons object
+        transcript_id = singlecons.getTranscript_id();
+        impact = singlecons.getImpact();
+        variant_allele = singlecons.getVariant_allele();
+        gene_symbole = singlecons.getGene_symbole();
+        gene_symbol_source = singlecons.getGene_symbol_source();
+        gene_id = singlecons.getGene_id();
+        hgnc_id = singlecons.getHgnc_id();
+        strand = singlecons.getStrand();
+        biotype = singlecons.getBiotype();
+        distance = singlecons.getDistance();
+
+        restring = restring+"('"+hgvs+"','"+transcript_id+"','"+impact+"','"+variant_allele+"','"+
+                   gene_symbole+"','"+gene_symbol_source+"','"+gene_id+"','"+hgnc_id+"','"+
+                   strand+"','"+biotype+"','"+distance+"')";
+        //if not the last object add a , to end of line
+        if(i+1 < transcons.size()){
+            restring = restring+",";
+        }
+    }
+    return restring;
+
+}
+
+
+/**
+ * @brief searchDatabank, searches the databank for an entry with the given hgvs string
+ * @param hgvs QString,
+ * @return bool, is in databank -> true, else false
+ */
+static bool searchDatabank(QString hgvs){
+
+    QSqlQuery query;
+    QString query1 = "SELECT t.hgvs FROM annotation AS t WHERE t.hgvs = '"+hgvs+"'";
+    query.prepare(query1);
+    query.exec(query1);
+    query.next();
+    QString chrom =  query.value(0).toString();
+    if(not chrom.isNull())
+        return true;
+    else{
+        return false;
+    }
+
+}
+/**
+ * @brief retriveAnno
+ * @param hgvs
+ * @return
+ */
+Annotation retriveAnno(QString hgvs){
+
+    QSqlQuery query;
+    QString retrive = "SELECT t.most_severe_consequence FROM annotation AS t WHERE t.hgvs ='"+hgvs;
+
+    query.exec(retrive);
+    query.next();
+
+    QString most_severe_consequence = query.value(0).toString();
+
+    retrive = "SELECT t.afr,t.eas,t.gnomad_eas,t.gnomad_nfe,t.gnomad_fint,t.sas,t.gnomad,t.amr,t.gnomad_sas,"
+              "t.aa,t.gnomad_afr,t.eur,t.ea,t.gnomad_asj,t.gnomad_amr,t.gnomad_oth,t.restring"
+              "FROM frequencies AS t WHERE t.hgvs ='"+hgvs+"')";
+
+    query.exec(retrive);
+    query.next();
+
+    double afr,eas,gnomad_eas,gnomad_nfe,gnomad_fin,sas,gnomad,amr,gnomad_sas,
+    aa,gnomad_afr,eur,ea,gnomad_asj,gnomad_amr,gnomad_oth,restring;
+
+    afr = query.value(0).toDouble();
+    eas = query.value(1).toDouble();
+    gnomad_eas = query.value(2).toDouble();
+    gnomad_nfe = query.value(3).toDouble();
+    gnomad_fin = query.value(4).toDouble();
+
+
+}
+
+
+/*
 //overloadet function with "varianten" as standart table
 static void addrow(QSqlQuery query,QString chrom,QString pos, QString id, QString ref, QString alt,QString anno){
     addrow(query,"varianten",chrom,pos,id,ref,alt,anno);
@@ -123,3 +303,4 @@ static QJsonObject getanno(QSqlQuery query,QString table,QString chrom, QString 
 
     }
 }
+**/
