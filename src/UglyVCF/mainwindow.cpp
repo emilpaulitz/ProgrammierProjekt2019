@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "filterdialog.h"
+#include "ui_filterdialog.h"
 #include "vcftable.h"
 #include "vcfline.h"
 #include "Transcriptcons.h"
@@ -190,7 +192,9 @@ void MainWindow::handlePipelineFinished(int, QProcess::ExitStatus status){
 // Platz wo man automatische Tests implementieren kann
 void MainWindow::on_actionSpace_for_Testing_triggered()
 {
-    QString i = this->tableObj.getLine(cellClicked).getAnno().getId();
+    std::string fdsa = "f sdaf ";
+    fdsa + "fdsa f" + "fdsafds ";
+    QString i = "fdsaf a";
     std::string msg = i.toStdString();
     QMessageBox::information(this, tr("Caution"), tr(&msg[0]));
 }
@@ -211,16 +215,117 @@ void MainWindow::on_tableWidget_cellClicked(int row, int)
 {
     qDebug() << "cell_clicked: " << row;
     int index = getObjIndex(row);
+    bool clickedAgain = cellClicked == index;
     this->cellClicked = index;
 
     // TODO incorporate pulling from database instead from temporary memory!
     // Enqueue job unless every anno is being pulled anyway or annotation already known
-    if (!annotationService->isPullingAllAnnos() && this->tableObj.getLine(cellClicked).getAnno().isEmpty()) {
+    if (!annotationService->isPullingAllAnnos() && (this->tableObj.getLine(cellClicked).getAnno().isEmpty() ||
+                                                    clickedAgain)) {
         annotationService->makeSingleRequest(index);
     }
 
     this->updateAnnoWidget(index);
     ui->annoWidget->show();
+}
+
+void MainWindow::on_actionFilter_by_Frequency_triggered() {
+
+    // check if an VCF file is opened
+    if (this->tableObj.getLines().isEmpty()){
+        QMessageBox::information(this, tr("Error"),
+                                 tr("Please open an VCF file and pull its annotations first!"));
+        return;
+    }
+
+    // Open filter dialog
+    FilterDialog * dia = new FilterDialog(this);
+    if (dia->exec()){
+        double maxFreq = dia->getFreq();
+        FilterDialog::Region region = dia->getRegion();
+
+        // Iterate through the lines to determine which to hide
+        bool missingFreq = false;
+        for (VCFline line : this->tableObj.getLines()){
+            double actualFreq = -1;
+
+            // continue if there is no annotation
+            if(line.getAnno().isEmpty()){
+                missingFreq = true;
+                continue;
+            }
+
+            // determine frequency of specified region
+            switch (region) {
+            case FilterDialog::aa:
+                actualFreq = line.getAnno().getFrequencies().getAa();
+                break;
+            case FilterDialog::ea:
+                actualFreq = line.getAnno().getFrequencies().getEa();
+                break;
+            case FilterDialog::afr:
+                actualFreq = line.getAnno().getFrequencies().getAfr();
+                break;
+            case FilterDialog::amr:
+                actualFreq = line.getAnno().getFrequencies().getAmr();
+                break;
+            case FilterDialog::eas:
+                actualFreq = line.getAnno().getFrequencies().getEas();
+                break;
+            case FilterDialog::eur:
+                actualFreq = line.getAnno().getFrequencies().getEur();
+                break;
+            case FilterDialog::sas:
+                actualFreq = line.getAnno().getFrequencies().getSas();
+                break;
+            case FilterDialog::gnomad:
+                actualFreq = line.getAnno().getFrequencies().getGnomad();
+                break;
+            case FilterDialog::gnomad_afr:
+                actualFreq = line.getAnno().getFrequencies().getGnomad_afr();
+                break;
+            case FilterDialog::gnomad_amr:
+                actualFreq = line.getAnno().getFrequencies().getGnomad_amr();
+                break;
+            case FilterDialog::gnomad_asj:
+                actualFreq = line.getAnno().getFrequencies().getGnomad_asj();
+                break;
+            case FilterDialog::gnomad_eas:
+                actualFreq = line.getAnno().getFrequencies().getGnomad_eas();
+                break;
+            case FilterDialog::gnomad_fin:
+                actualFreq = line.getAnno().getFrequencies().getGnomad_fin();
+                break;
+            case FilterDialog::gnomad_nfe:
+                actualFreq = line.getAnno().getFrequencies().getGnomad_nfe();
+                break;
+            case FilterDialog::gnomad_oth:
+                actualFreq = line.getAnno().getFrequencies().getGnomad_oth();
+                break;
+            case FilterDialog::gnomad_sas:
+                actualFreq = line.getAnno().getFrequencies().getGnomad_sas();
+                break;
+            default:
+                qDebug() << "Region in line " << line.getIndex() << "could not be found!";
+                break;
+            }
+
+            // show or hide line depending on frequency
+            if(actualFreq > maxFreq){
+                ui->tableWidget->hideRow(line.getIndex());
+            } else {
+                ui->tableWidget->showRow(line.getIndex());
+            }
+        }
+
+        // show a warning if not every line has an annotation
+        if (missingFreq){
+            QMessageBox::warning(this, tr("Missing Annotations"),
+                                 tr("Filtering complete. Please note that there has been "
+                                    "at least one line for which no annotation is given. "
+                                    "Those lines are still shown."));
+        }
+    }
 }
 
 /**
@@ -329,5 +434,3 @@ void MainWindow::pop_no_connection()
 {
     QMessageBox::warning(this, tr("No Connectioin"), tr("No connection available, check your internet settings!"));
 }
-
-

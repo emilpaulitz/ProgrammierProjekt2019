@@ -72,6 +72,8 @@
     <addaction name="actionSpace_for_Testing"/>
     <addaction name="actionpull_all_annotations"/>
     <addaction name="actionhide_annotations"/>
+    <addaction name="separator"/>
+    <addaction name="actionFilter_by_Frequency"/>
    </widget>
    <addaction name="menuOpen"/>
    <addaction name="menuSettings"/>
@@ -145,6 +147,11 @@
   <action name="actionhide_annotations">
    <property name="text">
     <string>hide annotations</string>
+   </property>
+  </action>
+  <action name="actionFilter_by_Frequency">
+   <property name="text">
+    <string>Filter by Frequency...</string>
    </property>
   </action>
  </widget>

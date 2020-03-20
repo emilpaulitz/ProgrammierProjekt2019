@@ -62,7 +62,7 @@ Frequencies::Frequencies(double afr, double eas, double gnomad_eas, double gnoma
   bool freqex = false;
 
 
-  //go through all colocated_variant array object till we find one with frequncies,set jobjectfre to this object
+  //go through all colocated_variant array object till we find one with frequencies,set jobjectfre to this object
   while(not freqex){
       qDebug() << "Test " + QString::fromStdString(std::to_string(index));
       QJsonObject freqob = jobjectfre.value(key2).toObject();

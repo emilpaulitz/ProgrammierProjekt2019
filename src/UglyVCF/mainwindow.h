@@ -3,6 +3,7 @@
 
 #include "annotationservice.h"
 #include "vcftable.h"
+#include "filter.h"
 
 #include <QMainWindow>
 #include <QtWidgets>
@@ -64,6 +65,8 @@ private slots:
 
     void on_actionhide_annotations_triggered();
 
+    void on_actionFilter_by_Frequency_triggered();
+
     void pop_no_connection();
 
     void updateAnnoWidget(int rowUpdated);
@@ -73,6 +76,5 @@ private slots:
     void updateAnnoProgress();
 
     void update_row(int index);
-
 };
 #endif // MAINWINDOW_H

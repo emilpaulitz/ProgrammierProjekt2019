@@ -22,6 +22,7 @@ SOURCES += \
     Transcriptcons.cpp \
     annotationservice.cpp \
     datenbank.cpp \
+    filterdialog.cpp \
     main.cpp \
     mainwindow.cpp \
     vcfline.cpp \
@@ -33,11 +34,13 @@ HEADERS += \
     Transcriptcons.h \
     annotationservice.h \
     datenbank.h \
+    filterdialog.h \
     mainwindow.h \
     vcfline.h \
     vcftable.h
 
 FORMS += \
+    filterdialog.ui \
     mainwindow.ui
 
 # Default rules for deployment.
