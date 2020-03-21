@@ -85,18 +85,6 @@ void MainWindow::parseVCF(QString filename)
     ui->tableWidget->show();
 }
 
-/**
- * @brief MainWindow::getObjIndex translates QTableWidget row to VCFtable index of VCFline visualised in certain row.
- * -> you can use tableObj.getLine(getObjIndex(qTableRow))
- * @param qTableRow the row of an QTableItem (cell)
- * @return the index of that row in tableObj
- */
-int MainWindow::getObjIndex(int qTableRow)
-{
-    return ui->tableWidget->item(qTableRow, 0)->data(Qt::UserRole).toInt();
-}
-
-
 void MainWindow::on_actionVCF_file_triggered()
 {
     QString fileName = QFileDialog::getOpenFileName(this, "Open Vcf file", QDir::homePath(), tr("VCF files (*.vcf)"));
@@ -119,7 +107,7 @@ void MainWindow::on_actionset_reference_genome_triggered()
     refGenPath = QFileDialog::getOpenFileName(this, "set reference genome", QDir::homePath(), tr("FastA files (*.fasta *.fa)"));
 }
 
-// TODO: check if this works
+// TODO: check if this works -> does not :(
 /**
  * @brief MainWindow::on_actionFastQ_file_triggered Read necessary inputs and execute the pipeline
  */
@@ -214,7 +202,7 @@ void MainWindow::on_actionpull_all_annotations_triggered()
 void MainWindow::on_tableWidget_cellClicked(int row, int)
 {
     qDebug() << "cell_clicked: " << row;
-    int index = getObjIndex(row);
+    int index = row;
     bool clickedAgain = cellClicked == index;
     this->cellClicked = index;
 
@@ -334,7 +322,6 @@ void MainWindow::update_row(int index)
     QString mostSevereImpact = "";
     for (Transcriptcons transcript:anno.getTranscriptcons())
     {
-        qDebug() << mostSevereImpact;
         if (severityOptions.indexOf(transcript.getImpact()) < severityOptions.indexOf(mostSevereImpact)
                 || mostSevereImpact == "")
         {
@@ -362,7 +349,6 @@ void MainWindow::update_row(int index)
     {
         color = Qt::transparent;
     }
-    qDebug() << color;
     // color entire row
     for (int col = 0; col < tableObj.getLine(index).getSize(); col++)
     {

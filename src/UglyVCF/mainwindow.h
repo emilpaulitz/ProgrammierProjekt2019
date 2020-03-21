@@ -29,21 +29,15 @@ private:
     QProcess * process;
 
     QString pipelineWD;
+    QString pipelinePath;
+    QString refGenPath;
 
-    // gives the row of the cell currently clicked on
+    // row of the cell currently clicked on
     int cellClicked;
 
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-
-    int getObjIndex(int qTableRow);
-
-    int getWidgetRow(int ObjIndex); //TODO: implement
-
-    //TODO: maybe make these private?
-    QString pipelinePath;
-    QString refGenPath;
 
 private slots:
 
