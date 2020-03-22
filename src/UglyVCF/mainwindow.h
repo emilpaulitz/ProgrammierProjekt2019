@@ -3,7 +3,7 @@
 
 #include "annotationservice.h"
 #include "vcftable.h"
-#include "filter.h"
+#include "filterdialog.h"
 
 #include <QMainWindow>
 #include <QtWidgets>

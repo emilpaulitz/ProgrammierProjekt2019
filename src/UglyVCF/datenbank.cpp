@@ -137,6 +137,9 @@ QString preparetranscons(QList<Transcriptcons> transcons,QString hgvs){
         restring = restring+"('"+hgvs+"','"+transcript_id+"','"+impact+"','"+variant_allele+"','"+
                    gene_symbole+"','"+gene_symbol_source+"','"+gene_id+"','"+hgnc_id+"','"+
                    strand+"','"+biotype+"','"+distance+"')";
+
+        QList<QString> terms = singlecons.getConsequence_terms();
+
         //if not the last object add a , to end of line
         if(i+1 < transcons.size()){
             restring = restring+",";
@@ -190,13 +193,25 @@ Annotation retriveAnno(QString hgvs){
     query.next();
 
     double afr,eas,gnomad_eas,gnomad_nfe,gnomad_fin,sas,gnomad,amr,gnomad_sas,
-    aa,gnomad_afr,eur,ea,gnomad_asj,gnomad_amr,gnomad_oth,restring;
+    aa,gnomad_afr,eur,ea,gnomad_asj,gnomad_amr,gnomad_oth;
 
     afr = query.value(0).toDouble();
     eas = query.value(1).toDouble();
     gnomad_eas = query.value(2).toDouble();
     gnomad_nfe = query.value(3).toDouble();
     gnomad_fin = query.value(4).toDouble();
+    sas = query.value(5).toDouble();
+    gnomad = query.value(6).toDouble();
+    amr = query.value(7).toDouble();
+    gnomad_sas = query.value(8).toDouble();
+    aa = query.value(9).toDouble();
+    gnomad_afr = query.value(10).toDouble();
+    eur = query.value(11).toDouble();
+    ea = query.value(12).toDouble();
+    gnomad_asj = query.value(13).toDouble();
+    gnomad_amr = query.value(14).toDouble();
+    gnomad_oth = query.value(15).toDouble();
+
 
 
 }
