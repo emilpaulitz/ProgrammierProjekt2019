@@ -17,6 +17,7 @@
 #include <QtWidgets/QDoubleSpinBox>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QPushButton>
 
 QT_BEGIN_NAMESPACE
 
@@ -30,6 +31,7 @@ public:
     QFrame *frame;
     QDoubleSpinBox *doubleSpinBox;
     QLabel *label;
+    QPushButton *pushButton;
 
     void setupUi(QDialog *FilterDialog)
     {
@@ -39,7 +41,7 @@ public:
         FilterDialog->setStyleSheet(QString::fromUtf8(""));
         buttonBox = new QDialogButtonBox(FilterDialog);
         buttonBox->setObjectName(QString::fromUtf8("buttonBox"));
-        buttonBox->setGeometry(QRect(50, 240, 281, 31));
+        buttonBox->setGeometry(QRect(130, 240, 231, 31));
         buttonBox->setStyleSheet(QString::fromUtf8("background-color: rgb(225, 225, 225);"));
         buttonBox->setOrientation(Qt::Horizontal);
         buttonBox->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Ok);
@@ -74,6 +76,9 @@ public:
         label = new QLabel(frame);
         label->setObjectName(QString::fromUtf8("label"));
         label->setGeometry(QRect(10, 10, 261, 21));
+        pushButton = new QPushButton(FilterDialog);
+        pushButton->setObjectName(QString::fromUtf8("pushButton"));
+        pushButton->setGeometry(QRect(20, 240, 101, 31));
 
         retranslateUi(FilterDialog);
         QObject::connect(buttonBox, SIGNAL(accepted()), FilterDialog, SLOT(accept()));
@@ -87,6 +92,7 @@ public:
         FilterDialog->setWindowTitle(QApplication::translate("FilterDialog", "Dialog", nullptr));
         label_2->setText(QApplication::translate("FilterDialog", "Select Region:", nullptr));
         label->setText(QApplication::translate("FilterDialog", "Enter frequency threshold:", nullptr));
+        pushButton->setText(QApplication::translate("FilterDialog", "Reset all", nullptr));
     } // retranslateUi
 
 };
