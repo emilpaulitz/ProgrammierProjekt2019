@@ -47,7 +47,7 @@ static void createTable()
 
    QString query3 = "CREATE TABLE transcripscons (hgvs text,transcript_id text,impact text,variant_allele text,"
                     "gene_symbole text,gene_symbol_source text,gene_id text,"
-                    "hgnc_id text,strand text,biotype text,distance text)";
+                    "hgnc_id text,strand text,biotype text,distance text,terms text)";
    query.prepare(query1);
    query.exec(query1);
    query.prepare(query2);
@@ -134,11 +134,16 @@ QString preparetranscons(QList<Transcriptcons> transcons,QString hgvs){
         biotype = singlecons.getBiotype();
         distance = singlecons.getDistance();
 
+        QList<QString> terms = singlecons.getConsequence_terms();
+        QString mehstring;
+
+        for(int b = 0; b < terms.size(); b++){
+            mehstring = mehstring + terms[b]+",";
+        }
+
         restring = restring+"('"+hgvs+"','"+transcript_id+"','"+impact+"','"+variant_allele+"','"+
                    gene_symbole+"','"+gene_symbol_source+"','"+gene_id+"','"+hgnc_id+"','"+
-                   strand+"','"+biotype+"','"+distance+"')";
-
-        QList<QString> terms = singlecons.getConsequence_terms();
+                   strand+"','"+biotype+"','"+distance+","+mehstring+"')";
 
         //if not the last object add a , to end of line
         if(i+1 < transcons.size()){
@@ -177,6 +182,7 @@ static bool searchDatabank(QString hgvs){
  */
 Annotation retriveAnno(QString hgvs){
 
+    //retrieve most_severe_consequence, we already know hgvs
     QSqlQuery query;
     QString retrive = "SELECT t.most_severe_consequence FROM annotation AS t WHERE t.hgvs ='"+hgvs;
 
@@ -185,6 +191,7 @@ Annotation retriveAnno(QString hgvs){
 
     QString most_severe_consequence = query.value(0).toString();
 
+    //retrieve frequncies and assign them to variables
     retrive = "SELECT t.afr,t.eas,t.gnomad_eas,t.gnomad_nfe,t.gnomad_fint,t.sas,t.gnomad,t.amr,t.gnomad_sas,"
               "t.aa,t.gnomad_afr,t.eur,t.ea,t.gnomad_asj,t.gnomad_amr,t.gnomad_oth,t.restring"
               "FROM frequencies AS t WHERE t.hgvs ='"+hgvs+"')";
@@ -212,8 +219,58 @@ Annotation retriveAnno(QString hgvs){
     gnomad_amr = query.value(14).toDouble();
     gnomad_oth = query.value(15).toDouble();
 
+    //frequncies object do create anno onject with later on
+    Frequencies refreq = Frequencies( afr,  eas, gnomad_eas, gnomad_nfe, gnomad_fin,  sas,  gnomad,
+                 amr,  gnomad_sas,  aa,  gnomad_afr,  eur,  ea,  gnomad_asj,
+                 gnomad_amr,  gnomad_oth);
 
+    // retrive transcriptcons
+    retrive = "SELECT t.transcript_id,t.impact,t.variant_allele,t.gene_symbole,t.gene_symbol_source,t.gene_id"
+              ",t.hgnc_id,t.strand,t.biotype,t.distance,t.terms FROM transcripscons AS t WHERE t.hgvs ='"+hgvs+"')";
+    query.exec(retrive);
+    qDebug() << query.lastError();
+    query.next();
 
+    QString transcript_id,impact, variant_allele,gene_symbole,gene_symbol_source,gene_id,
+            hgnc_id,strand,biotype,distance,mehstring;
+
+    QList<QString> terms;
+    QList<Transcriptcons> relist;
+
+   //cycle throu all Transcriptcons option in Query list
+   while(query.next()){
+
+       // create a new QList for consequence_terms and assing values to variables
+       QList<QString> terms;
+       transcript_id = query.value(0).toString();
+       impact = query.value(1).toString();
+       variant_allele = query.value(2).toString();
+       gene_symbole = query.value(3).toString();
+       gene_symbol_source = query.value(4).toString();
+       gene_id = query.value(5).toString();
+       hgnc_id = query.value(6).toString();
+       strand = query.value(7).toString();
+       biotype = query.value(8).toString();
+       distance = query.value(9).toString();
+
+       //split QString at every ',' and put into terms QList
+       mehstring = query.value(10).toString();
+       QStringList remeh = mehstring.split(',');
+       for(int b = 0; b < remeh.size(); b++){
+           terms << remeh[b];
+       }
+       //Transcriptcons object to put into list
+       Transcriptcons retrans = Transcriptcons(transcript_id, impact, variant_allele, gene_symbole, gene_symbol_source,
+                        gene_id, hgnc_id, strand, biotype, distance,terms);
+
+       //add Transcriptcons object to QList of Transcriptcons
+       relist << retrans;
+
+   }
+
+    Annotation reanno = Annotation(refreq,relist,hgvs,most_severe_consequence);
+
+    return reanno;
 }
 
 

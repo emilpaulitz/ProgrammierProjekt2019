@@ -50,19 +50,26 @@ Frequencies::Frequencies(double afr, double eas, double gnomad_eas, double gnoma
   //go into first (0) compartment of array,and create objet jobcet
   QJsonObject jobject = jarray[0].toObject();
   qWarning() << "is jobject empty? " << jobject.isEmpty();
+  qWarning() << "list of key in jobject" << jobject.keys();
+
+  /**Key Liste <- ("allele_string", "assembly_name", "end", "id", "input",
+         "most_severe_consequence", "seq_region_name",
+         "start", "strand", "transcript_consequences")
+         key1 fehlt -> keine freqcies -> craah weiter unten
+    **/
 
   //take the array value of key colocated_variants of jobject
   QJsonArray jarrayco = jobject.value(key1).toArray();
-  qWarning() << "is jarrayco empty? " << jarray.isEmpty();
+  qWarning() << "is jarrayco empty? " << jarrayco.isEmpty(); //<- ist empty im bug
 
   //go into first(0) compartment of array
   int index = 0;
-  QJsonObject jobjectfre = jarrayco[index].toObject();
-  bool freqex = false;
+  QJsonObject jobjectfre; // = jarrayco[index].toObject();
+  // bool freqex = false;
 
 
   //go through all colocated_variant array object till we find one with frequencies,set jobjectfre to this object
-  while(not freqex){
+ /** while(not freqex){
       qDebug() << "Test " + QString::fromStdString(std::to_string(index));
       QJsonObject freqob = jobjectfre.value(key2).toObject();
       if (freqob.isEmpty()){
@@ -75,13 +82,22 @@ Frequencies::Frequencies(double afr, double eas, double gnomad_eas, double gnoma
           freqex = true;
       }
   }
+  **/
+  for(int a = 0; a <jarrayco.size(); a++){
+    jobjectfre = jarrayco[a].toObject();
+    QJsonObject freqob = jobjectfre.value(key2).toObject();
+
+    if (not freqob.isEmpty()){
+        break;
+    }
+  }
 
 
  qWarning() << "is jobjectfre empty?" << jobjectfre.isEmpty();
 
   //search for key the last char of the value to key: allele_string
 
-  QString key3 = jobjectfre.value("allele_string").toString();
+  QString key3 = "-,A,C,G,T,U";
   QString key4 = QString(key3[key3.size()-1]);
 
   //get value to key frquencies
@@ -90,8 +106,9 @@ Frequencies::Frequencies(double afr, double eas, double gnomad_eas, double gnoma
   //get objects to value of the last char of key3
   QJsonObject jAllele = jfreq.value(key4).toObject();
 
+  //Key 4
   index = 3;
-  while(jAllele.isEmpty()){
+  while(jAllele.isEmpty() and key3.size()-index != -2){
       key4 =   QString(key3[key3.size()-index]);
       jAllele = jfreq.value(key4).toObject();
       index = index+2;
