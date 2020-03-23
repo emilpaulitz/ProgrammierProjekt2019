@@ -1,3 +1,4 @@
+
 #include "Frequencies.h"
 
 #include <QJsonObject>
@@ -13,6 +14,10 @@
 
 Frequencies::Frequencies(){
 
+}
+
+Frequencies::Frequencies(QString note){
+    this->noted = note;
 }
 
 Frequencies::Frequencies(double afr, double eas, double gnomad_eas, double gnomad_nfe, double gnomad_fin,
@@ -47,7 +52,7 @@ Frequencies::Frequencies(double afr, double eas, double gnomad_eas, double gnoma
   QJsonArray jarray = doc.array();
   qWarning() << "is array empty? " << jarray.isEmpty();
 
-  //go into first (0) compartment of array,and create objet jobcet
+    //go into first (0) compartment of array,and create objet jobcet
   QJsonObject jobject = jarray[0].toObject();
   qWarning() << "is jobject empty? " << jobject.isEmpty();
   qWarning() << "list of key in jobject" << jobject.keys();
@@ -61,6 +66,12 @@ Frequencies::Frequencies(double afr, double eas, double gnomad_eas, double gnoma
   //take the array value of key colocated_variants of jobject
   QJsonArray jarrayco = jobject.value(key1).toArray();
   qWarning() << "is jarrayco empty? " << jarrayco.isEmpty(); //<- ist empty im bug
+
+  //in case there are no frequencies
+  if(jarrayco.isEmpty()){
+      Frequencies freq= Frequencies("Frequencies are unknown");
+      return freq;
+  }
 
   //go into first(0) compartment of array
   int index = 0;
@@ -147,6 +158,11 @@ Frequencies::Frequencies(double afr, double eas, double gnomad_eas, double gnoma
  QString Frequencies::print_frequencies(Frequencies freq){
 
     QString restring;
+
+    if(freq.noted == "Frequencies are unknown" ){
+        restring = freq.noted;
+        return restring;
+    }
 
     for (int i = 0; i < FilterDialog::LASTENUM; i++) {
 

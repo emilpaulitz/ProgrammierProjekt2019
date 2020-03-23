@@ -1,0 +1,14 @@
+release/Annotation.o
+release/Frequencies.o
+release/Transcriptcons.o
+release/annotationservice.o
+release/datenbank.o
+release/filterdialog.o
+release/main.o
+release/mainwindow.o
+release/vcfline.o
+release/vcftable.o
+release/qrc_resources.o
+release/moc_annotationservice.o
+release/moc_filterdialog.o
+release/moc_mainwindow.o
