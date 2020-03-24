@@ -194,10 +194,17 @@ QString Transcriptcons::printtranscons(Transcriptcons trans){
    for(int i =0; i < qli.size(); i++){
         li = li + qli.at(i);  }
 
-    re = re + trans.getTranscript_id() +",\n IMPACT: " + trans.getImpact()+",\n VARIANT_ALLELE: " + trans.getVariant_allele()
-       +",\n GENE_SYMBOLE: " + trans.getGene_symbole()+",\n GENE_SYMBOLE_SOURCE: "+ trans.getGene_symbol_source()
-       +",\n GENE_ID: "+ trans.getGene_id()+",\n HGNC: " + trans.getHgnc_id()+",\n STRAND: "
-       + trans.getStrand()+",\n BIOTYPE: " + trans.getBiotype()+",\n DISTANCE: " + trans.getDistance()+", \n CONSEQUENCE: " + li + "\n";
+    re = re + trans.getTranscript_id() +
+            ",\n IMPACT: " + trans.getImpact()+
+            ",\n VARIANT_ALLELE: " + trans.getVariant_allele() +
+            ",\n GENE_SYMBOLE: " + trans.getGene_symbole()+
+            ",\n GENE_SYMBOLE_SOURCE: "+ trans.getGene_symbol_source() +
+            ",\n GENE_ID: "+ trans.getGene_id()+
+            ",\n HGNC: " + trans.getHgnc_id()+
+            ",\n STRAND: " + trans.getStrand()+
+            ",\n BIOTYPE: " + trans.getBiotype()+
+            ",\n DISTANCE: " + trans.getDistance()+
+            ",\n CONSEQUENCE: " + li + "\n";
     return re;
 }
 
