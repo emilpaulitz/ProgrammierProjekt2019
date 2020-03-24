@@ -159,7 +159,7 @@ Frequencies::Frequencies(double afr, double eas, double gnomad_eas, double gnoma
 
     QString restring;
 
-    if(freq.noted == "Frequencies are unknown" ){
+    if(! freq.noted.isNull() ){
         restring = freq.noted;
         return restring;
     }
