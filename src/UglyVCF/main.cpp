@@ -13,9 +13,9 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
     MainWindow w;
-    databank testdb;
-    databank::connect();
-    databank::createTable();
+
+    //databank::connect();
+    //databank::createTable();
 
     w.centralWidget();
     w.showMaximized();

@@ -21,8 +21,7 @@ public:
 
     QString preparetranscons(QList<Transcriptcons> transcons,QString hgvs);
 
-    Annotation retriveAnno(QString hgvs);
+    Annotation retrieveAnno(QString hgvs);
 };
-
 
 #endif // DATABANK_H

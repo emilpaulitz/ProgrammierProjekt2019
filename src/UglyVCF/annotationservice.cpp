@@ -56,8 +56,6 @@ void AnnotationService::makeVEPrequest(QNetworkAccessManager &manager, VCFline &
     QString URL = "http://grch37.rest.ensembl.org/vep/homo_sapiens/hgvs/";
     QString notation = line.getHgvsNotation();
     QString optionJson = "content-type=application/json";
-
-    //if(notation)
     QNetworkRequest *request = new QNetworkRequest(QUrl(URL + notation + optionJson));
     qDebug() << "Making VEP Request to " + URL + notation + optionJson;
     // check connectivity

@@ -14,6 +14,7 @@ databank::databank()
 {
 
 }
+
 /**
  * @brief connect, connects to the local host database "varianten" with usr "variantusr"
  */
@@ -28,7 +29,6 @@ db.setPassword("variantpw");
 db.open();
 qDebug() << "Testing if open: " << db.open();
 }
-
 
 /**
  * @brief createTable, creats three tables in the connected databank, annotation,frequencies and transcriptcons.
@@ -55,6 +55,7 @@ void databank::createTable()
    query.prepare(query3);
    query.exec(query3);
 }
+
 /**
  * @brief addRow,adds a new anotation to the databse from a given Annotation object
  * @param Annotation object
@@ -176,11 +177,11 @@ bool databank::searchDatabank(QString hgvs){
 
 }
 /**
- * @brief retriveAnno
+ * @brief retrieveAnno
  * @param hgvs
  * @return
  */
-Annotation databank::retriveAnno(QString hgvs){
+Annotation databank::retrieveAnno(QString hgvs){
 
     //retrieve most_severe_consequence, we already know hgvs
     QSqlQuery query;
