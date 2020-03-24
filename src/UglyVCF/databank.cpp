@@ -1,4 +1,4 @@
-#include "datenbank.h"
+#include "databank.h"
 #include "Annotation.h"
 #include <QCoreApplication>
 #include <QSqlDatabase>
@@ -17,7 +17,7 @@ databank::databank()
 /**
  * @brief connect, connects to the local host database "varianten" with usr "variantusr"
  */
-void connect(){
+void databank::connect(){
 
 QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL");
 db.setHostName("localhost");
@@ -35,7 +35,7 @@ qDebug() << "Testing if open: " << db.open();
  * Key in annotation is hgvs, is foreign key in frequencies und trancriptcons
  * @return void
  */
-static void createTable()
+void databank::createTable()
 {
    QSqlQuery query;
 
@@ -60,7 +60,7 @@ static void createTable()
  * @param Annotation object
  * @return true if insertion successful, false if not
  */
-bool addRow(Annotation anno){
+bool databank::addRow(Annotation anno){
 
     QSqlQuery query;
     QString mostsevercons = anno.getMost_severe_consequence();
@@ -91,7 +91,7 @@ bool addRow(Annotation anno){
  * @param QString hgvs as forein key
  * @return Qstring
  */
-QString preparefreq(Frequencies freq,QString hgvs){
+QString databank::preparefreq(Frequencies freq,QString hgvs){
 
     QString restring = "INSERT INTO frequencies VALUES('"+hgvs;
     for (int i = 0; i < FilterDialog::LASTENUM; i++) {
@@ -109,7 +109,7 @@ QString preparefreq(Frequencies freq,QString hgvs){
  * @param hgvs QString
  * @return a QString with all transcript consequnces to be loaded into database
  */
-QString preparetranscons(QList<Transcriptcons> transcons,QString hgvs){
+QString databank::preparetranscons(QList<Transcriptcons> transcons,QString hgvs){
 
     QString transcript_id,impact, variant_allele,
             gene_symbole,gene_symbol_source,gene_id,
@@ -160,7 +160,7 @@ QString preparetranscons(QList<Transcriptcons> transcons,QString hgvs){
  * @param hgvs QString,
  * @return bool, is in databank -> true, else false
  */
-static bool searchDatabank(QString hgvs){
+bool databank::searchDatabank(QString hgvs){
 
     QSqlQuery query;
     QString query1 = "SELECT t.hgvs FROM annotation AS t WHERE t.hgvs = '"+hgvs+"'";
@@ -180,7 +180,7 @@ static bool searchDatabank(QString hgvs){
  * @param hgvs
  * @return
  */
-Annotation retriveAnno(QString hgvs){
+Annotation databank::retriveAnno(QString hgvs){
 
     //retrieve most_severe_consequence, we already know hgvs
     QSqlQuery query;

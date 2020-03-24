@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "vcftable.h"
+#include "databank.h"
 
 
 #include <QApplication>
@@ -12,6 +13,10 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
     MainWindow w;
+    databank testdb;
+    databank::connect();
+    databank::createTable();
+
     w.centralWidget();
     w.showMaximized();
     w.setWindowIcon(QIcon(":/icons/rsc/uglyVCF_icon6.ico"));
