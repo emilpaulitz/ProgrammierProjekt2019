@@ -11,13 +11,21 @@ FilterDialog::FilterDialog(QWidget *parent) :
     for (int i = 0; i < FilterDialog::LASTENUM; i++){
         ui->comboBox->addItem(regionToString((Region) i));
     }
+
 }
 
 double FilterDialog::getFreq(){
+    if (this->reset){
+        return 1;
+    }
     return ui->doubleSpinBox->value();
 }
 
 FilterDialog::Region FilterDialog::getRegion(){
+    if (this->reset){
+        return (Region) 0;
+    }
+
     for (int i = 0; i < LASTENUM; i++){
         if(regionToString((Region) i) == ui->comboBox->currentText()){
             return (Region) i;
@@ -88,4 +96,9 @@ QString FilterDialog::regionToString(FilterDialog::Region region) {
 FilterDialog::~FilterDialog()
 {
     delete ui;
+}
+
+void FilterDialog::on_resetButton_clicked()
+{
+    this->reset = true;
 }

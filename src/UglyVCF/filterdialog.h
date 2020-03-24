@@ -24,6 +24,10 @@ public:
 
     double getFreq();
     FilterDialog::Region getRegion();
+    bool reset =false;
+
+private slots:
+    void on_resetButton_clicked();
 
 private:
     Ui::FilterDialog *ui;

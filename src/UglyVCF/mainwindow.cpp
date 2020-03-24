@@ -229,6 +229,8 @@ void MainWindow::on_actionFilter_by_Frequency_triggered() {
     // Open filter dialog
     FilterDialog * dia = new FilterDialog(this);
     if (dia->exec()){
+
+        // get entered values
         double maxFreq = dia->getFreq();
         FilterDialog::Region region = dia->getRegion();
 
