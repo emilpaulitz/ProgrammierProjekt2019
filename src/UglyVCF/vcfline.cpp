@@ -165,8 +165,8 @@ QString VCFline::getChrNum()
 {
     if (this->getChr().left(3) == "chr"){
         QString num = this->getChr().remove(0,3);
-        if (num == "X" || num == "x") return "22";
-        if (num == "Y" || num == "y") return "23";
+        if (num == "X" || num == "23") return "x";
+        if (num == "Y" || num == "24") return "y";
         if (num.length() <= 2) return num;
     }
     // not a valid chr1, chr2 ... notation
