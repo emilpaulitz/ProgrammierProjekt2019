@@ -15,13 +15,13 @@ public:
 
     static bool searchDatabank(QString hgvs);
 
-    bool addRow(Annotation anno);
+    static bool addRow(Annotation anno);
 
-    QString preparefreq(Frequencies freq,QString hgvs);
+    static QString preparefreq(Frequencies freq,QString hgvs);
 
-    QString preparetranscons(QList<Transcriptcons> transcons,QString hgvs);
+    static QString preparetranscons(QList<Transcriptcons> transcons,QString hgvs);
 
-    Annotation retrieveAnno(QString hgvs);
+    static Annotation & retrieveAnno(QString hgvs);
 };
 
 #endif // DATABANK_H
