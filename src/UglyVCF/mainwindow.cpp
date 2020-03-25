@@ -251,6 +251,7 @@ void MainWindow::on_actionFilter_by_Frequency_triggered() {
             } else {
                 ui->tableWidget->showRow(line.getIndex());
             }
+
         }
 
         // show a warning if not every line has an annotation
@@ -316,13 +317,15 @@ void MainWindow::updateAnnoProgress() {
 void MainWindow::update_row(int index)
 {
     int row = index;
-    QList<QString> severityOptions = {"HIGH", "MODIFIER", "MODERATE", "LOW"};
+    QList<QString> SEVERITY_OPTIONS = {"HIGH", "MODERATE", "LOW", "MODIFIER"};
+
     // determine most severe impact
     Annotation & anno = tableObj.getLine(row).getAnno();
     QString mostSevereImpact = "";
+
     for (Transcriptcons transcript:anno.getTranscriptcons())
     {
-        if (severityOptions.indexOf(transcript.getImpact()) < severityOptions.indexOf(mostSevereImpact)
+        if (SEVERITY_OPTIONS.indexOf(transcript.getImpact()) < SEVERITY_OPTIONS.indexOf(mostSevereImpact)
                 || mostSevereImpact == "")
         {
             mostSevereImpact = transcript.getImpact();
@@ -345,14 +348,16 @@ void MainWindow::update_row(int index)
     else if (mostSevereImpact == "MODIFIER")
     {
         color = Qt::cyan;
-    } else
+    }
+    else
     {
         color = Qt::transparent;
     }
+
     // color entire row
     for (int col = 0; col < tableObj.getLine(index).getSize(); col++)
     {
-        ui->tableWidget->item(row, col)->setBackground(QBrush(color, Qt::Dense5Pattern));
+        ui->tableWidget->item(row, col)->setBackground(QBrush(color, Qt::Dense4Pattern));
     }
 }
 
