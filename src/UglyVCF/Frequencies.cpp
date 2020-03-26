@@ -89,8 +89,7 @@ Frequencies::Frequencies(double afr, double eas, double gnomad_eas, double gnoma
     }
   }
 
-
- qWarning() << "is jobjectfre empty?" << jobjectfre.isEmpty();
+  qWarning() << "is jobjectfre empty?" << jobjectfre.isEmpty();
 
   //search for key the last char of the value to key: allele_string
 
@@ -169,4 +168,8 @@ double Frequencies::getFreq(FilterDialog::Region region){
 
 void Frequencies::setFreq(FilterDialog::Region region, double value){
     this->FreqByRegions[(int) region] = value;
+}
+
+bool Frequencies::isUnknown(){
+    return not this->noted.isNull();
 }

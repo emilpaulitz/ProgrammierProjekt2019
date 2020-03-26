@@ -83,28 +83,26 @@ void AnnotationService::pullAnnotations(VCFtable &table)
     for (int index = 0; index < table.getLines().size(); index++)
     {
         //TODO: check database, only add necessary lines
-                QString currHGVS = table.getLine(index).getHgvsNotation();
-                bool isindb = databank::searchDatabank(currHGVS);
+        QString currHGVS = table.getLine(index).getHgvsNotation();
+        bool isindb = databank::searchDatabank(currHGVS);
 
-                //qDebug() << "Test ob in dB " << isindb;
+        //qDebug() << "Test ob in dB " << isindb;
 
-                if (isindb)
-                {
-                    Annotation & currAnno = databank::retrieveAnno(currHGVS);
-                    table.getLine(index).setAnno(currAnno);
-                    emit annotation_set(index);
-                    qDebug() << "pulled from DB";
-
-
-                } else {
-                    queue.enqueue(index);
-                }
+        if (isindb)
+        {
+            Annotation & currAnno = databank::retrieveAnno(currHGVS);
+            table.getLine(index).setAnno(currAnno);
+            emit annotation_set(index);
+            qDebug() << "pulled from DB";
+        } else {
+            queue.enqueue(index);
+        }
+    }
 
     setPullingAllAnnosTrue();
 
     // start queue
     handle_queue();
-}
 }
 
 /**

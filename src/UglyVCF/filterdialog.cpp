@@ -15,14 +15,14 @@ FilterDialog::FilterDialog(QWidget *parent) :
 }
 
 double FilterDialog::getFreq(){
-    if (this->reset){
+    if (isReset()){
         return 1;
     }
     return ui->doubleSpinBox->value();
 }
 
 FilterDialog::Region FilterDialog::getRegion(){
-    if (this->reset){
+    if (isReset()){
         return (Region) 0;
     }
 
@@ -35,6 +35,17 @@ FilterDialog::Region FilterDialog::getRegion(){
     qDebug() << "Something went wrong in filterdialog.cpp line 22!"
                 " The text chosen in ComboBox could not be converted to a filter::Region enum type!";
     return LASTENUM;
+}
+
+bool FilterDialog::hideUnknown(){
+    if (isReset()){
+        return false;
+    }
+    return ui->hideBox->isChecked();
+}
+
+bool FilterDialog::isReset(){
+    return this->reset;
 }
 
 QString FilterDialog::regionToString(FilterDialog::Region region) {
@@ -100,5 +111,6 @@ FilterDialog::~FilterDialog()
 
 void FilterDialog::on_resetButton_clicked()
 {
+    qDebug() << "Filter reset";
     this->reset = true;
 }

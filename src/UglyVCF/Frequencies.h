@@ -28,6 +28,8 @@ public:
     double getFreq(FilterDialog::Region region);
     void setFreq(FilterDialog::Region region, double value);
 
+    bool isUnknown();
+
 /*
 
     double getAfr() const;
