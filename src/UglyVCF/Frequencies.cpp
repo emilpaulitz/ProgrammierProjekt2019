@@ -16,10 +16,6 @@ Frequencies::Frequencies(){
 
 }
 
-Frequencies::Frequencies(QString note){
-    this->noted = note;
-}
-
 Frequencies::Frequencies(double afr, double eas, double gnomad_eas, double gnomad_nfe, double gnomad_fin,
                          double sas, double gnomad, double amr, double gnomad_sas, double aa, double gnomad_afr,
                          double eur, double ea, double gnomad_asj, double gnomad_amr, double gnomad_oth)
@@ -66,12 +62,6 @@ Frequencies::Frequencies(double afr, double eas, double gnomad_eas, double gnoma
   //take the array value of key colocated_variants of jobject
   QJsonArray jarrayco = jobject.value(key1).toArray();
   qWarning() << "is jarrayco empty? " << jarrayco.isEmpty(); //<- ist empty im bug
-
-  //in case there are no frequencies
-  if(jarrayco.isEmpty()){
-      Frequencies freq= Frequencies("Frequencies are unknown");
-      return freq;
-  }
 
   //go into first(0) compartment of array
   int index = 0;
@@ -130,22 +120,22 @@ Frequencies::Frequencies(double afr, double eas, double gnomad_eas, double gnoma
   aa,gnomad_afr,eur,ea,gnomad_asj,gnomad_amr,gnomad_oth;
 
   //retrieve all the values to the freq keys
-  afr = jAllele.value("afr").toDouble();
-  eas = jAllele.value("eas").toDouble();
-  sas = jAllele.value("sas").toDouble();
-  amr = jAllele.value("amr").toDouble();
-  aa = jAllele.value("aa").toDouble();
-  eur = jAllele.value("eur").toDouble();
-  ea = jAllele.value("ea").toDouble();
-  gnomad = jAllele.value("gnomad").toDouble();
-  gnomad_afr = jAllele.value("gnomad_afr").toDouble();
-  gnomad_eas = jAllele.value("gnomad_eas").toDouble();
-  gnomad_nfe = jAllele.value("gnomad_nfe").toDouble();
-  gnomad_fin = jAllele.value("gnomad_fin").toDouble();
-  gnomad_asj = jAllele.value("gnomad_asj").toDouble();
-  gnomad_amr = jAllele.value("gnomad_amr").toDouble();
-  gnomad_oth = jAllele.value("gnomad_oth").toDouble();
-  gnomad_sas = jAllele.value("gnomad_sas").toDouble();
+  afr = jAllele.value("afr").toDouble(-1);
+  eas = jAllele.value("eas").toDouble(-1);
+  sas = jAllele.value("sas").toDouble(-1);
+  amr = jAllele.value("amr").toDouble(-1);
+  aa = jAllele.value("aa").toDouble(-1);
+  eur = jAllele.value("eur").toDouble(-1);
+  ea = jAllele.value("ea").toDouble(-1);
+  gnomad = jAllele.value("gnomad").toDouble(-1);
+  gnomad_afr = jAllele.value("gnomad_afr").toDouble(-1);
+  gnomad_eas = jAllele.value("gnomad_eas").toDouble(-1);
+  gnomad_nfe = jAllele.value("gnomad_nfe").toDouble(-1);
+  gnomad_fin = jAllele.value("gnomad_fin").toDouble(-1);
+  gnomad_asj = jAllele.value("gnomad_asj").toDouble(-1);
+  gnomad_amr = jAllele.value("gnomad_amr").toDouble(-1);
+  gnomad_oth = jAllele.value("gnomad_oth").toDouble(-1);
+  gnomad_sas = jAllele.value("gnomad_sas").toDouble(-1);
 
   //create freq. ob to return with given values
   Frequencies freq = Frequencies(afr,eas,gnomad_eas,gnomad_nfe,gnomad_fin,sas,gnomad,amr,gnomad_sas,
@@ -158,21 +148,28 @@ Frequencies::Frequencies(double afr, double eas, double gnomad_eas, double gnoma
  QString Frequencies::print_frequencies(Frequencies freq){
 
     QString restring;
-
-    if(! freq.noted.isNull() ){
-        restring = freq.noted;
-        return restring;
-    }
+    QString region;
+    QString value;
 
     for (int i = 0; i < FilterDialog::LASTENUM; i++) {
 
         FilterDialog::Region reg = (FilterDialog::Region) i;
-        restring += FilterDialog::regionToString(reg) + ": " + QString::number(freq.getFreq(reg));
+        region = FilterDialog::regionToString(reg) + ": ";
+                if(freq.getFreq(reg) == -1){
+           value= "frequency unknown";
+    }
+                else{
+                value= QString::number(freq.getFreq(reg));
+    }
 
-        // Add comma if not the last entry
+                restring+= region + value;
+
+                // Add comma if not the last entry
         if (i + 1 != FilterDialog::LASTENUM) {
             restring += ", ";
         }
+
+        restring +=  + "\n";
     }
     return restring;
 }
