@@ -2,7 +2,7 @@ release/Annotation.o
 release/Frequencies.o
 release/Transcriptcons.o
 release/annotationservice.o
-release/datenbank.o
+release/databank.o
 release/filterdialog.o
 release/main.o
 release/mainwindow.o

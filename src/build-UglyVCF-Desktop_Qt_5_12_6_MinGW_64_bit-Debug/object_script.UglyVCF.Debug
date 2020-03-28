@@ -2,7 +2,7 @@ debug/Annotation.o
 debug/Frequencies.o
 debug/Transcriptcons.o
 debug/annotationservice.o
-debug/datenbank.o
+debug/databank.o
 debug/filterdialog.o
 debug/main.o
 debug/mainwindow.o

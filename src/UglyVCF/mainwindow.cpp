@@ -247,7 +247,7 @@ void MainWindow::on_actionFilter_by_Frequency_triggered() {
             }
 
             // catch case of unknown frequencies
-            if(line.getAnno().getFrequencies().isUnknown()) {
+            if(line.getAnno().getFrequencies().isRegUnknown(region)) {
                 if(hideUnknown){
                     ui->tableWidget->hideRow(line.getIndex());
                 } else {

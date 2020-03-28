@@ -167,6 +167,9 @@ void Frequencies::setFreq(FilterDialog::Region region, double value){
     this->FreqByRegions[(int) region] = value;
 }
 
-bool Frequencies::isUnknown(){
-    return not this->noted.isNull();
+bool Frequencies::isRegUnknown(FilterDialog::Region region){
+    if (getFreq(region) == -1){
+        return true;
+    }
+    return false;
 }

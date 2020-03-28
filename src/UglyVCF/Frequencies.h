@@ -26,7 +26,7 @@ public:
     double getFreq(FilterDialog::Region region);
     void setFreq(FilterDialog::Region region, double value);
 
-    bool isUnknown();
+    bool isRegUnknown(FilterDialog::Region region);
 
 /*
 
