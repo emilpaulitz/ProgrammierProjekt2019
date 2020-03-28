@@ -24,9 +24,16 @@ public:
 
     double getFreq();
     FilterDialog::Region getRegion();
+    bool hideUnknown();
+    bool isReset();
+
+
+private slots:
+    void on_resetButton_clicked();
 
 private:
     Ui::FilterDialog *ui;
+    bool reset =false;
 };
 
 #endif // FILTERDIALOG_H

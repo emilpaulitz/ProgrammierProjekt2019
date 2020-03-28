@@ -65,25 +65,11 @@ Frequencies::Frequencies(double afr, double eas, double gnomad_eas, double gnoma
 
   //go into first(0) compartment of array
   int index = 0;
-  QJsonObject jobjectfre; // = jarrayco[index].toObject();
-  // bool freqex = false;
+  QJsonObject jobjectfre;
 
 
   //go through all colocated_variant array object till we find one with frequencies,set jobjectfre to this object
- /** while(not freqex){
-      qDebug() << "Test " + QString::fromStdString(std::to_string(index));
-      QJsonObject freqob = jobjectfre.value(key2).toObject();
-      if (freqob.isEmpty()){
-          // Grund des BUGs: Schleife terminiert nicht, index wird absurd hoch -> jarrayco.size() benutzen?
 
-         //set to new array pos
-         jobjectfre = jarrayco[index].toObject();
-         index++;
-      } else{
-          freqex = true;
-      }
-  }
-  **/
   for(int a = 0; a <jarrayco.size(); a++){
     jobjectfre = jarrayco[a].toObject();
     QJsonObject freqob = jobjectfre.value(key2).toObject();
@@ -93,8 +79,7 @@ Frequencies::Frequencies(double afr, double eas, double gnomad_eas, double gnoma
     }
   }
 
-
- qWarning() << "is jobjectfre empty?" << jobjectfre.isEmpty();
+  qWarning() << "is jobjectfre empty?" << jobjectfre.isEmpty();
 
   //search for key the last char of the value to key: allele_string
 
@@ -180,4 +165,8 @@ double Frequencies::getFreq(FilterDialog::Region region){
 
 void Frequencies::setFreq(FilterDialog::Region region, double value){
     this->FreqByRegions[(int) region] = value;
+}
+
+bool Frequencies::isUnknown(){
+    return not this->noted.isNull();
 }

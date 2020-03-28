@@ -1,4 +1,4 @@
-#include "datenbank.h"
+#include "databank.h"
 #include "Annotation.h"
 #include <QCoreApplication>
 #include <QSqlDatabase>
@@ -14,10 +14,11 @@ databank::databank()
 {
 
 }
+
 /**
  * @brief connect, connects to the local host database "varianten" with usr "variantusr"
  */
-void connect(){
+void databank::connect(){
 
 QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL");
 db.setHostName("localhost");
@@ -29,13 +30,12 @@ db.open();
 qDebug() << "Testing if open: " << db.open();
 }
 
-
 /**
  * @brief createTable, creats three tables in the connected databank, annotation,frequencies and transcriptcons.
  * Key in annotation is hgvs, is foreign key in frequencies und trancriptcons
  * @return void
  */
-static void createTable()
+void databank::createTable()
 {
    QSqlQuery query;
 
@@ -55,13 +55,15 @@ static void createTable()
    query.prepare(query3);
    query.exec(query3);
 }
+
 /**
  * @brief addRow,adds a new anotation to the databse from a given Annotation object
  * @param Annotation object
  * @return true if insertion successful, false if not
  */
-bool addRow(Annotation anno){
+bool databank::addRow(Annotation anno){
 
+    bool rebool = false;
     QSqlQuery query;
     QString mostsevercons = anno.getMost_severe_consequence();
     QString hgvs = anno.getId();
@@ -72,16 +74,20 @@ bool addRow(Annotation anno){
     QString toquery = "INSERT INTO annotation VALUES('"+hgvs+"','"+mostsevercons+"')";
     query.exec(toquery);
     qDebug() << query.lastError();
+    qDebug() << "anno query rin: " << query.lastQuery();
 
     //prepares query and adds a row to the frequencies tabel with hgvs a forein key
     QString frequery = preparefreq(freq,hgvs);
     query.exec(frequery);
     qDebug() << query.lastError();
+    qDebug() << "frequ Query run: " << query.lastQuery();
 
     //prepares and a
     QString consquery = preparetranscons(transcons,hgvs);
     query.exec(consquery);
     qDebug() << query.lastError();
+    qDebug() << "trasncons Query run: " << query.lastQuery();
+    return rebool;
 
 }
 
@@ -91,7 +97,7 @@ bool addRow(Annotation anno){
  * @param QString hgvs as forein key
  * @return Qstring
  */
-QString preparefreq(Frequencies freq,QString hgvs){
+QString databank::preparefreq(Frequencies freq,QString hgvs){
 
     QString restring = "INSERT INTO frequencies VALUES('"+hgvs;
     for (int i = 0; i < FilterDialog::LASTENUM; i++) {
@@ -109,7 +115,7 @@ QString preparefreq(Frequencies freq,QString hgvs){
  * @param hgvs QString
  * @return a QString with all transcript consequnces to be loaded into database
  */
-QString preparetranscons(QList<Transcriptcons> transcons,QString hgvs){
+QString databank::preparetranscons(QList<Transcriptcons> transcons,QString hgvs){
 
     QString transcript_id,impact, variant_allele,
             gene_symbole,gene_symbol_source,gene_id,
@@ -143,7 +149,7 @@ QString preparetranscons(QList<Transcriptcons> transcons,QString hgvs){
 
         restring = restring+"('"+hgvs+"','"+transcript_id+"','"+impact+"','"+variant_allele+"','"+
                    gene_symbole+"','"+gene_symbol_source+"','"+gene_id+"','"+hgnc_id+"','"+
-                   strand+"','"+biotype+"','"+distance+","+mehstring+"')";
+                   strand+"','"+biotype+"','"+distance+"','"+mehstring+"')";
 
         //if not the last object add a , to end of line
         if(i+1 < transcons.size()){
@@ -160,44 +166,43 @@ QString preparetranscons(QList<Transcriptcons> transcons,QString hgvs){
  * @param hgvs QString,
  * @return bool, is in databank -> true, else false
  */
-static bool searchDatabank(QString hgvs){
+bool databank::searchDatabank(QString hgvs){
 
     QSqlQuery query;
-    QString query1 = "SELECT t.hgvs FROM annotation AS t WHERE t.hgvs = '"+hgvs+"'";
-    query.prepare(query1);
+    QString query1 = "SELECT t.hgvs FROM annotation AS t WHERE t.hgvs ='"+hgvs+"'";
     query.exec(query1);
+    //qDebug() << "test db query eror " << query.lastError();
+    //qDebug() << "print last query " << query.lastQuery();
     query.next();
-    QString chrom =  query.value(0).toString();
-    if(not chrom.isNull())
-        return true;
-    else{
-        return false;
-    }
+    return query.isValid();
 
 }
 /**
- * @brief retriveAnno
+ * @brief retrieveAnno
  * @param hgvs
- * @return
+ * @return Annotation
  */
-Annotation retriveAnno(QString hgvs){
+Annotation & databank::retrieveAnno(QString hgvs){
 
     //retrieve most_severe_consequence, we already know hgvs
     QSqlQuery query;
-    QString retrive = "SELECT t.most_severe_consequence FROM annotation AS t WHERE t.hgvs ='"+hgvs;
+    QString retrive = "SELECT t.most_severe_consequence FROM annotation AS t WHERE t.hgvs ='"+hgvs+"'";
 
     query.exec(retrive);
     query.next();
+    qDebug() << "Ist anno query vald?" << query.isValid();
 
     QString most_severe_consequence = query.value(0).toString();
 
     //retrieve frequncies and assign them to variables
-    retrive = "SELECT t.afr,t.eas,t.gnomad_eas,t.gnomad_nfe,t.gnomad_fint,t.sas,t.gnomad,t.amr,t.gnomad_sas,"
-              "t.aa,t.gnomad_afr,t.eur,t.ea,t.gnomad_asj,t.gnomad_amr,t.gnomad_oth,t.restring"
-              "FROM frequencies AS t WHERE t.hgvs ='"+hgvs+"')";
+    retrive = "SELECT t.afr,t.eas,t.gnomad_eas,t.gnomad_nfe,t.gnomad_fin,t.sas,t.gnomad,t.amr,t.gnomad_sas,"
+              "t.aa,t.gnomad_afr,t.eur,t.ea,t.gnomad_asj,t.gnomad_amr,t.gnomad_oth "
+              "FROM frequencies AS t WHERE t.hgvs ='"+hgvs+"'";
 
     query.exec(retrive);
+    qDebug() << "retive freq query" << query.lastQuery();
     query.next();
+    qDebug() << "is freq query valid?: " << query.isValid();
 
     double afr,eas,gnomad_eas,gnomad_nfe,gnomad_fin,sas,gnomad,amr,gnomad_sas,
     aa,gnomad_afr,eur,ea,gnomad_asj,gnomad_amr,gnomad_oth;
@@ -226,10 +231,12 @@ Annotation retriveAnno(QString hgvs){
 
     // retrive transcriptcons
     retrive = "SELECT t.transcript_id,t.impact,t.variant_allele,t.gene_symbole,t.gene_symbol_source,t.gene_id"
-              ",t.hgnc_id,t.strand,t.biotype,t.distance,t.terms FROM transcripscons AS t WHERE t.hgvs ='"+hgvs+"')";
+              ",t.hgnc_id,t.strand,t.biotype,t.distance,t.terms FROM transcripscons AS t WHERE t.hgvs ='"+hgvs+"'";
     query.exec(retrive);
-    qDebug() << query.lastError();
+    qDebug() <<"Transcripcons: " << query.lastError();
+    qDebug() <<"Trascons query: " << query.lastQuery();
     query.next();
+    qDebug() << "Transcons is valid?:" << query.isValid();
 
     QString transcript_id,impact, variant_allele,gene_symbole,gene_symbol_source,gene_id,
             hgnc_id,strand,biotype,distance,mehstring;
@@ -239,7 +246,7 @@ Annotation retriveAnno(QString hgvs){
 
    //cycle throu all Transcriptcons option in Query list
    while(query.next()){
-
+    qDebug() << "geht 1";
        // create a new QList for consequence_terms and assing values to variables
        QList<QString> terms;
        transcript_id = query.value(0).toString();
@@ -258,100 +265,21 @@ Annotation retriveAnno(QString hgvs){
        QStringList remeh = mehstring.split(',');
        for(int b = 0; b < remeh.size(); b++){
            terms << remeh[b];
+           qDebug() << "geht 2";
        }
        //Transcriptcons object to put into list
-       Transcriptcons retrans = Transcriptcons(transcript_id, impact, variant_allele, gene_symbole, gene_symbol_source,
-                        gene_id, hgnc_id, strand, biotype, distance,terms);
+       Transcriptcons retrans = Transcriptcons(transcript_id, impact, variant_allele,
+                                               gene_symbole, gene_symbol_source,gene_id, hgnc_id, strand,
+                                               biotype, distance,terms);
 
        //add Transcriptcons object to QList of Transcriptcons
        relist << retrans;
 
    }
 
-    Annotation reanno = Annotation(refreq,relist,hgvs,most_severe_consequence);
-
-    return reanno;
+    Annotation* reanno = new Annotation(refreq,relist,hgvs,most_severe_consequence);
+    qDebug() << "geht 3";
+    return *reanno;
 }
 
 
-/*
-//overloadet function with "varianten" as standart table
-static void addrow(QSqlQuery query,QString chrom,QString pos, QString id, QString ref, QString alt,QString anno){
-    addrow(query,"varianten",chrom,pos,id,ref,alt,anno);
-}
-
-static void deleterow(QSqlQuery query, QString table, QString chrom,QString pos,QString ref,QString alt){
-    //create a string to be used as query request
-    QString querys = "DELETE FROM "+ table +" WHERE chrom = "+chrom+" AND pos = "+pos+" AND ref = "+ref+" AND alt = "+alt+";";
-    qDebug() << "Your query: " << querys ;
-    query.prepare(querys);
-
-    if (query.exec(querys)){ //run query and check if successfull if yes confirm to user
-        qDebug() << "Delete succsesfull";
-    }
-     qDebug() << query.lastError();
-}
-
-//overloadet with "varianten as table
-static void deleterow(QSqlQuery query, QString chrom,QString pos,QString ref,QString alt){
-   deleterow(query,"varianten",chrom,pos,ref,alt);
-}
-
-//print a sql table to coutput
-static void printtable(QSqlQuery query){
-
-    int row = 0;
-     while(query.next()){
-
-     QString chrom =  query.value(0).toString();
-     QString pos = query.value(1).toString();
-     QString id = query.value(2).toString();
-     QString ref = query.value(3).toString();
-     QString alt = query.value(4).toString();
-     QString info = query.value(5).toString();
-     QString anno = query.value(6).toString();
-     qDebug()<< "Row:" << row << "chrom:" << chrom << "pos:" << pos << "id:" << id << "ref:"
-             << ref <<  "alt:" << alt << "info:" << info << "anno" << anno;
-     row = row + 1;
-     }
-
-}
-
-
-//searches for entrys in the qiven tabel with keywords, return true and table entry on success and false on no entry;
-static bool searchtable(QSqlQuery query, QString table, QString chrom, QString pos, QString ref, QString alt){
-
-    //string with query to execute
-    QString querys = "SELECT v.chrom, v.pos., v.ref, v.alt FROM "+ table + " AS v WHERE v.chrom"
-    " = "+chrom+" AND pos = "+pos+" AND v.ref = "+ref+" AND v.alt = "+alt;
-    if (query.exec(querys)){
-        return true;
-    }
-    else {
-      qDebug() << "No entry found in table";
-      return false;
-    }
-}
-//overloaded searchtabel with varianten as table
-static bool searchtable(QSqlQuery query,QString chrom,QString pos,QString ref,QString alt){
-  return  searchtable(query,"varianten",chrom,pos,ref,alt);
-}
-
-//retuns to annotation of a requested variant if exsist otherwise an empty JSON object
-static QJsonObject getanno(QSqlQuery query,QString table,QString chrom, QString pos, QString ref, QString alt){
-    QString querys = "SELECT v.chrom, v.pos., v.ref, v.alt FROM "+ table + " AS v WHERE v.chrom"
-    " = "+chrom+" AND pos = "+pos+" AND v.ref = "+ref+" AND v.alt = "+alt;
-
-    //return the annotation of requested varint as a JSON object
-    if(query.exec(querys)){
-        QJsonObject anno = query.value(6).toJsonObject();
-        return anno;
-    }
-    else{
-        // if there is no annotation retunr an empty JSON object, not an NULL object
-        QJsonObject anno = {};
-       return anno;
-
-    }
-}
-**/

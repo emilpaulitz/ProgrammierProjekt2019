@@ -6,6 +6,7 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <mainwindow.h>
+#include <databank.h>
 
 #include <QJsonObject>
 #include <QJsonDocument>
@@ -56,8 +57,10 @@ void AnnotationService::makeVEPrequest(QNetworkAccessManager &manager, VCFline &
     QString URL = "http://grch37.rest.ensembl.org/vep/homo_sapiens/hgvs/";
     QString notation = line.getHgvsNotation();
     QString optionJson = "content-type=application/json";
-    QNetworkRequest *request = new QNetworkRequest(QUrl(URL + notation + optionJson));
-    qDebug() << "Making VEP Request to " + URL + notation + optionJson;
+
+    QNetworkRequest *request = new QNetworkRequest(QUrl(URL + notation +" ?" + optionJson));
+    // ? ist jetz hier da nicht zur hgvs gehört
+    //qDebug() << "Making VEP Request to " + URL + notation+ "?" + optionJson;
     // check connectivity
     if (manager.networkAccessible())
     {
@@ -80,7 +83,20 @@ void AnnotationService::pullAnnotations(VCFtable &table)
     for (int index = 0; index < table.getLines().size(); index++)
     {
         //TODO: check database, only add necessary lines
-        queue.enqueue(index);
+        QString currHGVS = table.getLine(index).getHgvsNotation();
+        bool isindb = databank::searchDatabank(currHGVS);
+
+        //qDebug() << "Test ob in dB " << isindb;
+
+        if (isindb)
+        {
+            Annotation & currAnno = databank::retrieveAnno(currHGVS);
+            table.getLine(index).setAnno(currAnno);
+            emit annotation_set(index);
+            qDebug() << "pulled from DB";
+        } else {
+            queue.enqueue(index);
+        }
     }
 
     setPullingAllAnnosTrue();
@@ -95,9 +111,24 @@ void AnnotationService::pullAnnotations(VCFtable &table)
  */
 void AnnotationService::makeSingleRequest(int row)
 {
-    qDebug() << __FUNCTION__;
-    queue.enqueue(row);
-    handle_queue();
+    QString currHGVS = annoTableObj->getLine(row).getHgvsNotation();
+    bool isindb = databank::searchDatabank(currHGVS);
+
+    //qDebug() << "Test ob in dB single request: " << isindb;
+
+    if (isindb)
+    {
+        Annotation& currAnno = databank::retrieveAnno(currHGVS);
+        annoTableObj->getLine(row).setAnno(currAnno);
+        emit annotation_set(row);
+        qDebug() << "pulled from DB";
+
+
+    } else {
+        queue.enqueue(row);
+        handle_queue();
+    }
+
 }
 
 // SLOTS
@@ -117,10 +148,13 @@ void AnnotationService::set_annotation(QNetworkReply *reply)
     QJsonDocument jsondoc = QJsonDocument::fromJson(data);
     Annotation* anno = new Annotation(jsondoc);
 
+    databank::addRow(*anno);
+    qDebug() << "inserted into DB";
+
     annoTableObj->getLine(index).setAnno(*anno);
     reply->deleteLater();
 
-    // trigger handle_queue()
+    //trigger handle_queue();
     emit annotation_set(index);
 }
 

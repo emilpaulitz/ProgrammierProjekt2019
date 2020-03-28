@@ -190,8 +190,8 @@ void MainWindow::on_actionSpace_for_Testing_triggered()
 
 void MainWindow::on_actionpull_all_annotations_triggered()
 {
-    annotationService->pullAnnotations(tableObj);
     this->showAnnoProgress();
+    annotationService->pullAnnotations(tableObj);
 }
 
 /**
@@ -231,15 +231,28 @@ void MainWindow::on_actionFilter_by_Frequency_triggered() {
     if (dia->exec()){
         double maxFreq = dia->getFreq();
         FilterDialog::Region region = dia->getRegion();
-
+        bool hideUnknown = dia->hideUnknown();
+        if(!dia->isReset()){
+           qDebug() << "Filter set: " << QString::number(maxFreq) << ", " << FilterDialog::regionToString(region);
+        }
         // Iterate through the lines to determine which to hide
-        bool missingFreq = false;
+        bool missingAnno = false;
+        double actualFreq = -1;
         for (VCFline line : this->tableObj.getLines()){
-            double actualFreq = -1;
 
             // continue if there is no annotation
             if(line.getAnno().isEmpty()){
-                missingFreq = true;
+                missingAnno = true;
+                continue;
+            }
+
+            // catch case of unknown frequencies
+            if(line.getAnno().getFrequencies().isUnknown()) {
+                if(hideUnknown){
+                    ui->tableWidget->hideRow(line.getIndex());
+                } else {
+                    ui->tableWidget->showRow(line.getIndex());
+                }
                 continue;
             }
 
@@ -254,7 +267,7 @@ void MainWindow::on_actionFilter_by_Frequency_triggered() {
         }
 
         // show a warning if not every line has an annotation
-        if (missingFreq){
+        if (missingAnno){
             QMessageBox::warning(this, tr("Missing Annotations"),
                                  tr("Filtering complete. Please note that there has been "
                                     "at least one line for which no annotation is given. "
@@ -290,6 +303,7 @@ void MainWindow::updateAnnoWidget(int rowUpdated){
 void MainWindow::showAnnoProgress() {
     ui->progressPullingAll->setMinimum(0);
     ui->progressPullingAll->setMaximum(this->tableObj.getNumLines());
+    ui->progressPullingAll->setValue(0);
     this->updateAnnoProgress();
     ui->progressPullingAll->show();
 }
@@ -316,13 +330,15 @@ void MainWindow::updateAnnoProgress() {
 void MainWindow::update_row(int index)
 {
     int row = index;
-    QList<QString> severityOptions = {"HIGH", "MODIFIER", "MODERATE", "LOW"};
+    QList<QString> SEVERITY_OPTIONS = {"HIGH", "MODERATE", "LOW", "MODIFIER"};
+
     // determine most severe impact
     Annotation & anno = tableObj.getLine(row).getAnno();
     QString mostSevereImpact = "";
+
     for (Transcriptcons transcript:anno.getTranscriptcons())
     {
-        if (severityOptions.indexOf(transcript.getImpact()) < severityOptions.indexOf(mostSevereImpact)
+        if (SEVERITY_OPTIONS.indexOf(transcript.getImpact()) < SEVERITY_OPTIONS.indexOf(mostSevereImpact)
                 || mostSevereImpact == "")
         {
             mostSevereImpact = transcript.getImpact();
@@ -345,14 +361,16 @@ void MainWindow::update_row(int index)
     else if (mostSevereImpact == "MODIFIER")
     {
         color = Qt::cyan;
-    } else
+    }
+    else
     {
         color = Qt::transparent;
     }
+
     // color entire row
     for (int col = 0; col < tableObj.getLine(index).getSize(); col++)
     {
-        ui->tableWidget->item(row, col)->setBackground(QBrush(color, Qt::Dense5Pattern));
+        ui->tableWidget->item(row, col)->setBackground(QBrush(color, Qt::Dense4Pattern));
     }
 }
 

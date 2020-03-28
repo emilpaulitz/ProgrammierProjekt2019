@@ -21,7 +21,7 @@ SOURCES += \
     Frequencies.cpp \
     Transcriptcons.cpp \
     annotationservice.cpp \
-    datenbank.cpp \
+    databank.cpp \
     filterdialog.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -33,7 +33,7 @@ HEADERS += \
     Frequencies.h \
     Transcriptcons.h \
     annotationservice.h \
-    datenbank.h \
+    databank.h \
     filterdialog.h \
     mainwindow.h \
     vcfline.h \
