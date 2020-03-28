@@ -1,6 +1,6 @@
 #include "filterdialog.h"
 #include "ui_filterdialog.h"
-
+#include "impactfilter.h"
 #include "annotationservice.h"
 
 FilterDialog::FilterDialog(QWidget *parent) :
@@ -117,5 +117,8 @@ void FilterDialog::on_resetButton_clicked()
 
 void FilterDialog::on_severityButton_clicked()
 {
+    impactFilter * dia = new impactFilter();
+    if (dia->exec()) {
 
+    }
 }
