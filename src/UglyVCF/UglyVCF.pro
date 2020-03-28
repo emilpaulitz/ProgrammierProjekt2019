@@ -41,6 +41,7 @@ HEADERS += \
 
 FORMS += \
     filterdialog.ui \
+    impactFilter.ui \
     mainwindow.ui
 
 # Default rules for deployment.

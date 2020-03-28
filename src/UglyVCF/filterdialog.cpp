@@ -114,3 +114,8 @@ void FilterDialog::on_resetButton_clicked()
     qDebug() << "Filter reset";
     this->reset = true;
 }
+
+void FilterDialog::on_severityButton_clicked()
+{
+
+}

@@ -31,6 +31,8 @@ public:
 private slots:
     void on_resetButton_clicked();
 
+    void on_severityButton_clicked();
+
 private:
     Ui::FilterDialog *ui;
     bool reset =false;
