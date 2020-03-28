@@ -11,7 +11,6 @@ class Frequencies
 
 private:
 double FreqByRegions[(int) FilterDialog::LASTENUM];
-QString noted;
 
 // afr,eas,gnomad_eas,gnomad_nfe,gnomad_fin,sas,gnomad,amr,gnomad_sas,
 //aa,gnomad_afr,eur,ea,gnomad_asj,gnomad_amr,gnomad_oth;
@@ -19,7 +18,6 @@ QString noted;
 public:
     Frequencies();
 
-    Frequencies(QString note);
 
     Frequencies(double afr, double eas,double gnomad_eas,double gnomad_nfe,double gnomad_fin, double sas, double gonmad,
                 double amr, double gnomad_sas, double aa, double gnomad_afr, double eur, double ea, double gnomad_asj,
