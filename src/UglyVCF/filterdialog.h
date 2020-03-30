@@ -2,6 +2,7 @@
 #define FILTERDIALOG_H
 
 #include <QDialog>
+#include "impactfilter.h"
 
 namespace Ui {
 class FilterDialog;
@@ -17,15 +18,24 @@ public:
 
     enum Region {
         afr,eas,gnomad_eas,gnomad_nfe,gnomad_fin,sas,gnomad,amr,gnomad_sas,
-        aa,gnomad_afr,eur,ea,gnomad_asj,gnomad_amr,gnomad_oth,LASTENUM
+        aa,gnomad_afr,eur,ea,gnomad_asj,gnomad_amr,gnomad_oth,LASTREGION
     };
 
+    // order has to be highest impact to lowest impact!
+    enum Impact {
+        HIGH=0, MODERATE=1, LOW=2, MODIFER=3, LASTIMPACT=4
+    };
+
+    Impact static stringToImpact (QString str);
     QString static regionToString(Region region);
 
     double getFreq();
+    double getFreq(FilterDialog::Impact impact);
     FilterDialog::Region getRegion();
     bool hideUnknown();
     bool isReset();
+    bool isFilterByImpact();
+    void openWindow();
 
 
 private slots:
@@ -35,7 +45,9 @@ private slots:
 
 private:
     Ui::FilterDialog *ui;
-    bool reset =false;
+    impactFilter * impact = nullptr;
+    bool filterByImpact = false;
+    bool reset = false;
 };
 
 #endif // FILTERDIALOG_H

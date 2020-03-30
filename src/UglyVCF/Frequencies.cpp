@@ -136,7 +136,7 @@ Frequencies::Frequencies(double afr, double eas, double gnomad_eas, double gnoma
     QString region;
     QString value;
 
-    for (int i = 0; i < FilterDialog::LASTENUM; i++) {
+    for (int i = 0; i < FilterDialog::LASTREGION; i++) {
 
         FilterDialog::Region reg = (FilterDialog::Region) i;
         region = FilterDialog::regionToString(reg) + ": ";
@@ -150,7 +150,7 @@ Frequencies::Frequencies(double afr, double eas, double gnomad_eas, double gnoma
                 restring+= region + value;
 
                 // Add comma if not the last entry
-        if (i + 1 != FilterDialog::LASTENUM) {
+        if (i + 1 != FilterDialog::LASTREGION) {
             restring += ", ";
         }
 

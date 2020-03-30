@@ -1,6 +1,7 @@
 #include "Annotation.h"
 #include "Transcriptcons.h"
 #include "Frequencies.h"
+#include "annotationservice.h"
 
 #include <QJsonObject>
 #include <QJsonDocument>
@@ -16,6 +17,26 @@ QString Annotation::getMost_severe_consequence() const
 void Annotation::setMost_severe_consequence(const QString &value)
 {
     most_severe_consequence = value;
+}
+
+/**
+ * @brief Annotation::getConsequenceClass returns the highest impact a transcript-consequence of this
+ *  annotation has. Returns FilterDialog::LASTIMPACT if there is no transcript-consequence!
+ * @return
+ */
+FilterDialog::Impact Annotation::getConsequenceClass(){
+
+    FilterDialog::Impact mostSevereImpact = FilterDialog::LASTIMPACT;
+
+    for (Transcriptcons transcript:this->getTranscriptcons())
+    {
+        if ((int) FilterDialog::stringToImpact(transcript.getImpact()) < (int) mostSevereImpact)
+        {
+            mostSevereImpact = FilterDialog::stringToImpact(transcript.getImpact());
+        }
+    }
+
+    return mostSevereImpact;
 }
 
 

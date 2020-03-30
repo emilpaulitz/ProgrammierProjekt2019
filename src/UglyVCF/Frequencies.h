@@ -10,7 +10,7 @@ class Frequencies
 {
 
 private:
-double FreqByRegions[(int) FilterDialog::LASTENUM];
+double FreqByRegions[(int) FilterDialog::LASTREGION];
 
 // afr,eas,gnomad_eas,gnomad_nfe,gnomad_fin,sas,gnomad,amr,gnomad_sas,
 //aa,gnomad_afr,eur,ea,gnomad_asj,gnomad_amr,gnomad_oth;

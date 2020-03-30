@@ -86,7 +86,7 @@ bool databank::addRow(Annotation anno){
     QString consquery = preparetranscons(transcons,hgvs);
     query.exec(consquery);
     qDebug() << query.lastError();
-    qDebug() << "trasncons Query run: " << query.lastQuery();
+    qDebug() << "transcons Query run: " << query.lastQuery();
     return rebool;
 
 }
@@ -100,7 +100,7 @@ bool databank::addRow(Annotation anno){
 QString databank::preparefreq(Frequencies freq,QString hgvs){
 
     QString restring = "INSERT INTO frequencies VALUES('"+hgvs;
-    for (int i = 0; i < FilterDialog::LASTENUM; i++) {
+    for (int i = 0; i < FilterDialog::LASTREGION; i++) {
         FilterDialog::Region reg = (FilterDialog::Region) i;
         restring += "','" + QString::number(freq.getFreq(reg));
     }

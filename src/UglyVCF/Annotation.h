@@ -4,7 +4,7 @@
 #include <QList>
 #include <Frequencies.h>
 #include <Transcriptcons.h>
-
+#include "filterdialog.h"
 
 
 class Annotation
@@ -22,6 +22,7 @@ public:
 
     Annotation(Frequencies frequencies,QList<Transcriptcons> transcriptcons,QString id,QString most_severe_consequence);
 
+    FilterDialog::Impact getConsequenceClass();
     QString getMost_severe_consequence() const;
     void setMost_severe_consequence(const QString &value);
 

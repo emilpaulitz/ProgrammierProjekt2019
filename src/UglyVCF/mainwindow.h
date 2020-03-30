@@ -26,6 +26,8 @@ private:
 
     VCFtable tableObj;
 
+    FilterDialog * filter = nullptr;
+
     QProcess * process;
 
     QString pipelineWD;

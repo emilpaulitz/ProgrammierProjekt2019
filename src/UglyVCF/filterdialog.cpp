@@ -8,10 +8,13 @@ FilterDialog::FilterDialog(QWidget *parent) :
     ui(new Ui::FilterDialog)
 {
     ui->setupUi(this);
-    for (int i = 0; i < FilterDialog::LASTENUM; i++){
+    for (int i = 0; i < FilterDialog::LASTREGION; i++){
         ui->comboBox->addItem(regionToString((Region) i));
     }
+}
 
+void FilterDialog::openWindow(){
+    this->reset = false;
 }
 
 double FilterDialog::getFreq(){
@@ -21,20 +24,41 @@ double FilterDialog::getFreq(){
     return ui->doubleSpinBox->value();
 }
 
+double FilterDialog::getFreq(FilterDialog::Impact impact){
+    switch (impact) {
+        case HIGH:
+            return this->impact->getHigh();
+        case MODERATE:
+            return this->impact->getModerate();
+        case LOW:
+            return this->impact->getLow();
+        case MODIFER:
+            return this->impact->getModifier();
+        case LASTIMPACT:
+            return this->impact->getUnknown();
+        default:
+            return 0;
+    }
+}
+
+bool FilterDialog::isFilterByImpact(){
+    return this->filterByImpact;
+}
+
 FilterDialog::Region FilterDialog::getRegion(){
     if (isReset()){
         return (Region) 0;
     }
 
-    for (int i = 0; i < LASTENUM; i++){
+    for (int i = 0; i < LASTREGION; i++){
         if(regionToString((Region) i) == ui->comboBox->currentText()){
             return (Region) i;
         }
     }
 
-    qDebug() << "Something went wrong in filterdialog.cpp line 22!"
-                " The text chosen in ComboBox could not be converted to a filter::Region enum type!";
-    return LASTENUM;
+    qDebug() << "ERROR in filterdialog.cpp getRegion: "
+                "The text chosen in ComboBox could not be converted to a filter::Region enum type!";
+    return LASTREGION;
 }
 
 bool FilterDialog::hideUnknown(){
@@ -46,6 +70,22 @@ bool FilterDialog::hideUnknown(){
 
 bool FilterDialog::isReset(){
     return this->reset;
+}
+
+FilterDialog::Impact FilterDialog::stringToImpact(QString str) {
+    if (str == "HIGH") {
+        return FilterDialog::HIGH;
+    } else if (str == "MODERATE") {
+        return FilterDialog::MODERATE;
+    } else if (str == "LOW") {
+        return FilterDialog::LOW;
+    } else if (str == "MODIFIER") {
+        return FilterDialog::MODIFER;
+    } else {
+        qDebug() << "ERROR in filterdialog.cpp function stringToImpact: "
+                    "given String could not be converted into enum type: " << str;
+        return FilterDialog::LASTIMPACT;
+    }
 }
 
 QString FilterDialog::regionToString(FilterDialog::Region region) {
@@ -112,13 +152,21 @@ FilterDialog::~FilterDialog()
 void FilterDialog::on_resetButton_clicked()
 {
     qDebug() << "Filter reset";
+    this->filterByImpact = false;
     this->reset = true;
 }
 
+/**
+ * @brief FilterDialog::on_severityButton_clicked opens the severity frequency dialog
+ * and stores the given values in impactFreq array.
+ */
 void FilterDialog::on_severityButton_clicked()
 {
-    impactFilter * dia = new impactFilter();
-    if (dia->exec()) {
-
+    if (!this->impact) {
+        this->impact = new impactFilter(this);
+    }
+    impact->openWindow(regionToString(this->getRegion()));
+    if (impact->exec()) {
+        this->filterByImpact = impact->isFilterByImpact();
     }
 }
