@@ -63,7 +63,7 @@ void databank::createTable()
  */
 bool databank::addRow(Annotation anno){
 
-    bool rebool = false;
+    
     QSqlQuery query;
     QString mostsevercons = anno.getMost_severe_consequence();
     QString hgvs = anno.getId();
@@ -73,21 +73,28 @@ bool databank::addRow(Annotation anno){
     //prepares query and adds a row to annotation table
     QString toquery = "INSERT INTO annotation VALUES('"+hgvs+"','"+mostsevercons+"')";
     query.exec(toquery);
-    qDebug() << query.lastError();
-    qDebug() << "anno query rin: " << query.lastQuery();
+    if (not query.isValid()){
+        return false;
+    }
+   
 
     //prepares query and adds a row to the frequencies tabel with hgvs a forein key
     QString frequery = preparefreq(freq,hgvs);
     query.exec(frequery);
-    qDebug() << query.lastError();
-    qDebug() << "frequ Query run: " << query.lastQuery();
+    if (not query.isValid()){
+        return false;
+    }
+    
 
-    //prepares and a
+    //prepares and a query transcons
     QString consquery = preparetranscons(transcons,hgvs);
     query.exec(consquery);
-    qDebug() << query.lastError();
-    qDebug() << "trasncons Query run: " << query.lastQuery();
-    return rebool;
+    if (not query.isValid()){
+        return false;
+    }
+   ;
+    
+    return true;
 
 }
 
@@ -142,7 +149,7 @@ QString databank::preparetranscons(QList<Transcriptcons> transcons,QString hgvs)
 
         QList<QString> terms = singlecons.getConsequence_terms();
         QString mehstring;
-
+        //creates a single string of terms -> no new table needed 
         for(int b = 0; b < terms.size(); b++){
             mehstring = mehstring + terms[b]+",";
         }
@@ -151,7 +158,7 @@ QString databank::preparetranscons(QList<Transcriptcons> transcons,QString hgvs)
                    gene_symbole+"','"+gene_symbol_source+"','"+gene_id+"','"+hgnc_id+"','"+
                    strand+"','"+biotype+"','"+distance+"','"+mehstring+"')";
 
-        //if not the last object add a , to end of line
+        //if not the last object add a "," to end of line
         if(i+1 < transcons.size()){
             restring = restring+",";
         }
@@ -171,9 +178,8 @@ bool databank::searchDatabank(QString hgvs){
     QSqlQuery query;
     QString query1 = "SELECT t.hgvs FROM annotation AS t WHERE t.hgvs ='"+hgvs+"'";
     query.exec(query1);
-    //qDebug() << "test db query eror " << query.lastError();
-    //qDebug() << "print last query " << query.lastQuery();
     query.next();
+    
     return query.isValid();
 
 }
@@ -187,11 +193,8 @@ Annotation & databank::retrieveAnno(QString hgvs){
     //retrieve most_severe_consequence, we already know hgvs
     QSqlQuery query;
     QString retrive = "SELECT t.most_severe_consequence FROM annotation AS t WHERE t.hgvs ='"+hgvs+"'";
-
     query.exec(retrive);
     query.next();
-    qDebug() << "Ist anno query vald?" << query.isValid();
-
     QString most_severe_consequence = query.value(0).toString();
 
     //retrieve frequncies and assign them to variables
@@ -200,8 +203,7 @@ Annotation & databank::retrieveAnno(QString hgvs){
               "FROM frequencies AS t WHERE t.hgvs ='"+hgvs+"'";
 
     query.exec(retrive);
-    qDebug() << "retive freq query" << query.lastQuery();
-    query.next();
+    //query.next();
     qDebug() << "is freq query valid?: " << query.isValid();
 
     double afr,eas,gnomad_eas,gnomad_nfe,gnomad_fin,sas,gnomad,amr,gnomad_sas,
@@ -234,9 +236,8 @@ Annotation & databank::retrieveAnno(QString hgvs){
               ",t.hgnc_id,t.strand,t.biotype,t.distance,t.terms FROM transcripscons AS t WHERE t.hgvs ='"+hgvs+"'";
     query.exec(retrive);
     qDebug() <<"Transcripcons: " << query.lastError();
-    qDebug() <<"Trascons query: " << query.lastQuery();
-    query.next();
-    qDebug() << "Transcons is valid?:" << query.isValid();
+    //qDebug() << "Query" << query.lastQuery();
+
 
     QString transcript_id,impact, variant_allele,gene_symbole,gene_symbol_source,gene_id,
             hgnc_id,strand,biotype,distance,mehstring;
@@ -246,7 +247,7 @@ Annotation & databank::retrieveAnno(QString hgvs){
 
    //cycle throu all Transcriptcons option in Query list
    while(query.next()){
-    qDebug() << "geht 1";
+    
        // create a new QList for consequence_terms and assing values to variables
        QList<QString> terms;
        transcript_id = query.value(0).toString();
@@ -265,7 +266,6 @@ Annotation & databank::retrieveAnno(QString hgvs){
        QStringList remeh = mehstring.split(',');
        for(int b = 0; b < remeh.size(); b++){
            terms << remeh[b];
-           qDebug() << "geht 2";
        }
        //Transcriptcons object to put into list
        Transcriptcons retrans = Transcriptcons(transcript_id, impact, variant_allele,
