@@ -56,7 +56,7 @@ Frequencies::Frequencies(double afr, double eas, double gnomad_eas, double gnoma
   /**Key Liste <- ("allele_string", "assembly_name", "end", "id", "input",
          "most_severe_consequence", "seq_region_name",
          "start", "strand", "transcript_consequences")
-         key1 fehlt -> keine freqcies -> craah weiter unten
+         key1 fehlt -> keine freqcies -> crash weiter unten
     **/
 
   //take the array value of key colocated_variants of jobject

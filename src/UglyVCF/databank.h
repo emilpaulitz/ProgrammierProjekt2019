@@ -22,6 +22,8 @@ public:
     static QString preparetranscons(QList<Transcriptcons> transcons,QString hgvs);
 
     static Annotation & retrieveAnno(QString hgvs);
+    static void purgeDB();
+    static void deleterow(QString hgvs);
 };
 
 #endif // DATABANK_H

@@ -82,7 +82,7 @@ void AnnotationService::pullAnnotations(VCFtable &table)
     // add lines to queue
     for (int index = 0; index < table.getLines().size(); index++)
     {
-        //TODO: check database, only add necessary lines
+        //check database, only add necessary lines
         QString currHGVS = table.getLine(index).getHgvsNotation();
         bool isindb = databank::searchDatabank(currHGVS);
 
@@ -114,7 +114,7 @@ void AnnotationService::makeSingleRequest(int row)
     QString currHGVS = annoTableObj->getLine(row).getHgvsNotation();
     bool isindb = databank::searchDatabank(currHGVS);
 
-    //qDebug() << "Test ob in dB single request: " << isindb;
+    qDebug() << "Test ob in dB single request: " << isindb;
 
     if (isindb)
     {

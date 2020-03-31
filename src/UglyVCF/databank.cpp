@@ -39,21 +39,28 @@ void databank::createTable()
 {
    QSqlQuery query;
 
-   QString query1 = "CREATE TABLE annotation (hgvs text,most_severe_consequence text)";
+   QString query1 = "CREATE TABLE annotation (hgvs text PRIMARY KEY,most_severe_consequence text)";
 
-   QString query2 = "CREATE TABLE frequencies (hgvs text,afr real,eas real,gnomad_eas real,gnomad_nfe real,"
+   QString query2 = "CREATE TABLE frequencies (hgvs text PRIMARY KEY,afr real,eas real,gnomad_eas real,gnomad_nfe real,"
                     "gnomad_fin real,sas real,gnomad real,amr real,gnomad_sas real,"
                     "aa real ,gnomad_afr real,eur real,ea real,gnomad_asj real,gnomad_amr real ,gnomad_oth real)";
 
    QString query3 = "CREATE TABLE transcripscons (hgvs text,transcript_id text,impact text,variant_allele text,"
                     "gene_symbole text,gene_symbol_source text,gene_id text,"
-                    "hgnc_id text,strand text,biotype text,distance text,terms text)";
+                    "hgnc_id text,strand text,biotype text,distance text,terms text,"
+                    "PRIMARY KEY(hgvs,transcript_id))";
+
+   QString query4 = "ALTER TABLE frequencies ADD FOREIGN KEY (hgvs) REFERENCES annotation ON DELETE CASCADE";
+   QString query5 = "ALTER TABLE transcripsconsn ADD FOREIGN KEY (hgvs) REFERENCES annotation ON DELETE CASCADE";
    query.prepare(query1);
    query.exec(query1);
    query.prepare(query2);
    query.exec(query2);
    query.prepare(query3);
    query.exec(query3);
+   query.exec(query4);
+   query.exec(query5);
+
 }
 
 /**
@@ -73,26 +80,23 @@ bool databank::addRow(Annotation anno){
     //prepares query and adds a row to annotation table
     QString toquery = "INSERT INTO annotation VALUES('"+hgvs+"','"+mostsevercons+"')";
     query.exec(toquery);
-    if (not query.isValid()){
-        return false;
-    }
-   
+    qDebug() << "geht ano insert" << query.lastError();
+
 
     //prepares query and adds a row to the frequencies tabel with hgvs a forein key
     QString frequery = preparefreq(freq,hgvs);
     query.exec(frequery);
-    if (not query.isValid()){
-        return false;
-    }
+    qDebug() << "geht freq" << query.lastError();
+
     
 
     //prepares and a query transcons
     QString consquery = preparetranscons(transcons,hgvs);
     query.exec(consquery);
-    if (not query.isValid()){
-        return false;
-    }
-    
+    qDebug() << "test trabscons " << query.lastError();
+
+
+
     return true;
 }
 
@@ -201,7 +205,7 @@ Annotation & databank::retrieveAnno(QString hgvs){
               "FROM frequencies AS t WHERE t.hgvs ='"+hgvs+"'";
 
     query.exec(retrive);
-    //query.next();
+    query.next();
     qDebug() << "is freq query valid?: " << query.isValid();
 
     double afr,eas,gnomad_eas,gnomad_nfe,gnomad_fin,sas,gnomad,amr,gnomad_sas,
@@ -233,7 +237,7 @@ Annotation & databank::retrieveAnno(QString hgvs){
     retrive = "SELECT t.transcript_id,t.impact,t.variant_allele,t.gene_symbole,t.gene_symbol_source,t.gene_id"
               ",t.hgnc_id,t.strand,t.biotype,t.distance,t.terms FROM transcripscons AS t WHERE t.hgvs ='"+hgvs+"'";
     query.exec(retrive);
-    qDebug() <<"Transcripcons: " << query.lastError();
+    //qDebug() <<"Transcripcons: " << query.lastError();
     //qDebug() << "Query" << query.lastQuery();
 
 
@@ -276,8 +280,38 @@ Annotation & databank::retrieveAnno(QString hgvs){
    }
 
     Annotation* reanno = new Annotation(refreq,relist,hgvs,most_severe_consequence);
-    qDebug() << "geht 3";
+   // qDebug() << "geht 3";
     return *reanno;
 }
+
+void databank::purgeDB() {
+QSqlQuery query;
+
+QString toexe = "DROP TABLE annotation, frequencies, transcripscons";
+query.exec(toexe);
+createTable();
+}
+
+void databank::deleterow(QString hgvs){
+QSqlQuery query;
+QString query1 = "DELETE FROM annotation AS t WHERE t.hgvs ='"+hgvs+"'";
+}
+
+DELTE FROM annotation AS t WHERE t.hgvs ='1:g.2044542T>C';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
