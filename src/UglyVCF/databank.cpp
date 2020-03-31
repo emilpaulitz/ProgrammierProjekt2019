@@ -92,10 +92,8 @@ bool databank::addRow(Annotation anno){
     if (not query.isValid()){
         return false;
     }
-   ;
     
     return true;
-
 }
 
 /**
@@ -107,7 +105,7 @@ bool databank::addRow(Annotation anno){
 QString databank::preparefreq(Frequencies freq,QString hgvs){
 
     QString restring = "INSERT INTO frequencies VALUES('"+hgvs;
-    for (int i = 0; i < FilterDialog::LASTENUM; i++) {
+    for (int i = 0; i < FilterDialog::LASTREGION; i++) {
         FilterDialog::Region reg = (FilterDialog::Region) i;
         restring += "','" + QString::number(freq.getFreq(reg));
     }

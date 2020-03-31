@@ -208,8 +208,8 @@ void MainWindow::on_tableWidget_cellClicked(int row, int)
 
     // TODO incorporate pulling from database instead from temporary memory!
     // Enqueue job unless every anno is being pulled anyway or annotation already known
-    if (!annotationService->isPullingAllAnnos() && (this->tableObj.getLine(cellClicked).getAnno().isEmpty() ||
-                                                    clickedAgain)) {
+    if ((!annotationService->isPullingAllAnnos() && this->tableObj.getLine(cellClicked).getAnno().isEmpty()) ||
+                                                    clickedAgain) {
         annotationService->makeSingleRequest(index);
     }
 
@@ -227,14 +227,22 @@ void MainWindow::on_actionFilter_by_Frequency_triggered() {
     }
 
     // Open filter dialog
-    FilterDialog * dia = new FilterDialog(this);
-    if (dia->exec()){
-        double maxFreq = dia->getFreq();
-        FilterDialog::Region region = dia->getRegion();
-        bool hideUnknown = dia->hideUnknown();
-        if(!dia->isReset()){
+
+    if (!this->filter){
+        this->filter = new FilterDialog(this);
+    }
+    filter->openWindow();
+    if (filter->exec()){
+
+        // retrieve values set by user
+        bool filterByImpact = filter->isFilterByImpact();
+        double maxFreq = filter->getFreq();
+        FilterDialog::Region region = filter->getRegion();
+        bool hideUnknown = filter->hideUnknown();
+        if(!filter->isReset()){
            qDebug() << "Filter set: " << QString::number(maxFreq) << ", " << FilterDialog::regionToString(region);
         }
+
         // Iterate through the lines to determine which to hide
         bool missingAnno = false;
         double actualFreq = -1;
@@ -247,13 +255,18 @@ void MainWindow::on_actionFilter_by_Frequency_triggered() {
             }
 
             // catch case of unknown frequencies
-            if(line.getAnno().getFrequencies().isUnknown()) {
+            if(line.getAnno().getFrequencies().isRegUnknown(region)) {
                 if(hideUnknown){
                     ui->tableWidget->hideRow(line.getIndex());
                 } else {
                     ui->tableWidget->showRow(line.getIndex());
                 }
                 continue;
+            }
+
+            // handle case of filtering by impact
+            if(filterByImpact) {
+                maxFreq = filter->getFreq(line.getAnno().getConsequenceClass());
             }
 
             actualFreq = line.getAnno().getFrequencies().getFreq(region);
@@ -329,48 +342,31 @@ void MainWindow::updateAnnoProgress() {
  */
 void MainWindow::update_row(int index)
 {
-    int row = index;
-    QList<QString> SEVERITY_OPTIONS = {"HIGH", "MODERATE", "LOW", "MODIFIER"};
-
-    // determine most severe impact
-    Annotation & anno = tableObj.getLine(row).getAnno();
-    QString mostSevereImpact = "";
-
-    for (Transcriptcons transcript:anno.getTranscriptcons())
-    {
-        if (SEVERITY_OPTIONS.indexOf(transcript.getImpact()) < SEVERITY_OPTIONS.indexOf(mostSevereImpact)
-                || mostSevereImpact == "")
-        {
-            mostSevereImpact = transcript.getImpact();
-        }
-    }
-    // choose colour from most severe consequence
+    FilterDialog::Impact mostSevereImpact = tableObj.getLine(index).getAnno().getConsequenceClass();
     QColor color;
-    if (mostSevereImpact == "HIGH")
-    {
-        color = Qt::red;
-    }
-    else if (mostSevereImpact == "MODERATE")
-    {
-        color = Qt::yellow;
-    }
-    else if (mostSevereImpact == "LOW")
-    {
-        color = Qt::green;
-    }
-    else if (mostSevereImpact == "MODIFIER")
-    {
-        color = Qt::cyan;
-    }
-    else
-    {
-        color = Qt::transparent;
+
+    switch (mostSevereImpact) {
+        case FilterDialog::HIGH:
+            color = Qt::red;
+            break;
+        case FilterDialog::MODERATE:
+            color = Qt::yellow;
+            break;
+        case FilterDialog::LOW:
+            color = Qt::green;
+            break;
+        case FilterDialog::MODIFER:
+            color = Qt::cyan;
+            break;
+        default:
+            color = Qt::transparent;
+            break;
     }
 
     // color entire row
     for (int col = 0; col < tableObj.getLine(index).getSize(); col++)
     {
-        ui->tableWidget->item(row, col)->setBackground(QBrush(color, Qt::Dense4Pattern));
+        ui->tableWidget->item(index, col)->setBackground(QBrush(color, Qt::Dense4Pattern));
     }
 }
 

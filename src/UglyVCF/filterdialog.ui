@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>441</width>
-    <height>356</height>
+    <height>392</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,9 +19,9 @@
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>130</x>
-     <y>280</y>
-     <width>261</width>
+     <x>160</x>
+     <y>340</y>
+     <width>231</width>
      <height>31</height>
     </rect>
    </property>
@@ -142,7 +142,7 @@ border-color: rgb(255, 0, 0);</string>
    <property name="geometry">
     <rect>
      <x>50</x>
-     <y>280</y>
+     <y>340</y>
      <width>101</width>
      <height>31</height>
     </rect>
@@ -161,7 +161,7 @@ border-color: rgb(255, 0, 0);</string>
    <property name="geometry">
     <rect>
      <x>50</x>
-     <y>240</y>
+     <y>290</y>
      <width>341</width>
      <height>20</height>
     </rect>
@@ -171,6 +171,19 @@ border-color: rgb(255, 0, 0);</string>
    </property>
    <property name="checked">
     <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="severityButton">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>240</y>
+     <width>171</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Filter by Impact &gt;&gt;</string>
    </property>
   </widget>
  </widget>

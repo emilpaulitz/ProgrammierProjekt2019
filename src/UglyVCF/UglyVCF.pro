@@ -23,6 +23,7 @@ SOURCES += \
     annotationservice.cpp \
     databank.cpp \
     filterdialog.cpp \
+    impactfilter.cpp \
     main.cpp \
     mainwindow.cpp \
     vcfline.cpp \
@@ -35,12 +36,14 @@ HEADERS += \
     annotationservice.h \
     databank.h \
     filterdialog.h \
+    impactfilter.h \
     mainwindow.h \
     vcfline.h \
     vcftable.h
 
 FORMS += \
     filterdialog.ui \
+    impactfilter.ui \
     mainwindow.ui
 
 # Default rules for deployment.
