@@ -297,9 +297,6 @@ QSqlQuery query;
 QString query1 = "DELETE FROM annotation AS t WHERE t.hgvs ='"+hgvs+"'";
 }
 
-DELTE FROM annotation AS t WHERE t.hgvs ='1:g.2044542T>C';
-
-
 
 
 
