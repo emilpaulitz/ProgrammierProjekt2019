@@ -25,20 +25,23 @@ double FilterDialog::getFreq(){
 }
 
 double FilterDialog::getFreq(FilterDialog::Impact impact){
-    switch (impact) {
-        case HIGH:
-            return this->impact->getHigh();
-        case MODERATE:
-            return this->impact->getModerate();
-        case LOW:
-            return this->impact->getLow();
-        case MODIFER:
-            return this->impact->getModifier();
-        case LASTIMPACT:
-            return this->impact->getUnknown();
-        default:
-            return 0;
+    if(filterByImpact) {
+        switch (impact) {
+            case HIGH:
+                return this->impact->getHigh();
+            case MODERATE:
+                return this->impact->getModerate();
+            case LOW:
+                return this->impact->getLow();
+            case MODIFER:
+                return this->impact->getModifier();
+            case LASTIMPACT:
+                return this->impact->getUnknown();
+            default:
+                return 0;
+        }
     }
+    return 1;
 }
 
 bool FilterDialog::isFilterByImpact(){

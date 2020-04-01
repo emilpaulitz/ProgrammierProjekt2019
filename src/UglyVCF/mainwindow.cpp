@@ -8,6 +8,7 @@
 #include "annotationservice.h"
 #include "Frequencies.h"
 #include "Annotation.h"
+#include "databank.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -35,18 +36,26 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     ui->annoWidget->hide();
     ui->progressPullingAll->hide();
-    annotationService = new AnnotationService(&tableObj);
-    // connect signals from annotationservice with corresponding slots from this class
-    connect(annotationService, &AnnotationService::no_connection, this, &MainWindow::pop_no_connection);
-    connect(annotationService, &AnnotationService::annotation_set,this, &MainWindow::updateAnnoWidget);
-    connect(annotationService, &AnnotationService::annotation_set,this, &MainWindow::updateAnnoProgress);
-    connect(annotationService, &AnnotationService::annotation_set, this, &MainWindow::update_row);
+    openAnnoService();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
     delete annotationService;
+}
+
+/**
+ * @brief MainWindow::openAnnoService creates a new annotationService object and connect all the
+ *  necessary functions
+ */
+void MainWindow::openAnnoService(){
+    annotationService = new AnnotationService(&tableObj);
+    // connect signals from annotationservice with corresponding slots from this class
+    connect(annotationService, &AnnotationService::no_connection, this, &MainWindow::pop_no_connection);
+    connect(annotationService, &AnnotationService::annotation_set, this, &MainWindow::updateAnnoWidget);
+    connect(annotationService, &AnnotationService::annotation_set, this, &MainWindow::updateAnnoProgress);
+    connect(annotationService, &AnnotationService::annotation_set, this, &MainWindow::update_row);
 }
 
 /**
@@ -82,6 +91,9 @@ void MainWindow::parseVCF(QString filename)
             newItem->setData(Qt::UserRole, i);
         }
     }
+
+    // create new annotationservice
+    openAnnoService();
     ui->tableWidget->show();
 }
 
@@ -180,11 +192,12 @@ void MainWindow::handlePipelineFinished(int, QProcess::ExitStatus status){
 // Platz wo man automatische Tests implementieren kann
 void MainWindow::on_actionSpace_for_Testing_triggered()
 {
-    std::string fdsa = "f sdaf ";
+    databank::purgeDB();
+    /*std::string fdsa = "f sdaf ";
     fdsa + "fdsa f" + "fdsafds ";
     QString i = "fdsaf a";
     std::string msg = i.toStdString();
-    QMessageBox::information(this, tr("Caution"), tr(&msg[0]));
+    QMessageBox::information(this, tr("Caution"), tr(&msg[0]));*/
 }
 
 
@@ -206,10 +219,10 @@ void MainWindow::on_tableWidget_cellClicked(int row, int)
     bool clickedAgain = cellClicked == index;
     this->cellClicked = index;
 
-    // TODO incorporate pulling from database instead from temporary memory!
+    // Pull annotation completely fresh after a double click
     // Enqueue job unless every anno is being pulled anyway or annotation already known
-    if ((!annotationService->isPullingAllAnnos() && this->tableObj.getLine(cellClicked).getAnno().isEmpty()) ||
-                                                    clickedAgain) {
+    if ((!annotationService->isPullingAllAnnos()
+               && this->tableObj.getLine(cellClicked).getAnno().isEmpty()) || clickedAgain) {
         annotationService->makeSingleRequest(index);
     }
 
@@ -247,7 +260,6 @@ void MainWindow::on_actionFilter_by_Frequency_triggered() {
         bool missingAnno = false;
         double actualFreq = -1;
         for (VCFline line : this->tableObj.getLines()){
-
             // continue if there is no annotation
             if(line.getAnno().isEmpty()){
                 missingAnno = true;
@@ -256,7 +268,7 @@ void MainWindow::on_actionFilter_by_Frequency_triggered() {
 
             // catch case of unknown frequencies
             if(line.getAnno().getFrequencies().isRegUnknown(region)) {
-                if(hideUnknown){
+                if(hideUnknown || filter->getFreq(line.getAnno().getConsequenceClass()) == -1){
                     ui->tableWidget->hideRow(line.getIndex());
                 } else {
                     ui->tableWidget->showRow(line.getIndex());
@@ -327,11 +339,7 @@ void MainWindow::showAnnoProgress() {
  */
 void MainWindow::updateAnnoProgress() {
     if (this->annotationService->isPullingAllAnnos()) {
-        if (annotationService->getQueue().isEmpty()) {
-            ui->progressPullingAll->hide();
-        } else {
-            ui->progressPullingAll->setValue(this->tableObj.getNumLines() - annotationService->getQueueSize());
-        }
+        ui->progressPullingAll->setValue(this->tableObj.getNumLines() - annotationService->getQueueSize());
     }
 }
 

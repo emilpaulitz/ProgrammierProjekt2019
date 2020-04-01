@@ -34,6 +34,8 @@ private:
     QString pipelinePath;
     QString refGenPath;
 
+    void openAnnoService();
+
     // row of the cell currently clicked on
     int cellClicked;
 

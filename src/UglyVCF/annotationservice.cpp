@@ -34,12 +34,11 @@ AnnotationService::AnnotationService(VCFtable *table)
 }
 
 // To be called when the job to pull every annotation has been enqueued
-// pullingAllAnnos should never be set to false -> enough reason to make this a new function?
-void AnnotationService::setPullingAllAnnosTrue(){
-    this->pullingAllAnnos = true;
+void AnnotationService::setPullingAllAnnos(bool b){
+    this->pullingAllAnnos = b;
 }
 
-// Returns true if the job to pull all annotations has been enqueued (maybe finished)
+// Returns true if the job to pull all annotations has been enqueued
 bool AnnotationService::isPullingAllAnnos() const{
     return this->pullingAllAnnos;
 }
@@ -99,7 +98,7 @@ void AnnotationService::pullAnnotations(VCFtable &table)
         }
     }
 
-    setPullingAllAnnosTrue();
+    setPullingAllAnnos(true);
 
     // start queue
     handle_queue();
@@ -122,7 +121,7 @@ void AnnotationService::makeSingleRequest(int row)
         annoTableObj->getLine(row).setAnno(currAnno);
         emit annotation_set(row);
         qDebug() << "pulled from DB";
-
+        handle_queue();
 
     } else {
         queue.enqueue(row);
@@ -168,6 +167,8 @@ void AnnotationService::handle_queue()
     {
         this->currentIndex = queue.dequeue();
         makeVEPrequest(*this->manager, annoTableObj->getLine(this->currentIndex));
+    } else {
+        setPullingAllAnnos(false);
     }
 }
 
