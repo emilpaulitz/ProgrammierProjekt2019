@@ -31,7 +31,6 @@ public:
     void makeVEPrequest(QNetworkAccessManager &manager, VCFline &line);
     void makeVEPrequest(QString notation);
     void pullAnnotations(VCFtable &table);
-    ///void handleQueue();
 
     void makeSingleRequest(int row);
 

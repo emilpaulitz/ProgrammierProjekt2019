@@ -10,10 +10,7 @@ class Frequencies
 {
 
 private:
-double FreqByRegions[(int) FilterDialog::LASTREGION];
-
-// afr,eas,gnomad_eas,gnomad_nfe,gnomad_fin,sas,gnomad,amr,gnomad_sas,
-//aa,gnomad_afr,eur,ea,gnomad_asj,gnomad_amr,gnomad_oth;
+double freqByRegions[(int) FilterDialog::LASTREGION];
 
 public:
     Frequencies();
@@ -28,59 +25,9 @@ public:
 
     bool isRegUnknown(FilterDialog::Region region);
 
-/*
+   static Frequencies parse_Frequencies(QJsonDocument doc);
 
-    double getAfr() const;
-    void setAfr(double value);
-
-    double getEas() const;
-    void setEas(double value);
-
-    double getGnomad_eas() const;
-    void setGnomad_eas(double value);
-
-    double getGnomad_nfe() const;
-    void setGnomad_nfe(double value);
-
-    double getGnomad_fin() const;
-    void setGnomad_fin(double value);
-
-    double getSas() const;
-    void setSas(double value);
-
-    double getGnomad() const;
-    void setGnomad(double value);
-
-    double getAmr() const;
-    void setAmr(double value);
-
-    double getGnomad_sas() const;
-    void setGnomad_sas(double value);
-
-    double getAa() const;
-    void setAa(double value);
-
-    double getGnomad_afr() const;
-    void setGnomad_afr(double value);
-
-    double getEur() const;
-    void setEur(double value);
-
-    double getEa() const;
-    void setEa(double value);
-
-    double getGnomad_asj() const;
-    void setGnomad_asj(double value);
-
-    double getGnomad_amr() const;
-    void setGnomad_amr(double value);
-
-    double getGnomad_oth() const;
-    void setGnomad_oth(double value);*/
-
-   static Frequencies pars_frequencies(QJsonDocument doc);
-
-   static QString print_frequencies(Frequencies freq);
+   static QString print_Frequencies(Frequencies freq);
 };
 
 

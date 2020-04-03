@@ -152,11 +152,15 @@ FilterDialog::~FilterDialog()
     delete ui;
 }
 
-void FilterDialog::on_resetButton_clicked()
-{
-    qDebug() << "Filter reset";
+void FilterDialog::resetFilter(){
+    qDebug() << __FUNCTION__;
     this->filterByImpact = false;
     this->reset = true;
+}
+
+void FilterDialog::on_resetButton_clicked()
+{
+    resetFilter();
 }
 
 /**

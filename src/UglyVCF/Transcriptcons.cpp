@@ -144,7 +144,7 @@ this->consequence_terms = consequence_terms;}
 
 
 //gets a JsonDoc and retuns a list of transcritioncons
-QList<Transcriptcons> Transcriptcons::parse_totranscrictionlist(QJsonDocument doc){
+QList<Transcriptcons> Transcriptcons::parse_TranscriptconsList(QJsonDocument doc){
 
 QList<Transcriptcons> tlist;
 
@@ -187,7 +187,7 @@ for(int i = 0; i < listlength; i++){
 return tlist;
 }
 
-QString Transcriptcons::printtranscons(Transcriptcons trans){
+QString Transcriptcons::print_Transcriptcons(Transcriptcons trans){
     QString re = "TRANSCRIPT_ID: ";
     QString li;
     QList<QString> qli = trans.getConsequence_terms();
@@ -208,11 +208,11 @@ QString Transcriptcons::printtranscons(Transcriptcons trans){
     return re;
 }
 
-QString Transcriptcons::printtranscons(QList<Transcriptcons> trans){
+QString Transcriptcons::print_Transcriptcons(QList<Transcriptcons> trans){
     QString re;
 
     for(int i = 0; i < trans.size(); i++){
-        re = re + printtranscons(trans.at(i))+ " \n ";
+        re = re + print_Transcriptcons(trans.at(i))+ " \n ";
     }
     return re;
 }
