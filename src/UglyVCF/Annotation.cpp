@@ -115,8 +115,8 @@ Annotation Annotation::pars_Annotation(QJsonDocument &doc){
 
     QString id = pars_id(doc);
     QString most_severe_consequence = pars_most_severe_consequence(doc);
-    QList<Transcriptcons> transcriptcons =  Transcriptcons::parse_totranscrictionlist(doc);
-    Frequencies frequencies = Frequencies::pars_frequencies(doc);
+    QList<Transcriptcons> transcriptcons =  Transcriptcons::parse_TranscriptconsList(doc);
+    Frequencies frequencies = Frequencies::parse_Frequencies(doc);
     Annotation reAnno = Annotation(frequencies,transcriptcons,id,most_severe_consequence);
 
     return reAnno;
@@ -127,8 +127,8 @@ bool Annotation::isEmpty(){
 }
 
 QString Annotation::print_Annotation(){
-    QString printcons = Transcriptcons::printtranscons(this->getTranscriptcons());
-    QString printfrequencies = Frequencies::print_frequencies(this->getFrequencies());
+    QString printcons = Transcriptcons::print_Transcriptcons(this->getTranscriptcons());
+    QString printfrequencies = Frequencies::print_Frequencies(this->getFrequencies());
     QString id = this->getId();
     QString most_severe_consequence = this->getMost_severe_consequence();
 

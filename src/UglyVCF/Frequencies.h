@@ -3,9 +3,6 @@
 #include <QJsonDocument>
 #include "filterdialog.h"
 
-
-
-
 class Frequencies
 {
 
