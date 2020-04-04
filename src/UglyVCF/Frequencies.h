@@ -10,7 +10,7 @@ class Frequencies
 {
 
 private:
-double freqByRegions[(int) FilterDialog::LASTREGION];
+double FreqByRegions[(int) FilterDialog::LASTREGION];
 
 public:
     Frequencies();
