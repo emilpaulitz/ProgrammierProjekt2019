@@ -34,6 +34,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ui->explanation->hide();
     ui->annoWidget->hide();
     ui->progressPullingAll->hide();
     openAnnoService();
@@ -228,6 +229,7 @@ void MainWindow::on_tableWidget_cellClicked(int row, int)
 
     this->updateAnnoWidget(index);
     ui->annoWidget->show();
+    ui->explanation->show();
 }
 
 void MainWindow::on_actionFilter_by_Frequency_triggered() {

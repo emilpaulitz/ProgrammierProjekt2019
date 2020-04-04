@@ -38,16 +38,14 @@ Frequencies::Frequencies(double afr, double eas, double gnomad_eas, double gnoma
     this->freqByRegions[FilterDialog::gnomad_oth] = gnomad_oth;
 }
 
-<<<<<<< HEAD
+
 /**
   * @brief Frequencies::parse_Frequencies, parases a QJason Doc to a Frequenciesy object
   * @param QJsonDocument doc
   * @returnFrequencies Object
   */
 Frequencies Frequencies::parse_Frequencies(QJsonDocument doc){
-=======
- Frequencies Frequencies::parse_Frequencies(QJsonDocument doc){
->>>>>>> 45893bd0890676276d8e71cbb6e7ef9c9cc1a341
+
 
   QString key1 = "colocated_variants";
   QString key2 = "frequencies";
@@ -140,14 +138,13 @@ Frequencies Frequencies::parse_Frequencies(QJsonDocument doc){
 
 
 //returns a String containing all the regions and their frequency
-<<<<<<< HEAD
+
 /**
   * @brief Frequencies::print_Frequencies, creates a readable QString out of a Frequencies object
   * @param Frequencies freq
   * @return QString
   */
-=======
->>>>>>> 45893bd0890676276d8e71cbb6e7ef9c9cc1a341
+
  QString Frequencies::print_Frequencies(Frequencies freq){
 
     QString restring;
