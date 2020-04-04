@@ -74,5 +74,6 @@ private slots:
     void updateAnnoProgress();
 
     void update_row(int index);
+    void on_tableWidget_cellDoubleClicked(int row, int column);
 };
 #endif // MAINWINDOW_H

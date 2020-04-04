@@ -25,11 +25,10 @@ AnnotationService::AnnotationService()
 {
 }
 
-AnnotationService::AnnotationService(VCFtable *table)
-{
+void AnnotationService::setupAnnoService(VCFtable *table){
     annoTableObj = table;
     manager = new QNetworkAccessManager();
-    connect(manager, &QNetworkAccessManager::finished, this, &AnnotationService::set_annotation);
+    connect(manager, &QNetworkAccessManager::finished, this, &AnnotationService::setAnnoFromVEP);
     connect(this, &AnnotationService::annotation_set, this, &AnnotationService::handle_queue);
 }
 
@@ -38,7 +37,10 @@ void AnnotationService::setPullingAllAnnos(bool b){
     this->pullingAllAnnos = b;
 }
 
-// Returns true if the job to pull all annotations has been enqueued
+/**
+ * @brief AnnotationService::isPullingAllAnnos Returns if the Queue has been filled and is being handled.
+ * @return
+ */
 bool AnnotationService::isPullingAllAnnos() const{
     return this->pullingAllAnnos;
 }
@@ -58,8 +60,7 @@ void AnnotationService::makeVEPrequest(QNetworkAccessManager &manager, VCFline &
     QString optionJson = "content-type=application/json";
 
     QNetworkRequest *request = new QNetworkRequest(QUrl(URL + notation +" ?" + optionJson));
-    // ? ist jetz hier da nicht zur hgvs gehört
-    //qDebug() << "Making VEP Request to " + URL + notation+ "?" + optionJson;
+
     // check connectivity
     if (manager.networkAccessible())
     {
@@ -78,30 +79,21 @@ void AnnotationService::makeVEPrequest(QNetworkAccessManager &manager, VCFline &
  */
 void AnnotationService::pullAnnotations(VCFtable &table)
 {
-    // add lines to queue
-    for (int index = 0; index < table.getLines().size(); index++)
-    {
-        //check database, only add necessary lines
-        QString currHGVS = table.getLine(index).getHgvsNotation();
-        bool isindb = databank::searchDatabank(currHGVS);
-
-        //qDebug() << "Test ob in dB " << isindb;
-
-        if (isindb)
+    if(!isPullingAllAnnos()){
+        // add lines to queue
+        for (int index = 0; index < table.getLines().size(); index++)
         {
-            Annotation & currAnno = databank::retrieveAnno(currHGVS);
-            table.getLine(index).setAnno(currAnno);
-            emit annotation_set(index);
-            qDebug() << "pulled from DB";
-        } else {
-            queue.enqueue(index);
+            //check database, pull available entries first
+            if (databank::searchDatabank(table.getLine(index).getHgvsNotation()))
+            {
+                queue.prepend(index);
+            } else {
+                queue.enqueue(index);
+            }
         }
+
+        startQueue();
     }
-
-    setPullingAllAnnos(true);
-
-    // start queue
-    handle_queue();
 }
 
 /**
@@ -110,34 +102,18 @@ void AnnotationService::pullAnnotations(VCFtable &table)
  */
 void AnnotationService::makeSingleRequest(int row)
 {
-    QString currHGVS = annoTableObj->getLine(row).getHgvsNotation();
-    bool isindb = databank::searchDatabank(currHGVS);
-
-    qDebug() << "Test ob in dB single request: " << isindb;
-
-    if (isindb)
-    {
-        Annotation& currAnno = databank::retrieveAnno(currHGVS);
-        annoTableObj->getLine(row).setAnno(currAnno);
-        emit annotation_set(row);
-        qDebug() << "pulled from DB";
-        handle_queue();
-
-    } else {
-        queue.enqueue(row);
-        handle_queue();
-    }
-
+    queue.prepend(row);
+    startQueue();
 }
 
 // SLOTS
 
 /**
- * @brief AnnotationService::set_annotation recieved reply is set as annotation onto the line in
+ * @brief AnnotationService::setAnnoFromVEP recieved reply is set as annotation onto the line in
  * this->currentIndex. TRIGGERED by: "finished"-signal from this->manager
  * @param reply The QNetorkReply recieved from VEP service
  */
-void AnnotationService::set_annotation(QNetworkReply *reply)
+void AnnotationService::setAnnoFromVEP(QNetworkReply *reply)
 {
     int index = this->currentIndex;
     qDebug() << __FUNCTION__ << index;
@@ -153,22 +129,56 @@ void AnnotationService::set_annotation(QNetworkReply *reply)
     annoTableObj->getLine(index).setAnno(*anno);
     reply->deleteLater();
 
-    //trigger handle_queue();
     emit annotation_set(index);
 }
 
 /**
- * @brief AnnotationService::handleQueue works through Queue, calls makeVEPrequest for every queue element
- * TRIGGRED by: "annotation_set"-signal from this
+ * @brief AnnotationService::setAnnoFromDB retrieves entry with given hgvs from db and sets
+ * it as the annotation for the given row.
+ * @param row row of the table object the annotation should be set for
+ * @param hgvs hgvs notation of the Annotation to be retrieved
+ */
+void AnnotationService::setAnnoFromDB(int row, QString hgvs){
+    Annotation & currAnno = databank::retrieveAnno(hgvs);
+    annoTableObj->getLine(row).setAnno(currAnno);
+    qDebug() << "pulled from DB";
+    emit annotation_set(row);
+}
+
+void AnnotationService::startQueue() {
+    if (!isPullingAllAnnos()){
+        setPullingAllAnnos(true);
+        handle_queue();
+    }
+}
+
+/**
+ * @brief AnnotationService::handleQueue DO NOT CALL! Instead call startQueue()!
+ * ONLY TRIGGRED by: "annotation_set"-signal from this
+ * works through the queue and starts either VEP requests or DB pulls.
  */
 void AnnotationService::handle_queue()
 {
-    if (!queue.isEmpty())
+    if (queue.isEmpty())
+    {
+        // pulling is finished
+        setPullingAllAnnos(false);
+    }
+    else
     {
         this->currentIndex = queue.dequeue();
-        makeVEPrequest(*this->manager, annoTableObj->getLine(this->currentIndex));
-    } else {
-        setPullingAllAnnos(false);
+        jobsProcessed++;
+        if (jobsProcessed % 1000 == 0){
+            databank::deleterow(annoTableObj->getLine(currentIndex).getHgvsNotation());
+            qDebug() << "Row Deleted!";
+        }
+        QString currHGVS = annoTableObj->getLine(currentIndex).getHgvsNotation();
+
+        if (databank::searchDatabank(currHGVS)) {
+            setAnnoFromDB(currentIndex, currHGVS);
+        } else {
+            makeVEPrequest(*this->manager, annoTableObj->getLine(this->currentIndex));
+        }
     }
 }
 

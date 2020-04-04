@@ -46,16 +46,20 @@ MainWindow::~MainWindow()
 }
 
 /**
- * @brief MainWindow::openAnnoService creates a new annotationService object and connect all the
+ * @brief MainWindow::openAnnoService creates a new annotationService object and connects all the
  *  necessary functions
  */
 void MainWindow::openAnnoService(){
-    annotationService = new AnnotationService(&tableObj);
+    annotationService = new AnnotationService();
+
     // connect signals from annotationservice with corresponding slots from this class
     connect(annotationService, &AnnotationService::no_connection, this, &MainWindow::pop_no_connection);
     connect(annotationService, &AnnotationService::annotation_set, this, &MainWindow::updateAnnoWidget);
-    connect(annotationService, &AnnotationService::annotation_set, this, &MainWindow::updateAnnoProgress);
     connect(annotationService, &AnnotationService::annotation_set, this, &MainWindow::update_row);
+    connect(annotationService, &AnnotationService::annotation_set, this, &MainWindow::updateAnnoProgress);
+
+    // set up annotationService connecting internal signals and slots
+    annotationService->setupAnnoService(&tableObj);
 }
 
 /**
@@ -214,20 +218,33 @@ void MainWindow::on_actionpull_all_annotations_triggered()
  */
 void MainWindow::on_tableWidget_cellClicked(int row, int)
 {
-    qDebug() << "cell_clicked: " << row;
-    int index = row;
-    bool clickedAgain = cellClicked == index;
-    this->cellClicked = index;
+    qDebug() << "cell clicked: " << row;
+    bool clickedAgain = (cellClicked == row);
+    this->cellClicked = row;
 
     // Pull annotation completely fresh after a double click
-    // Enqueue job unless every anno is being pulled anyway or annotation already known
-    if ((!annotationService->isPullingAllAnnos()
-               && this->tableObj.getLine(cellClicked).getAnno().isEmpty()) || clickedAgain) {
-        annotationService->makeSingleRequest(index);
+    if (clickedAgain){
+        databank::deleterow(tableObj.getLine(row).getHgvsNotation());
+        annotationService->makeSingleRequest(row);
+
+    // Enqueue job unless annotation already known nor every anno is being pulled anyway
+    } else if (tableObj.getLine(cellClicked).getAnno().isEmpty()
+                && !annotationService->isPullingAllAnnos())  {
+        annotationService->makeSingleRequest(row);
     }
 
-    this->updateAnnoWidget(index);
+    this->updateAnnoWidget(row);
     ui->annoWidget->show();
+}
+
+/**
+ * @brief MainWindow::on_tableWidget_cellDoubleClicked call cellClicked function with clickedAgain being true
+ * @param row
+ */
+void MainWindow::on_tableWidget_cellDoubleClicked(int row, int)
+{
+    this->cellClicked = row;
+    on_tableWidget_cellClicked(row,0);
 }
 
 void MainWindow::on_actionFilter_by_Frequency_triggered() {
@@ -260,9 +277,10 @@ void MainWindow::on_actionFilter_by_Frequency_triggered() {
         bool missingAnno = false;
         double actualFreq = -1;
         for (VCFline line : this->tableObj.getLines()){
-            // continue if there is no annotation
+            // show line (in case of new file) and continue if there is no annotation
             if(line.getAnno().isEmpty()){
                 missingAnno = true;
+                ui->tableWidget->showRow(line.getIndex());
                 continue;
             }
 
@@ -315,7 +333,8 @@ void MainWindow::updateAnnoWidget(int rowUpdated){
 
     if (this->tableObj.getLine(cellClicked).getAnno().isEmpty()){
 
-        ui->annoWidget->setText("Making a VEP Request, please stand by...");
+        ui->annoWidget->setText("The VEP Request has been enqueued, please stand by. "
+                                "Doubleclick or click again to make this line a priority.");
     } else {
 
         ui->annoWidget->setText(this->tableObj.getLine(cellClicked).getAnno().print_Annotation());
@@ -340,6 +359,8 @@ void MainWindow::showAnnoProgress() {
 void MainWindow::updateAnnoProgress() {
     if (this->annotationService->isPullingAllAnnos()) {
         ui->progressPullingAll->setValue(this->tableObj.getNumLines() - annotationService->getQueueSize());
+    } else {
+        ui->progressPullingAll->hide();
     }
 }
 
