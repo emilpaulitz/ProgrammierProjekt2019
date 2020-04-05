@@ -77,5 +77,6 @@ private slots:
 
     void update_row(int index);
     void on_tableWidget_cellDoubleClicked(int row, int column);
+    void on_actionDelete_current_annotation_triggered();
 };
 #endif // MAINWINDOW_H

@@ -414,3 +414,12 @@ void MainWindow::pop_no_connection()
 void MainWindow::on_actionDelete_all_annotations_triggered(){
    databank::purgeDB();
 }
+
+void MainWindow::on_actionDelete_current_annotation_triggered()
+{
+    if (0 <= cellClicked && cellClicked < tableObj.getNumLines()){
+        databank::deleterow(tableObj.getLine(cellClicked).getHgvsNotation());
+    } else {
+        QMessageBox::warning(this, tr("Delete current Row"), tr("Please select a line first!"));
+    }
+}
