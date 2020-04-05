@@ -401,6 +401,7 @@ void MainWindow::update_row(int index)
 void MainWindow::on_actionhide_annotations_triggered()
 {
     ui->annoWidget->hide();
+    ui->explanation->hide();
 }
 
 // Shows a warning that there is no internet connection
