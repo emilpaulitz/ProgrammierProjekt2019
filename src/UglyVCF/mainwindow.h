@@ -65,6 +65,8 @@ private slots:
 
     void on_actionFilter_by_Frequency_triggered();
 
+    void on_actionDelete_all_annotations_triggered();
+
     void pop_no_connection();
 
     void updateAnnoWidget(int rowUpdated);

@@ -46,6 +46,7 @@ Frequencies::Frequencies(double afr, double eas, double gnomad_eas, double gnoma
   */
 Frequencies Frequencies::parse_Frequencies(QJsonDocument doc){
 
+
   QString key1 = "colocated_variants";
   QString key2 = "frequencies";
   qWarning() << "is doc empty?" << doc.isEmpty();
