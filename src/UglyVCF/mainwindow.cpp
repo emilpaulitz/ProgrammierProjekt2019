@@ -391,3 +391,7 @@ void MainWindow::pop_no_connection()
 {
     QMessageBox::warning(this, tr("No Connectioin"), tr("No connection available, check your internet settings!"));
 }
+
+void MainWindow::on_actionDelete_all_annotations_triggered(){
+   databank::purgeDB();
+}
