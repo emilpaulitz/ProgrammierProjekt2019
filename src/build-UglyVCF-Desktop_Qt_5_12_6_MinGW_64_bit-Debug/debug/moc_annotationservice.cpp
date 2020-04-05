@@ -36,14 +36,14 @@ QT_MOC_LITERAL(1, 18, 14), // "annotation_set"
 QT_MOC_LITERAL(2, 33, 0), // ""
 QT_MOC_LITERAL(3, 34, 5), // "index"
 QT_MOC_LITERAL(4, 40, 13), // "no_connection"
-QT_MOC_LITERAL(5, 54, 14), // "set_annotation"
+QT_MOC_LITERAL(5, 54, 14), // "setAnnoFromVEP"
 QT_MOC_LITERAL(6, 69, 14), // "QNetworkReply*"
 QT_MOC_LITERAL(7, 84, 5), // "reply"
 QT_MOC_LITERAL(8, 90, 12) // "handle_queue"
 
     },
     "AnnotationService\0annotation_set\0\0"
-    "index\0no_connection\0set_annotation\0"
+    "index\0no_connection\0setAnnoFromVEP\0"
     "QNetworkReply*\0reply\0handle_queue"
 };
 #undef QT_MOC_LITERAL
@@ -66,8 +66,8 @@ static const uint qt_meta_data_AnnotationService[] = {
        4,    0,   37,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       5,    1,   38,    2, 0x0a /* Public */,
-       8,    0,   41,    2, 0x0a /* Public */,
+       5,    1,   38,    2, 0x08 /* Private */,
+       8,    0,   41,    2, 0x08 /* Private */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::Int,    3,
@@ -88,7 +88,7 @@ void AnnotationService::qt_static_metacall(QObject *_o, QMetaObject::Call _c, in
         switch (_id) {
         case 0: _t->annotation_set((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 1: _t->no_connection(); break;
-        case 2: _t->set_annotation((*reinterpret_cast< QNetworkReply*(*)>(_a[1]))); break;
+        case 2: _t->setAnnoFromVEP((*reinterpret_cast< QNetworkReply*(*)>(_a[1]))); break;
         case 3: _t->handle_queue(); break;
         default: ;
         }

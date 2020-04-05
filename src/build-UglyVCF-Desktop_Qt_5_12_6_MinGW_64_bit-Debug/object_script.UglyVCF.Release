@@ -4,6 +4,7 @@ release/Transcriptcons.o
 release/annotationservice.o
 release/databank.o
 release/filterdialog.o
+release/impactfilter.o
 release/main.o
 release/mainwindow.o
 release/vcfline.o
@@ -11,4 +12,5 @@ release/vcftable.o
 release/qrc_resources.o
 release/moc_annotationservice.o
 release/moc_filterdialog.o
+release/moc_impactfilter.o
 release/moc_mainwindow.o

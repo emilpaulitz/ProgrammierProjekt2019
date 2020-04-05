@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>911</width>
+    <width>1013</width>
     <height>376</height>
    </rect>
   </property>
@@ -71,7 +71,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>911</width>
+     <width>1013</width>
      <height>30</height>
     </rect>
    </property>
@@ -177,11 +177,19 @@ p, li { white-space: pre-wrap; }
    </property>
   </action>
   <action name="actionhide_annotations">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/rsc/icons8-bandit-50.png</normaloff>:/icons/rsc/icons8-bandit-50.png</iconset>
+   </property>
    <property name="text">
     <string>hide annotations</string>
    </property>
   </action>
   <action name="actionFilter_by_Frequency">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/rsc/Icons8-Ios7-Very-Basic-Filter-Filled.ico</normaloff>:/icons/rsc/Icons8-Ios7-Very-Basic-Filter-Filled.ico</iconset>
+   </property>
    <property name="text">
     <string>Filter by Frequency...</string>
    </property>
@@ -190,11 +198,19 @@ p, li { white-space: pre-wrap; }
    <property name="checkable">
     <bool>false</bool>
    </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/rsc/Tatice-Just-Bins-Bin-black-full.ico</normaloff>:/icons/rsc/Tatice-Just-Bins-Bin-black-full.ico</iconset>
+   </property>
    <property name="text">
     <string>Delete current annotation</string>
    </property>
   </action>
   <action name="actionDelete_all_annotations">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/rsc/Tatice-Just-Bins-Bin-red-full.ico</normaloff>:/icons/rsc/Tatice-Just-Bins-Bin-red-full.ico</iconset>
+   </property>
    <property name="text">
     <string>Delete all annotations</string>
    </property>
