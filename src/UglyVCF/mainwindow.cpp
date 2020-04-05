@@ -225,8 +225,8 @@ void MainWindow::on_tableWidget_cellClicked(int row, int)
 
     // Pull annotation  fresh after a double click
     // Enqueue job unless annotation already known nor every anno is being pulled anyway
-    } else if (tableObj.getLine(cellClicked).getAnno().isEmpty()
-                && !annotationService->isPullingAllAnnos()||clickedAgain)  {
+    if ((tableObj.getLine(cellClicked).getAnno().isEmpty()
+                && !annotationService->isPullingAllAnnos())||clickedAgain)  {
         annotationService->makeSingleRequest(row);
     }
 

@@ -49,10 +49,6 @@ Frequencies::Frequencies(double afr, double eas, double gnomad_eas, double gnoma
   */
 Frequencies Frequencies::parse_Frequencies(QJsonDocument doc){
 
-
-
-
-
   QString key1 = "colocated_variants";
   QString key2 = "frequencies";
   qWarning() << "is doc empty?" << doc.isEmpty();
@@ -144,14 +140,6 @@ Frequencies Frequencies::parse_Frequencies(QJsonDocument doc){
 
 
 //returns a String containing all the regions and their frequency
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-
->>>>>>> 8d8a9dbb4ac9d29ddf7b292173a1a00d689b1fed
-=======
-
->>>>>>> 8d8a9dbb4ac9d29ddf7b292173a1a00d689b1fed
 /**
   * @brief Frequencies::print_Frequencies, creates a readable QString out of a Frequencies object
   * @param Frequencies freq

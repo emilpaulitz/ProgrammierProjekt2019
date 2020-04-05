@@ -138,7 +138,7 @@ void AnnotationService::setAnnoFromVEP(QNetworkReply *reply)
  * @param row row of the table object the annotation should be set for
  * @param hgvs hgvs notation of the Annotation to be retrieved
  */
-void AnnotationService::setAnnoFromDB(int row, QString hgvs){
+void AnnotationService::setAnnoFromDB(int row, QString & hgvs){
     Annotation & currAnno = databank::retrieveAnno(hgvs);
     annoTableObj->getLine(row).setAnno(currAnno);
     qDebug() << "pulled from DB";
