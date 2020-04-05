@@ -223,14 +223,10 @@ void MainWindow::on_tableWidget_cellClicked(int row, int)
     bool clickedAgain = (cellClicked == row);
     this->cellClicked = row;
 
-    // Pull annotation completely fresh after a double click
-    if (clickedAgain){
-        databank::deleterow(tableObj.getLine(row).getHgvsNotation());
-        annotationService->makeSingleRequest(row);
-
+    // Pull annotation  fresh after a double click
     // Enqueue job unless annotation already known nor every anno is being pulled anyway
     } else if (tableObj.getLine(cellClicked).getAnno().isEmpty()
-                && !annotationService->isPullingAllAnnos())  {
+                && !annotationService->isPullingAllAnnos()||clickedAgain)  {
         annotationService->makeSingleRequest(row);
     }
 
