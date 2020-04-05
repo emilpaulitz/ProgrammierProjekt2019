@@ -58,6 +58,7 @@ void MainWindow::openAnnoService(){
     connect(annotationService, &AnnotationService::annotation_set, this, &MainWindow::updateAnnoWidget);
     connect(annotationService, &AnnotationService::annotation_set, this, &MainWindow::update_row);
     connect(annotationService, &AnnotationService::annotation_set, this, &MainWindow::updateAnnoProgress);
+    connect(annotationService, &AnnotationService::queueFinished, this, &MainWindow::updateAnnoProgress);
 
     // set up annotationService connecting internal signals and slots
     annotationService->setupAnnoService(&tableObj);

@@ -20,7 +20,6 @@ private :
     QNetworkAccessManager * manager;
 
     int currentIndex;
-    int jobsProcessed = 0;
     bool pullingAllAnnos = false;
     void setPullingAllAnnos(bool b);
 
@@ -49,6 +48,7 @@ private slots:
     void handle_queue();
 
 signals:
+    void queueFinished();
     void annotation_set(int index);
     void no_connection();
 };

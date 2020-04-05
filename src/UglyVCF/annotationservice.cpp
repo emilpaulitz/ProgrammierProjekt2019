@@ -29,7 +29,6 @@ void AnnotationService::setupAnnoService(VCFtable *table){
     annoTableObj = table;
     manager = new QNetworkAccessManager();
     connect(manager, &QNetworkAccessManager::finished, this, &AnnotationService::setAnnoFromVEP);
-    connect(this, &AnnotationService::annotation_set, this, &AnnotationService::handle_queue);
 }
 
 // To be called when the job to pull every annotation has been enqueued
@@ -130,6 +129,7 @@ void AnnotationService::setAnnoFromVEP(QNetworkReply *reply)
     reply->deleteLater();
 
     emit annotation_set(index);
+    handle_queue();
 }
 
 /**
@@ -154,32 +154,29 @@ void AnnotationService::startQueue() {
 
 /**
  * @brief AnnotationService::handleQueue DO NOT CALL! Instead call startQueue()!
- * ONLY TRIGGRED by: "annotation_set"-signal from this
+ * ONLY called by start_queue or setAnnofromVEP
  * works through the queue and starts either VEP requests or DB pulls.
  */
 void AnnotationService::handle_queue()
 {
-    if (queue.isEmpty())
-    {
-        // pulling is finished
-        setPullingAllAnnos(false);
-    }
-    else
-    {
+    // work through the necessary db pulls until the queue is empty or an VEP request is to be made.
+    // When that finishes, it will call handle_queue
+    while (!queue.isEmpty()) {
+
         this->currentIndex = queue.dequeue();
-        jobsProcessed++;
-        if (jobsProcessed % 1000 == 0){
-            databank::deleterow(annoTableObj->getLine(currentIndex).getHgvsNotation());
-            qDebug() << "Row Deleted!";
-        }
         QString currHGVS = annoTableObj->getLine(currentIndex).getHgvsNotation();
 
         if (databank::searchDatabank(currHGVS)) {
             setAnnoFromDB(currentIndex, currHGVS);
         } else {
             makeVEPrequest(*this->manager, annoTableObj->getLine(this->currentIndex));
+            return;
         }
     }
+
+    // pulling is finished
+    setPullingAllAnnos(false);
+    emit queueFinished();
 }
 
 int AnnotationService::getQueueSize() const {
