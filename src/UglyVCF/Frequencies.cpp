@@ -136,12 +136,17 @@ Frequencies Frequencies::parse_Frequencies(QJsonDocument doc){
 
 
 //returns a String containing all the regions and their frequency
+<<<<<<< HEAD
+=======
+
+>>>>>>> 8d8a9dbb4ac9d29ddf7b292173a1a00d689b1fed
 /**
   * @brief Frequencies::print_Frequencies, creates a readable QString out of a Frequencies object
   * @param Frequencies freq
   * @return QString
   */
-QString Frequencies::print_Frequencies(Frequencies freq){
+
+ QString Frequencies::print_Frequencies(Frequencies freq){
 
     QString restring;
     QString region;

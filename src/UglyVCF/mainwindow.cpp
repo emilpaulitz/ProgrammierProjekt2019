@@ -34,6 +34,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ui->explanation->hide();
     ui->annoWidget->hide();
     ui->progressPullingAll->hide();
     openAnnoService();
@@ -235,6 +236,7 @@ void MainWindow::on_tableWidget_cellClicked(int row, int)
 
     this->updateAnnoWidget(row);
     ui->annoWidget->show();
+    ui->explanation->show();
 }
 
 /**
@@ -409,4 +411,8 @@ void MainWindow::on_actionhide_annotations_triggered()
 void MainWindow::pop_no_connection()
 {
     QMessageBox::warning(this, tr("No Connectioin"), tr("No connection available, check your internet settings!"));
+}
+
+void MainWindow::on_actionDelete_all_annotations_triggered(){
+   databank::purgeDB();
 }
