@@ -29,7 +29,7 @@
 
 #include <QDebug>
 #include <QThread>
-#include <QSignalSpy>
+//#include <QSignalSpy>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -102,6 +102,7 @@ void MainWindow::parseVCF(QString filename)
 
     // create new annotationservice
     openAnnoService();
+    ui->tableWidget->resizeColumnsToContents();
     ui->tableWidget->show();
 }
 
