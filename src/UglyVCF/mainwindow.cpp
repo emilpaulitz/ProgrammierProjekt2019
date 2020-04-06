@@ -127,8 +127,8 @@ void MainWindow::on_actionset_reference_genome_triggered()
     refGenPath = QFileDialog::getOpenFileName(this, "set reference genome", QDir::homePath(), tr("FastA files (*.fasta *.fa)"));
 }
 
-
 // TODO make user able to abort -> button
+// NOTE QFiledialog::getOpenFileName works, but results in error message (seems to be an Unix-Qt issue)
 /**
  * @brief MainWindow::on_actionFastQ_file_triggered Read necessary inputs and execute the pipeline
  */
@@ -166,7 +166,7 @@ void MainWindow::on_actionFastQ_file_triggered()
             this->pipelineWD = pipelinePath.left(lastSlash);
 
             QStringList args;
-            args << read1 << read2 << refGenPath << pipelineWD;
+            args << read1 << read2 << refGenPath;
 
             // make process and fill parameters 'program' and 'arguments'
             this->process = new QProcess(this);
@@ -206,10 +206,11 @@ void MainWindow::handlePipelineFinished(int, QProcess::ExitStatus status){
 
 void MainWindow::handle_pipeline_working()
 {
+    qDebug() << __FUNCTION__;
     this->ui->statusbar->showMessage(this->process->readAllStandardOutput());
 }
 
-// TODO delete
+// TODO delete test
 // Platz wo man automatische Tests implementieren kann
 void MainWindow::on_actionSpace_for_Testing_triggered()
 {
