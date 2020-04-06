@@ -34,6 +34,7 @@ public:
     FilterDialog::Region getRegion();
     bool hideUnknown();
     bool isReset();
+    void resetFilter();
     bool isFilterByImpact();
     void openWindow();
 

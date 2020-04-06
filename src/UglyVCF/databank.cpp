@@ -80,20 +80,20 @@ bool databank::addRow(Annotation anno){
     //prepares query and adds a row to annotation table
     QString toquery = "INSERT INTO annotation VALUES('"+hgvs+"','"+mostsevercons+"')";
     query.exec(toquery);
-    qDebug() << "geht ano insert" << query.lastError();
+    //qDebug() << "geht ano insert" << query.lastError();
 
 
     //prepares query and adds a row to the frequencies tabel with hgvs a forein key
     QString frequery = preparefreq(freq,hgvs);
     query.exec(frequery);
-    qDebug() << "geht freq" << query.lastError();
+    //qDebug() << "geht freq" << query.lastError();
 
     
 
     //prepares and a query transcons
     QString consquery = preparetranscons(transcons,hgvs);
     query.exec(consquery);
-    qDebug() << "test trabscons " << query.lastError();
+    //qDebug() << "test trabscons " << query.lastError();
 
 
 
@@ -295,6 +295,7 @@ createTable();
 void databank::deleterow(QString hgvs){
 QSqlQuery query;
 QString query1 = "DELETE FROM annotation AS t WHERE t.hgvs ='"+hgvs+"'";
+query.exec(query1);
 }
 
 

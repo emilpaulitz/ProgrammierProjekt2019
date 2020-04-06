@@ -6,16 +6,26 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>554</width>
+    <width>1013</width>
     <height>376</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="autoFillBackground">
+   <bool>false</bool>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
+    <item row="0" column="1">
+     <widget class="QTextEdit" name="annoWidget">
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0" rowspan="2">
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
        <widget class="QTableWidget" name="tableWidget">
@@ -26,17 +36,31 @@
       </item>
      </layout>
     </item>
-    <item row="0" column="1">
-     <widget class="QTextEdit" name="annoWidget">
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="0" colspan="2">
+    <item row="2" column="0" colspan="2">
      <widget class="QProgressBar" name="progressPullingAll">
       <property name="value">
        <number>24</number>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QLabel" name="explanation">
+      <property name="font">
+       <font>
+        <pointsize>6</pointsize>
+        <italic>false</italic>
+        <kerning>true</kerning>
+       </font>
+      </property>
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:6pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:11pt;&quot;&gt;Impact of the most severe consequence: &lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:14pt; font-weight:600; color:#ff0000;&quot;&gt;HIGH &lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:14pt; font-weight:600; color:#ffff7f;&quot;&gt;MODERATE&lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:14pt; font-weight:600; color:#ffff00;&quot;&gt; &lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:14pt; font-weight:600; color:#00eb00;&quot;&gt;LOW&lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:14pt; font-weight:600; color:#aaff00;&quot;&gt; &lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:14pt; font-weight:600; color:#00efef;&quot;&gt;MODIFIER&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
     </item>
@@ -47,8 +71,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>554</width>
-     <height>21</height>
+     <width>1013</width>
+     <height>30</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuOpen">
@@ -75,9 +99,17 @@
     <addaction name="separator"/>
     <addaction name="actionFilter_by_Frequency"/>
    </widget>
+   <widget class="QMenu" name="menuData_base">
+    <property name="title">
+     <string>Data base</string>
+    </property>
+    <addaction name="actionDelete_current_annotation"/>
+    <addaction name="actionDelete_all_annotations"/>
+   </widget>
    <addaction name="menuOpen"/>
    <addaction name="menuSettings"/>
    <addaction name="menuAnalysis"/>
+   <addaction name="menuData_base"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionVCF_file">
@@ -145,13 +177,42 @@
    </property>
   </action>
   <action name="actionhide_annotations">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/rsc/icons8-bandit-50.png</normaloff>:/icons/rsc/icons8-bandit-50.png</iconset>
+   </property>
    <property name="text">
     <string>hide annotations</string>
    </property>
   </action>
   <action name="actionFilter_by_Frequency">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/rsc/Icons8-Ios7-Very-Basic-Filter-Filled.ico</normaloff>:/icons/rsc/Icons8-Ios7-Very-Basic-Filter-Filled.ico</iconset>
+   </property>
    <property name="text">
     <string>Filter by Frequency...</string>
+   </property>
+  </action>
+  <action name="actionDelete_current_annotation">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/rsc/Tatice-Just-Bins-Bin-black-full.ico</normaloff>:/icons/rsc/Tatice-Just-Bins-Bin-black-full.ico</iconset>
+   </property>
+   <property name="text">
+    <string>Delete current annotation</string>
+   </property>
+  </action>
+  <action name="actionDelete_all_annotations">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/rsc/Tatice-Just-Bins-Bin-red-full.ico</normaloff>:/icons/rsc/Tatice-Just-Bins-Bin-red-full.ico</iconset>
+   </property>
+   <property name="text">
+    <string>Delete all annotations</string>
    </property>
   </action>
  </widget>

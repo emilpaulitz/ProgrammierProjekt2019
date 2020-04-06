@@ -13,8 +13,6 @@ QString transcript_id,impact, variant_allele,gene_symbole,gene_symbol_source,gen
 
 QList<QString> consequence_terms;
 
-
-
 public:
     Transcriptcons();
 
@@ -56,11 +54,11 @@ public:
     QList<QString> getConsequence_terms() const;
     void setConsequence_terms(const QList<QString> &value);
 
-    static QList<Transcriptcons> parse_totranscrictionlist(QJsonDocument doc);
+    static QList<Transcriptcons> parse_TranscriptconsList(QJsonDocument doc);
 
-    static QString printtranscons(Transcriptcons trans);
+    static QString print_Transcriptcons(Transcriptcons trans);
 
-    static QString printtranscons(QList<Transcriptcons> trans);
+    static QString print_Transcriptcons(QList<Transcriptcons> trans);
 };
 
 #endif // TRANSCRIPTCONS_H

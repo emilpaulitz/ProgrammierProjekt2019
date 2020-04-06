@@ -15,30 +15,39 @@
 Frequencies::Frequencies(){
 
 }
-
+//Objekt with Enum, keeps frequencies
 Frequencies::Frequencies(double afr, double eas, double gnomad_eas, double gnomad_nfe, double gnomad_fin,
                          double sas, double gnomad, double amr, double gnomad_sas, double aa, double gnomad_afr,
                          double eur, double ea, double gnomad_asj, double gnomad_amr, double gnomad_oth)
 {
-    this->FreqByRegions[FilterDialog::afr] = afr;
-    this->FreqByRegions[FilterDialog::eas] = eas;
-    this->FreqByRegions[FilterDialog::gnomad_eas] = gnomad_eas;
-    this->FreqByRegions[FilterDialog::gnomad_nfe] = gnomad_nfe;
-    this->FreqByRegions[FilterDialog::gnomad_fin] = gnomad_fin;
-    this->FreqByRegions[FilterDialog::sas] = sas;
-    this->FreqByRegions[FilterDialog::gnomad] = gnomad;
-    this->FreqByRegions[FilterDialog::amr] = amr;
-    this->FreqByRegions[FilterDialog::gnomad_sas] = gnomad_sas;
-    this->FreqByRegions[FilterDialog::aa] = aa;
-    this->FreqByRegions[FilterDialog::gnomad_afr] = gnomad_afr;
-    this->FreqByRegions[FilterDialog::eur] = eur;
-    this->FreqByRegions[FilterDialog::ea] = ea;
-    this->FreqByRegions[FilterDialog::gnomad_asj] = gnomad_asj;
-    this->FreqByRegions[FilterDialog::gnomad_amr] = gnomad_amr;
-    this->FreqByRegions[FilterDialog::gnomad_oth] = gnomad_oth;
+    this->freqByRegions[FilterDialog::afr] = afr;
+    this->freqByRegions[FilterDialog::eas] = eas;
+    this->freqByRegions[FilterDialog::gnomad_eas] = gnomad_eas;
+    this->freqByRegions[FilterDialog::gnomad_nfe] = gnomad_nfe;
+    this->freqByRegions[FilterDialog::gnomad_fin] = gnomad_fin;
+    this->freqByRegions[FilterDialog::sas] = sas;
+    this->freqByRegions[FilterDialog::gnomad] = gnomad;
+    this->freqByRegions[FilterDialog::amr] = amr;
+    this->freqByRegions[FilterDialog::gnomad_sas] = gnomad_sas;
+    this->freqByRegions[FilterDialog::aa] = aa;
+    this->freqByRegions[FilterDialog::gnomad_afr] = gnomad_afr;
+    this->freqByRegions[FilterDialog::eur] = eur;
+    this->freqByRegions[FilterDialog::ea] = ea;
+    this->freqByRegions[FilterDialog::gnomad_asj] = gnomad_asj;
+    this->freqByRegions[FilterDialog::gnomad_amr] = gnomad_amr;
+    this->freqByRegions[FilterDialog::gnomad_oth] = gnomad_oth;
 }
 
- Frequencies Frequencies::pars_frequencies(QJsonDocument doc){
+
+
+
+
+/**
+  * @brief Frequencies::parse_Frequencies, parases a QJason Doc to a Frequenciesy object
+  * @param QJsonDocument doc
+  * @returnFrequencies Object
+  */
+Frequencies Frequencies::parse_Frequencies(QJsonDocument doc){
 
   QString key1 = "colocated_variants";
   QString key2 = "frequencies";
@@ -129,8 +138,15 @@ Frequencies::Frequencies(double afr, double eas, double gnomad_eas, double gnoma
   return freq;
 }
 
+
 //returns a String containing all the regions and their frequency
- QString Frequencies::print_frequencies(Frequencies freq){
+/**
+  * @brief Frequencies::print_Frequencies, creates a readable QString out of a Frequencies object
+  * @param Frequencies freq
+  * @return QString
+  */
+
+ QString Frequencies::print_Frequencies(Frequencies freq){
 
     QString restring;
     QString region;
@@ -159,14 +175,28 @@ Frequencies::Frequencies(double afr, double eas, double gnomad_eas, double gnoma
     return restring;
 }
 
+ /**
+ * @brief Frequencies::getFreq, getter Enum Region specific
+ * @param FilterDialog::Region region
+ * @return double
+ */
 double Frequencies::getFreq(FilterDialog::Region region){
-    return this->FreqByRegions[(int) region];
+    return this->freqByRegions[(int) region];
 }
-
+/**
+ * @brief Frequencies::setFreq, setter Enum region specific
+ * @param FilterDialog::Region region
+ * @param double value
+ */
 void Frequencies::setFreq(FilterDialog::Region region, double value){
-    this->FreqByRegions[(int) region] = value;
+    this->freqByRegions[(int) region] = value;
 }
 
+/**
+ * @brief Frequencies::isRegUnknown, check if region is unkown
+ * @param FilterDialog::Region region
+ * @return bool
+ */
 bool Frequencies::isRegUnknown(FilterDialog::Region region){
     if (getFreq(region) == -1){
         return true;

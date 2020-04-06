@@ -67,6 +67,8 @@ private slots:
 
     void on_actionFilter_by_Frequency_triggered();
 
+    void on_actionDelete_all_annotations_triggered();
+
     void pop_no_connection();
 
     void updateAnnoWidget(int rowUpdated);
@@ -76,5 +78,7 @@ private slots:
     void updateAnnoProgress();
 
     void update_row(int index);
+    void on_tableWidget_cellDoubleClicked(int row, int column);
+    void on_actionDelete_current_annotation_triggered();
 };
 #endif // MAINWINDOW_H
