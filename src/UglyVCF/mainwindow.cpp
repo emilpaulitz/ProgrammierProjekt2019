@@ -29,7 +29,6 @@
 
 #include <QDebug>
 #include <QThread>
-#include <QSignalSpy>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -127,8 +126,7 @@ void MainWindow::on_actionset_reference_genome_triggered()
     refGenPath = QFileDialog::getOpenFileName(this, "set reference genome", QDir::homePath(), tr("FastA files (*.fasta *.fa)"));
 }
 
-// FIXME connect SIGNAL(process::finnished) to SLOT(handlePipelineFinnished)
-// TODO print output somewhere for user to observe
+
 // TODO make user able to abort -> button
 /**
  * @brief MainWindow::on_actionFastQ_file_triggered Read necessary inputs and execute the pipeline
@@ -169,7 +167,6 @@ void MainWindow::on_actionFastQ_file_triggered()
             QStringList args;
             args << read1 << read2 << refGenPath << pipelineWD;
 
-            //FIXME memory leak: delete Obj somewhere
             // make process and fill parameters 'program' and 'arguments'
             this->process = new QProcess(this);
             this->process->setWorkingDirectory(pipelineWD);
@@ -179,6 +176,8 @@ void MainWindow::on_actionFastQ_file_triggered()
             // connect to finshing handler to be independent from duration of pipeline
             connect(this->process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
                     this, &MainWindow::handlePipelineFinished);
+            // connect to show stdout on statusbar
+            connect(this->process, &QProcess::readyReadStandardOutput, this, &MainWindow::handle_pipeline_working);
 
             this->process->start();
         }
@@ -193,11 +192,20 @@ void MainWindow::on_actionFastQ_file_triggered()
 void MainWindow::handlePipelineFinished(int, QProcess::ExitStatus status){
     qDebug() << __FUNCTION__;
     // automatically open new vcf
-    if (status==EXIT_SUCCESS){
-        parseVCF(this->pipelineWD + "/cache/final.vcf");
-    } else if(status==EXIT_FAILURE){
+    if (status==EXIT_SUCCESS && this->process->workingDirectory() != "")
+    {
+            parseVCF(this->process->workingDirectory() + "/cache/final.vcf");
+    }
+    else if(status==EXIT_FAILURE)
+    {
         QMessageBox::warning(this, tr("Error"), tr("Pipeline terminated with an error!"));
     }
+    this->process->deleteLater();
+}
+
+void MainWindow::handle_pipeline_working()
+{
+    this->ui->statusbar->showMessage(this->process->readAllStandardOutput());
 }
 
 // TODO delete
@@ -210,11 +218,13 @@ void MainWindow::on_actionSpace_for_Testing_triggered()
     this->process = new QProcess(this);
     connect(this->process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
             this, &MainWindow::handlePipelineFinished);
+    // to print stdout
+    connect(this->process, &QProcess::readyReadStandardOutput, this, &MainWindow::handle_pipeline_working);
 
+    this->process->setWorkingDirectory("/home/casimir/Desktop/ProgrammierProjekt2019/src/Pipeline");
     this->process->setProgram("/home/casimir/Desktop/ProgrammierProjekt2019/src/Pipeline/dummy.sh");
     this->process->start();
 
-    qDebug() << this->process->exitStatus();
 }
 
 // BUG tries to get annos when clicked with no VCF loaded
@@ -434,3 +444,4 @@ void MainWindow::on_actionDelete_current_annotation_triggered()
         QMessageBox::warning(this, tr("Delete current Row"), tr("Please select a line first!"));
     }
 }
+

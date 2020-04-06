@@ -47,13 +47,15 @@ public:
 
 private slots:
 
+    void handlePipelineFinished(int, QProcess::ExitStatus);
+
+    void handle_pipeline_working();
+
     void on_actionVCF_file_triggered();
 
     void on_actionset_pipeline_triggered();
 
     void on_actionFastQ_file_triggered();
-
-    void handlePipelineFinished(int, QProcess::ExitStatus);
 
     void on_actionset_reference_genome_triggered();
 
@@ -80,5 +82,6 @@ private slots:
     void update_row(int index);
     void on_tableWidget_cellDoubleClicked(int row, int column);
     void on_actionDelete_current_annotation_triggered();
+    void on_actionhide_pipeline_progress_triggered();
 };
 #endif // MAINWINDOW_H
