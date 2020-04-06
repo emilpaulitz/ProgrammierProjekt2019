@@ -30,14 +30,16 @@ private:
 
     QProcess * process;
 
+    // pipeline parameters
     QString pipelineWD;
     QString pipelinePath;
     QString refGenPath;
 
-    void openAnnoService();
-
     // row of the cell currently clicked on
     int cellClicked;
+
+    // Methods
+    void openAnnoService();
 
 public:
     MainWindow(QWidget *parent = nullptr);
@@ -51,7 +53,7 @@ private slots:
 
     void on_actionFastQ_file_triggered();
 
-    void handlePipelineFinished(int, QProcess::ExitStatus status);
+    void handlePipelineFinished(int, QProcess::ExitStatus);
 
     void on_actionset_reference_genome_triggered();
 
