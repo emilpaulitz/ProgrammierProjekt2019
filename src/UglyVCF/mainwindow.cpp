@@ -101,6 +101,7 @@ void MainWindow::parseVCF(QString filename)
 
     // create new annotationservice
     openAnnoService();
+    ui->tableWidget->resizeColumnsToContents();
     ui->tableWidget->show();
 }
 
