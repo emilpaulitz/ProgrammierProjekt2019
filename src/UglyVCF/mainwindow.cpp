@@ -74,11 +74,13 @@ void MainWindow::parseVCF(QString filename)
     // create table object
     this->tableObj = VCFtable();
     tableObj.parse(filename.toStdString());
+
     int NUM_LINES = tableObj.getLines().size();
     int NUM_COLS = tableObj.getLine(0).getSize();
     ui->tableWidget->setRowCount(NUM_LINES);
     ui->tableWidget->setColumnCount(NUM_COLS);
 
+    //creates table heading
     QStringList headerLabels = {"CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER", "INFO", "FORMAT", "SAMPLE", "ANNO"};
     ui->tableWidget->setHorizontalHeaderLabels(headerLabels);
 
@@ -88,6 +90,7 @@ void MainWindow::parseVCF(QString filename)
     {
         currLine = &tableObj.getLine(i);
         QTableWidgetItem *newItem;
+
         // fill line
         currLine->setIndex(i);
         for (int k = 0; k < NUM_COLS; k++)
@@ -101,14 +104,20 @@ void MainWindow::parseVCF(QString filename)
 
     // create new annotationservice
     openAnnoService();
-    ui->tableWidget->resizeColumnsToContents();
     ui->tableWidget->show();
 }
 
+/**
+ * @brief MainWindow::on_actionVCF_file_triggered opens dialog window to select the vcf file and print it and tells user if invalid chromosome number notations were found
+ */
 void MainWindow::on_actionVCF_file_triggered()
 {
     QString fileName = QFileDialog::getOpenFileName(this, "Open Vcf file", QDir::homePath(), tr("VCF files (*.vcf)"));
     if (fileName != "") parseVCF(fileName);
+    // if an invalid chr1, chr2 ... notation were found, but they will not be printed out
+    if(VCFtable::invalidChrNum == true){
+        QMessageBox::information(this,tr("Warning"),tr("invalid chromosome number notations were found"));
+    }
 }
 
 void MainWindow::on_actionset_pipeline_triggered()
