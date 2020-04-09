@@ -6,6 +6,7 @@
 #include <vector>
 
 using namespace std;
+bool VCFtable::invalidChrNum = false;
 
 // constructor
 VCFtable::VCFtable()
@@ -24,7 +25,6 @@ void VCFtable::setHeader(const QString &value)
 }
 
 // methods
-
 QList<VCFline> VCFtable::getLines()
 {
     return this->listOfLines;
@@ -63,8 +63,8 @@ void VCFtable::parse(string filename)
             // add line to header
             setHeader(getHeader().append(QString::fromStdString(line)) + '\n');
         } else
-            // add new line
         {
+            // add new line
             istringstream stream(line);
             string token;
             tokens.clear();
@@ -92,11 +92,14 @@ void VCFtable::parse(string filename)
                     vcfline.setSample(QString::fromStdString(tokens[9]));
                 }
             }
-            ///vcfline.setSize(tokens.size());
-            ///
 
             // append line to table
             this->addLine(vcfline);
+           }
+
+           // not a valid chr1, chr2 ... notation
+           else{
+               invalidChrNum = true;
            }
         }
     }

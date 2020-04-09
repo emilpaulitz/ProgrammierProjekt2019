@@ -13,9 +13,14 @@ private:
     // values
     QList<VCFline> listOfLines;
     QString header;
+
 public:
-    // constructor, getter/setter
+    static bool invalidChrNum;
+
+    // constructor
     VCFtable();
+
+    //getter/setter
     QString getHeader() const;
     void setHeader(const QString &value);
 
@@ -26,7 +31,5 @@ public:
     void parse(std::string filename);
     int getNumLines() const;
 };
-
-
 
 #endif // VCFTABLE_H
