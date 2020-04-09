@@ -25,7 +25,6 @@ db.setHostName("localhost");
 db.setDatabaseName("varianten");
 db.setUserName("variantusr");
 db.setPassword("variantpw");
-//db.setPort(5433);
 db.open();
 qDebug() << "Testing if open: " << db.open();
 }
@@ -39,24 +38,27 @@ void databank::createTable()
 {
    QSqlQuery query;
 
-   QString query1 = "CREATE TABLE annotation (hgvs text PRIMARY KEY,most_severe_consequence text)";
+   QString query1 = "CREATE TABLE annotation "
+                    "(hgvs text PRIMARY KEY,most_severe_consequence text)";
 
-   QString query2 = "CREATE TABLE frequencies (hgvs text PRIMARY KEY,afr real,eas real,gnomad_eas real,gnomad_nfe real,"
+   QString query2 = "CREATE TABLE frequencies (hgvs text PRIMARY KEY,afr real, "
+                    "eas real,gnomad_eas real,gnomad_nfe real,"
                     "gnomad_fin real,sas real,gnomad real,amr real,gnomad_sas real,"
-                    "aa real ,gnomad_afr real,eur real,ea real,gnomad_asj real,gnomad_amr real ,gnomad_oth real)";
+                    "aa real ,gnomad_afr real,eur real,ea real,gnomad_asj real, "
+                    "gnomad_amr real ,gnomad_oth real)";
 
-   QString query3 = "CREATE TABLE transcripscons (hgvs text,transcript_id text,impact text,variant_allele text,"
+   QString query3 = "CREATE TABLE transcripscons (hgvs text,transcript_id text, "
+                    "impact text,variant_allele text,"
                     "gene_symbole text,gene_symbol_source text,gene_id text,"
                     "hgnc_id text,strand text,biotype text,distance text,terms text,"
                     "PRIMARY KEY(hgvs,transcript_id))";
 
-   QString query4 = "ALTER TABLE frequencies ADD FOREIGN KEY (hgvs) REFERENCES annotation ON DELETE CASCADE";
-   QString query5 = "ALTER TABLE transcripsconsn ADD FOREIGN KEY (hgvs) REFERENCES annotation ON DELETE CASCADE";
-   query.prepare(query1);
+   QString query4 = "ALTER TABLE frequencies ADD FOREIGN KEY (hgvs) "
+                    "REFERENCES annotation ON DELETE CASCADE";
+   QString query5 = "ALTER TABLE transcripsconsn ADD FOREIGN KEY (hgvs) "
+                    "REFERENCES annotation ON DELETE CASCADE";
    query.exec(query1);
-   query.prepare(query2);
    query.exec(query2);
-   query.prepare(query3);
    query.exec(query3);
    query.exec(query4);
    query.exec(query5);
@@ -76,28 +78,23 @@ bool databank::addRow(Annotation anno){
     QString hgvs = anno.getId();
     Frequencies freq = anno.getFrequencies();
     QList<Transcriptcons> transcons = anno.getTranscriptcons();
+    bool first, second, third, final;
 
     //prepares query and adds a row to annotation table
     QString toquery = "INSERT INTO annotation VALUES('"+hgvs+"','"+mostsevercons+"')";
-    query.exec(toquery);
-    qDebug() << "geht ano insert" << query.lastError();
-
+    first = query.exec(toquery);
 
     //prepares query and adds a row to the frequencies tabel with hgvs a forein key
     QString frequery = preparefreq(freq,hgvs);
-    query.exec(frequery);
-    qDebug() << "geht freq" << query.lastError();
+    second = query.exec(frequery);
 
-    
 
     //prepares and a query transcons
     QString consquery = preparetranscons(transcons,hgvs);
-    query.exec(consquery);
-    qDebug() << "test trabscons " << query.lastError();
+    third = query.exec(consquery);
 
-
-
-    return true;
+    final = (first and second and third);
+    return final;
 }
 
 /**
