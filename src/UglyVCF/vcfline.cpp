@@ -1,6 +1,12 @@
 #include "vcfline.h"
 #include <QString>
 
+//constructor
+VCFline::VCFline()
+{
+}
+
+// getter and setter
 QString VCFline::getDataField(int i)
 {
     return dataFields[i];
@@ -9,10 +15,6 @@ QString VCFline::getDataField(int i)
 int VCFline::getSize()
 {
     return size;
-}
-
-VCFline::VCFline()
-{
 }
 
 QString VCFline::getHeader() const
@@ -138,6 +140,26 @@ void VCFline::setIndex(const int value)
     index = value;
 }
 
+//methods
+/**
+ * @brief VCFline::getChrNum translates chromosome number notation into the notation required for hgvs
+ * @return chromosome number
+ */
+QString VCFline::getChrNum()
+{
+    if (this->getChr().left(3) == "chr"){
+        QString num = this->getChr().remove(0,3);
+        //translate chromosome notation for x and y chromosome into hgvs notation
+        if (num == "X" || num == "23") return "x";
+        if (num == "Y" || num == "24") return "y";
+        //all other chromosomes besides x and y
+        if (num.length() <= 2) return num;
+    }
+
+    return getChr();
+}
+
+
 /**
  * @brief VCFline::getHgvsNotation returns HGVS Notation of the mutation in this VCFline
  * @return HGVS Notation of the mutation in this VCFline
@@ -147,29 +169,14 @@ QString VCFline::getHgvsNotation()
     if (getAlt().length() == 1 && getRef().length() == 1)
     {
         // case SUBSTITUTION notation: CHR :g. POS REF>ALT (no spaces)
-        // habe das ? abgeschnitten und in requst gelget
         QString notation = getChrNum() + ":g." + getPos() + getRef() + ">" + getAlt();
         return notation;
     }
-    // INDEL notation covers Ins and Dels and yields the same results
+    // case INDEL notation covers Ins and Dels and yields the same results
     if (getAlt().length() > 1 || getRef().length() > 1){
-        // case INDEL notation:
         QString endPos = QString::number(getPos().toInt() + getRef().length() - 1);
         QString notation = getChrNum() + ":g." + getPos() + "_" + endPos + getRef() + "delins" + getAlt();
         return notation;
     }
     return "";
-}
-
-// TODO: Improve error handling, e.g. show a warning
-QString VCFline::getChrNum()
-{
-    if (this->getChr().left(3) == "chr"){
-        QString num = this->getChr().remove(0,3);
-        if (num == "X" || num == "23") return "x";
-        if (num == "Y" || num == "24") return "y";
-        if (num.length() <= 2) return num;
-    }
-    // not a valid chr1, chr2 ... notation
-    return getChr();
 }

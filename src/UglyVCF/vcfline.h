@@ -14,8 +14,8 @@ private:
     int size = 10;
     int index;
 
-
 public:
+    //constructor
     VCFline();
 
     // getter & setter
@@ -26,7 +26,6 @@ public:
     void setHeader(const QString &value);
     QString getChr() const;
     void setChr(const QString &value);
-    QString getChrNum();
     QString getPos() const;
     void setPos(QString value);
     QString getId() const;
@@ -43,7 +42,6 @@ public:
     void setInfo(const QString &value);
     QString getFormat() const;
     void setFormat(const QString &value);
-
     Annotation getAnno() const;
     Annotation & getAnno();
     void setAnno(const Annotation &value);
@@ -56,8 +54,8 @@ public:
     void setIndex(const int value);
 
     // methods
+    QString getChrNum();
     QString getHgvsNotation();
-
 };
 
 #endif // VCFLINE_H
