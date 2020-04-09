@@ -34,16 +34,17 @@ public:
     QLabel *label;
     QPushButton *resetButton;
     QCheckBox *hideBox;
+    QPushButton *severityButton;
 
     void setupUi(QDialog *FilterDialog)
     {
         if (FilterDialog->objectName().isEmpty())
             FilterDialog->setObjectName(QString::fromUtf8("FilterDialog"));
-        FilterDialog->resize(441, 356);
+        FilterDialog->resize(441, 392);
         FilterDialog->setStyleSheet(QString::fromUtf8(""));
         buttonBox = new QDialogButtonBox(FilterDialog);
         buttonBox->setObjectName(QString::fromUtf8("buttonBox"));
-        buttonBox->setGeometry(QRect(130, 280, 261, 31));
+        buttonBox->setGeometry(QRect(160, 340, 231, 31));
         buttonBox->setStyleSheet(QString::fromUtf8("background-color: rgb(225, 225, 225);"));
         buttonBox->setOrientation(Qt::Horizontal);
         buttonBox->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Ok);
@@ -80,12 +81,15 @@ public:
         label->setGeometry(QRect(10, 10, 321, 21));
         resetButton = new QPushButton(FilterDialog);
         resetButton->setObjectName(QString::fromUtf8("resetButton"));
-        resetButton->setGeometry(QRect(50, 280, 101, 31));
+        resetButton->setGeometry(QRect(50, 340, 101, 31));
         resetButton->setToolTipDuration(-1);
         hideBox = new QCheckBox(FilterDialog);
         hideBox->setObjectName(QString::fromUtf8("hideBox"));
-        hideBox->setGeometry(QRect(50, 240, 341, 20));
+        hideBox->setGeometry(QRect(50, 290, 341, 20));
         hideBox->setChecked(false);
+        severityButton = new QPushButton(FilterDialog);
+        severityButton->setObjectName(QString::fromUtf8("severityButton"));
+        severityButton->setGeometry(QRect(50, 240, 171, 31));
 
         retranslateUi(FilterDialog);
         QObject::connect(buttonBox, SIGNAL(accepted()), FilterDialog, SLOT(accept()));
@@ -105,6 +109,7 @@ public:
 #endif // QT_NO_TOOLTIP
         resetButton->setText(QApplication::translate("FilterDialog", "Reset all", nullptr));
         hideBox->setText(QApplication::translate("FilterDialog", "Hide entries with unknown frequencies", nullptr));
+        severityButton->setText(QApplication::translate("FilterDialog", "Filter by Impact >>", nullptr));
     } // retranslateUi
 
 };

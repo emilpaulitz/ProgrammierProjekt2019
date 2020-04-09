@@ -39,13 +39,15 @@ Frequencies::Frequencies(double afr, double eas, double gnomad_eas, double gnoma
 }
 
 
+
+
+
 /**
   * @brief Frequencies::parse_Frequencies, parases a QJason Doc to a Frequenciesy object
   * @param QJsonDocument doc
   * @returnFrequencies Object
   */
 Frequencies Frequencies::parse_Frequencies(QJsonDocument doc){
-
 
   QString key1 = "colocated_variants";
   QString key2 = "frequencies";
@@ -138,7 +140,6 @@ Frequencies Frequencies::parse_Frequencies(QJsonDocument doc){
 
 
 //returns a String containing all the regions and their frequency
-
 /**
   * @brief Frequencies::print_Frequencies, creates a readable QString out of a Frequencies object
   * @param Frequencies freq

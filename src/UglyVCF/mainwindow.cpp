@@ -19,6 +19,7 @@
 #include <QProcess>
 
 #include <QString>
+#include <QStringList>
 
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
@@ -47,16 +48,21 @@ MainWindow::~MainWindow()
 }
 
 /**
- * @brief MainWindow::openAnnoService creates a new annotationService object and connect all the
+ * @brief MainWindow::openAnnoService creates a new annotationService object and connects all the
  *  necessary functions
  */
 void MainWindow::openAnnoService(){
-    annotationService = new AnnotationService(&tableObj);
+    annotationService = new AnnotationService();
+
     // connect signals from annotationservice with corresponding slots from this class
     connect(annotationService, &AnnotationService::no_connection, this, &MainWindow::pop_no_connection);
     connect(annotationService, &AnnotationService::annotation_set, this, &MainWindow::updateAnnoWidget);
-    connect(annotationService, &AnnotationService::annotation_set, this, &MainWindow::updateAnnoProgress);
     connect(annotationService, &AnnotationService::annotation_set, this, &MainWindow::update_row);
+    connect(annotationService, &AnnotationService::annotation_set, this, &MainWindow::updateAnnoProgress);
+    connect(annotationService, &AnnotationService::queueFinished, this, &MainWindow::updateAnnoProgress);
+
+    // set up annotationService connecting internal signals and slots
+    annotationService->setupAnnoService(&tableObj);
 }
 
 /**
@@ -95,6 +101,7 @@ void MainWindow::parseVCF(QString filename)
 
     // create new annotationservice
     openAnnoService();
+    ui->tableWidget->resizeColumnsToContents();
     ui->tableWidget->show();
 }
 
@@ -120,7 +127,8 @@ void MainWindow::on_actionset_reference_genome_triggered()
     refGenPath = QFileDialog::getOpenFileName(this, "set reference genome", QDir::homePath(), tr("FastA files (*.fasta *.fa)"));
 }
 
-// TODO: check if this works -> does not :(
+// TODO make user able to abort -> button
+// NOTE QFiledialog::getOpenFileName works, but results in error message (seems to be an Unix-Qt issue)
 /**
  * @brief MainWindow::on_actionFastQ_file_triggered Read necessary inputs and execute the pipeline
  */
@@ -140,8 +148,10 @@ void MainWindow::on_actionFastQ_file_triggered()
     {
         //open FastQ files (read 1, read 2)
         QString read1 = "", read2 = "";
-        read1 = QFileDialog::getOpenFileName(this, "open READ 1 FastQ file", QDir::homePath(), tr("FASTQ files (*.fastq *.fq *.fastq.gz *fq.gz)"));
-        read2 = QFileDialog::getOpenFileName(this, "open READ 2 FastQ file", QDir::homePath(), tr("FASTQ files (*.fastq *.fq *.fastq.gz *fq.gz)"));
+        read1 = QFileDialog::getOpenFileName(this, "open READ 1 FastQ file", QDir::homePath(),
+                                             tr("FASTQ files (*.fastq *.fq *.fastq.gz *fq.gz)"));
+        read2 = QFileDialog::getOpenFileName(this, "open READ 2 FastQ file", QDir::homePath(),
+                                             tr("FASTQ files (*.fastq *.fq *.fastq.gz *fq.gz)"));
         // check if everything is set
         if (read1 == "" || read2 == "")
         {
@@ -151,26 +161,26 @@ void MainWindow::on_actionFastQ_file_triggered()
         {
             // make process and formulate command
             QMessageBox::information(this, tr("Caution"), tr("Starting pipeline, this may take a while!"));
-            QString command = pipelinePath + " " + read1 + " " + read2 + " " + refGenPath;
+
             int lastSlash = pipelinePath.lastIndexOf('/');
-            pipelineWD = pipelinePath.left(lastSlash);
+            this->pipelineWD = pipelinePath.left(lastSlash);
+
+            QStringList args;
+            args << read1 << read2 << refGenPath;
+
+            // make process and fill parameters 'program' and 'arguments'
             this->process = new QProcess(this);
             this->process->setWorkingDirectory(pipelineWD);
+            this->process->setProgram(pipelinePath);
+            this->process->setArguments(args);
 
             // connect to finshing handler to be independent from duration of pipeline
             connect(this->process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
                     this, &MainWindow::handlePipelineFinished);
-            this->process->execute(command);
+            // connect to show stdout on statusbar
+            connect(this->process, &QProcess::readyReadStandardOutput, this, &MainWindow::handle_pipeline_working);
 
-            // So war es vorher, falls das oben nicht funktioniert:
-            // QProcess::execute(command);
-            /*if (QProcess::ExitStatus()==EXIT_SUCCESS){
-                //automatically open new vcf
-                parseVCF(wdPipeline + "/cache/final.vcf");
-            }
-            if(QProcess::ExitStatus()==EXIT_FAILURE){
-                QMessageBox::warning(this, tr("Error"), tr("pipeline could not be executed"));
-            }*/
+            this->process->start();
         }
     }
 }
@@ -181,27 +191,45 @@ void MainWindow::on_actionFastQ_file_triggered()
  * @param status ExitStatus of the Process
  */
 void MainWindow::handlePipelineFinished(int, QProcess::ExitStatus status){
+    qDebug() << __FUNCTION__;
     // automatically open new vcf
-    if (status==EXIT_SUCCESS){
-        parseVCF(this->pipelineWD + "/cache/final.vcf");
-    } else if(status==EXIT_FAILURE){
+    if (status==EXIT_SUCCESS && this->process->workingDirectory() != "")
+    {
+            parseVCF(this->process->workingDirectory() + "/cache/final.vcf");
+    }
+    else if(status==EXIT_FAILURE)
+    {
         QMessageBox::warning(this, tr("Error"), tr("Pipeline terminated with an error!"));
     }
+    this->process->deleteLater();
 }
 
-// TODO delete
+void MainWindow::handle_pipeline_working()
+{
+    qDebug() << __FUNCTION__;
+    this->ui->statusbar->showMessage(this->process->readAllStandardOutput());
+}
+
+// TODO delete test
 // Platz wo man automatische Tests implementieren kann
 void MainWindow::on_actionSpace_for_Testing_triggered()
 {
-    databank::purgeDB();
-    /*std::string fdsa = "f sdaf ";
-    fdsa + "fdsa f" + "fdsafds ";
-    QString i = "fdsaf a";
-    std::string msg = i.toStdString();
-    QMessageBox::information(this, tr("Caution"), tr(&msg[0]));*/
+    qDebug() << __FUNCTION__;
+    // test something here
+
+    this->process = new QProcess(this);
+    connect(this->process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+            this, &MainWindow::handlePipelineFinished);
+    // to print stdout
+    connect(this->process, &QProcess::readyReadStandardOutput, this, &MainWindow::handle_pipeline_working);
+
+    this->process->setWorkingDirectory("/home/casimir/Desktop/ProgrammierProjekt2019/src/Pipeline");
+    this->process->setProgram("/home/casimir/Desktop/ProgrammierProjekt2019/src/Pipeline/dummy.sh");
+    this->process->start();
+
 }
 
-
+// BUG tries to get annos when clicked with no VCF loaded
 void MainWindow::on_actionpull_all_annotations_triggered()
 {
     this->showAnnoProgress();
@@ -215,21 +243,30 @@ void MainWindow::on_actionpull_all_annotations_triggered()
  */
 void MainWindow::on_tableWidget_cellClicked(int row, int)
 {
-    qDebug() << "cell_clicked: " << row;
-    int index = row;
-    bool clickedAgain = cellClicked == index;
-    this->cellClicked = index;
+    qDebug() << "cell clicked: " << row;
+    bool clickedAgain = (cellClicked == row);
+    this->cellClicked = row;
 
-    // Pull annotation completely fresh after a double click
-    // Enqueue job unless every anno is being pulled anyway or annotation already known
-    if ((!annotationService->isPullingAllAnnos()
-               && this->tableObj.getLine(cellClicked).getAnno().isEmpty()) || clickedAgain) {
-        annotationService->makeSingleRequest(index);
+    // Pull annotation  fresh after a double click
+    // Enqueue job unless annotation already known nor every anno is being pulled anyway
+    if ((tableObj.getLine(cellClicked).getAnno().isEmpty()
+                && !annotationService->isPullingAllAnnos())||clickedAgain)  {
+        annotationService->makeSingleRequest(row);
     }
 
-    this->updateAnnoWidget(index);
+    this->updateAnnoWidget(row);
     ui->annoWidget->show();
     ui->explanation->show();
+}
+
+/**
+ * @brief MainWindow::on_tableWidget_cellDoubleClicked call cellClicked function with clickedAgain being true
+ * @param row
+ */
+void MainWindow::on_tableWidget_cellDoubleClicked(int row, int)
+{
+    this->cellClicked = row;
+    on_tableWidget_cellClicked(row,0);
 }
 
 void MainWindow::on_actionFilter_by_Frequency_triggered() {
@@ -262,9 +299,10 @@ void MainWindow::on_actionFilter_by_Frequency_triggered() {
         bool missingAnno = false;
         double actualFreq = -1;
         for (VCFline line : this->tableObj.getLines()){
-            // continue if there is no annotation
+            // show line (in case of new file) and continue if there is no annotation
             if(line.getAnno().isEmpty()){
                 missingAnno = true;
+                ui->tableWidget->showRow(line.getIndex());
                 continue;
             }
 
@@ -317,7 +355,8 @@ void MainWindow::updateAnnoWidget(int rowUpdated){
 
     if (this->tableObj.getLine(cellClicked).getAnno().isEmpty()){
 
-        ui->annoWidget->setText("Making a VEP Request, please stand by...");
+        ui->annoWidget->setText("The VEP Request has been enqueued, please stand by. "
+                                "Doubleclick or click again to make this line a priority.");
     } else {
 
         ui->annoWidget->setText(this->tableObj.getLine(cellClicked).getAnno().print_Annotation());
@@ -342,6 +381,8 @@ void MainWindow::showAnnoProgress() {
 void MainWindow::updateAnnoProgress() {
     if (this->annotationService->isPullingAllAnnos()) {
         ui->progressPullingAll->setValue(this->tableObj.getNumLines() - annotationService->getQueueSize());
+    } else {
+        ui->progressPullingAll->hide();
     }
 }
 
@@ -353,30 +394,30 @@ void MainWindow::updateAnnoProgress() {
 void MainWindow::update_row(int index)
 {
     FilterDialog::Impact mostSevereImpact = tableObj.getLine(index).getAnno().getConsequenceClass();
-    QColor color;
+    QBrush design;
 
     switch (mostSevereImpact) {
         case FilterDialog::HIGH:
-            color = Qt::red;
+            design = QBrush(Qt::red, Qt::SolidPattern);
             break;
         case FilterDialog::MODERATE:
-            color = Qt::yellow;
+            design = QBrush(Qt::yellow, Qt::Dense4Pattern);
             break;
         case FilterDialog::LOW:
-            color = Qt::green;
+            design = QBrush(Qt::green, Qt::Dense4Pattern);
             break;
         case FilterDialog::MODIFER:
-            color = Qt::cyan;
+            design = QBrush(Qt::cyan, Qt::Dense4Pattern);
             break;
         default:
-            color = Qt::transparent;
+            design = QBrush(Qt::transparent, Qt::Dense4Pattern);
             break;
     }
 
     // color entire row
     for (int col = 0; col < tableObj.getLine(index).getSize(); col++)
     {
-        ui->tableWidget->item(index, col)->setBackground(QBrush(color, Qt::Dense4Pattern));
+        ui->tableWidget->item(index, col)->setBackground(design);
     }
 }
 
@@ -384,6 +425,7 @@ void MainWindow::update_row(int index)
 void MainWindow::on_actionhide_annotations_triggered()
 {
     ui->annoWidget->hide();
+    ui->explanation->hide();
 }
 
 // Shows a warning that there is no internet connection
@@ -395,3 +437,13 @@ void MainWindow::pop_no_connection()
 void MainWindow::on_actionDelete_all_annotations_triggered(){
    databank::purgeDB();
 }
+
+void MainWindow::on_actionDelete_current_annotation_triggered()
+{
+    if (0 <= cellClicked && cellClicked < tableObj.getNumLines()){
+        databank::deleterow(tableObj.getLine(cellClicked).getHgvsNotation());
+    } else {
+        QMessageBox::warning(this, tr("Delete current Row"), tr("Please select a line first!"));
+    }
+}
+

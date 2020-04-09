@@ -14,5 +14,10 @@
         <file>rsc/uglyVCF_icon6.ico</file>
         <file>rsc/pull_annotation.ico</file>
         <file>rsc/pull_all_annotations.png</file>
+        <file>rsc/icons8-bandit-50.png</file>
+        <file>rsc/Icons8-Ios7-Very-Basic-Filter-Filled.ico</file>
+        <file>rsc/Tatice-Just-Bins-Bin-black-full.ico</file>
+        <file>rsc/Tatice-Just-Bins-Bin-red-full.ico</file>
+        <file>rsc/Vexels-Office-Trash.ico</file>
     </qresource>
 </RCC>

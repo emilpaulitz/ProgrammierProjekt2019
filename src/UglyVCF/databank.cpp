@@ -88,7 +88,6 @@ bool databank::addRow(Annotation anno){
     QString frequery = preparefreq(freq,hgvs);
     second = query.exec(frequery);
 
-
     //prepares and a query transcons
     QString consquery = preparetranscons(transcons,hgvs);
     third = query.exec(consquery);
@@ -292,6 +291,7 @@ createTable();
 void databank::deleterow(QString hgvs){
 QSqlQuery query;
 QString query1 = "DELETE FROM annotation AS t WHERE t.hgvs ='"+hgvs+"'";
+query.exec(query1);
 }
 
 
