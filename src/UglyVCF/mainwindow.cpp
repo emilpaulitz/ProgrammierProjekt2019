@@ -116,8 +116,8 @@ void MainWindow::on_actionVCF_file_triggered()
     if (fileName != "") parseVCF(fileName);
     // if an invalid chr1, chr2 ... notation were found, but they will not be printed out
     if(VCFtable::invalidChrNum == true){
-        QMessageBox::information(this,tr("Warning"),tr("invalid chromosome number notations were found"));
-    }
+        QMessageBox::information(this,tr("Warning"),tr("invalid chromosome number were found"));
+}
 }
 
 void MainWindow::on_actionset_pipeline_triggered()
