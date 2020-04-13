@@ -21,7 +21,6 @@ private :
 
     int currentIndex;
     bool pullingAllAnnos = false;
-    void setPullingAllAnnos(bool b);
 
 public:
     AnnotationService();

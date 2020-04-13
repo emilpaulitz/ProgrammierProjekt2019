@@ -61,7 +61,7 @@ void MainWindow::openAnnoService(){
     connect(annotationService, &AnnotationService::annotation_set, this, &MainWindow::updateAnnoProgress);
     connect(annotationService, &AnnotationService::queueFinished, this, &MainWindow::updateAnnoProgress);
 
-    // set up annotationService connecting internal signals and slots
+    // set up annotationService, connecting internal signals and slots
     annotationService->setupAnnoService(&tableObj);
 }
 
@@ -108,7 +108,8 @@ void MainWindow::parseVCF(QString filename)
 }
 
 /**
- * @brief MainWindow::on_actionVCF_file_triggered opens dialog window to select the vcf file and print it and tells user if invalid chromosome number notations were found
+ * @brief MainWindow::on_actionVCF_file_triggered opens dialog window to select the vcf file and print it and tells user
+ * if invalid chromosome number notations were found
  */
 void MainWindow::on_actionVCF_file_triggered()
 {
@@ -120,6 +121,9 @@ void MainWindow::on_actionVCF_file_triggered()
     }
 }
 
+/**
+ * @brief MainWindow::on_actionset_pipeline_triggered opens file explorer dialog to set the path to the pipeline
+ */
 void MainWindow::on_actionset_pipeline_triggered()
 {
     // user sets path to pipeline.sh
@@ -131,15 +135,21 @@ void MainWindow::on_actionset_pipeline_triggered()
     }
 }
 
+/**
+ * @brief MainWindow::on_actionset_reference_genome_triggered opens file explorer dialog to set the path
+ * to the reference genome
+ */
 void MainWindow::on_actionset_reference_genome_triggered()
 {
-    refGenPath = QFileDialog::getOpenFileName(this, "set reference genome", QDir::homePath(), tr("FastA files (*.fasta *.fa)"));
+    refGenPath = QFileDialog::getOpenFileName(this, "set reference genome", QDir::homePath(),
+                                              tr("FastA files (*.fasta *.fa)"));
 }
 
 // TODO make user able to abort -> button
 // NOTE QFiledialog::getOpenFileName works, but results in error message (seems to be an Unix-Qt issue)
 /**
- * @brief MainWindow::on_actionFastQ_file_triggered Read necessary inputs and execute the pipeline
+ * @brief MainWindow::on_actionFastQ_file_triggered Open file explorer dialog to let the user enter necessary inputs
+ * and execute the pipeline
  */
 void MainWindow::on_actionFastQ_file_triggered()
 {
@@ -213,36 +223,29 @@ void MainWindow::handlePipelineFinished(int, QProcess::ExitStatus status){
     this->process->deleteLater();
 }
 
+/**
+ * @brief MainWindow::handle_pipeline_working shows the pipeline outputs to the user.
+ * TRIGGERED when this->process has new output
+ */
 void MainWindow::handle_pipeline_working()
 {
     qDebug() << __FUNCTION__;
     this->ui->statusbar->showMessage(this->process->readAllStandardOutput());
 }
 
-// TODO delete test
-// Platz wo man automatische Tests implementieren kann
-void MainWindow::on_actionSpace_for_Testing_triggered()
-{
-    qDebug() << __FUNCTION__;
-    // test something here
-
-    this->process = new QProcess(this);
-    connect(this->process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
-            this, &MainWindow::handlePipelineFinished);
-    // to print stdout
-    connect(this->process, &QProcess::readyReadStandardOutput, this, &MainWindow::handle_pipeline_working);
-
-    this->process->setWorkingDirectory("/home/casimir/Desktop/ProgrammierProjekt2019/src/Pipeline");
-    this->process->setProgram("/home/casimir/Desktop/ProgrammierProjekt2019/src/Pipeline/dummy.sh");
-    this->process->start();
-
-}
-
-// BUG tries to get annos when clicked with no VCF loaded
+/**
+ * @brief MainWindow::on_actionpull_all_annotations_triggered starts the process of pulling all annotations if
+ * an VCF file is open
+ */
 void MainWindow::on_actionpull_all_annotations_triggered()
 {
-    this->showAnnoProgress();
-    annotationService->pullAnnotations(tableObj);
+    if (this->tableObj.getLines().isEmpty()){
+        QMessageBox::information(this, tr("Error"),
+                                 tr("Please open an VCF file to pull its annotations!"));
+    } else {
+        this->showAnnoProgress();
+        annotationService->pullAnnotations(tableObj);
+    }
 }
 
 /**
@@ -288,11 +291,10 @@ void MainWindow::on_actionFilter_by_Frequency_triggered() {
     }
 
     // Open filter dialog
-
     if (!this->filter){
         this->filter = new FilterDialog(this);
     }
-    filter->openWindow();
+    filter->windowOpened();
     if (filter->exec()){
 
         // retrieve values set by user
@@ -308,14 +310,14 @@ void MainWindow::on_actionFilter_by_Frequency_triggered() {
         bool missingAnno = false;
         double actualFreq = -1;
         for (VCFline line : this->tableObj.getLines()){
-            // show line (in case of new file) and continue if there is no annotation
+            // If there is no annotation, show line (in case of new file) and continue
             if(line.getAnno().isEmpty()){
                 missingAnno = true;
                 ui->tableWidget->showRow(line.getIndex());
                 continue;
             }
 
-            // catch case of unknown frequencies
+            // handle case of unknown frequencies
             if(line.getAnno().getFrequencies().isRegUnknown(region)) {
                 if(hideUnknown || filter->getFreq(line.getAnno().getConsequenceClass()) == -1){
                     ui->tableWidget->hideRow(line.getIndex());
@@ -351,7 +353,8 @@ void MainWindow::on_actionFilter_by_Frequency_triggered() {
 }
 
 /**
- * @brief MainWindow::updateAnnoWidget Shows either waiting text or annotation of this->cellClicked (!), the parameter specifies row of which the annotation got updated.
+ * @brief MainWindow::updateAnnoWidget Shows either waiting text or annotation of this->cellClicked (!), the parameter
+ * specifies row of which the annotation got updated.
  * TRIGGERED by: AnnotationService::annotation_set
  */
 void MainWindow::updateAnnoWidget(int rowUpdated){
@@ -430,29 +433,40 @@ void MainWindow::update_row(int index)
     }
 }
 
-// Hides anotationwidget
+/**
+ * @brief MainWindow::on_actionhide_annotations_triggered hide annotations and legend
+ */
 void MainWindow::on_actionhide_annotations_triggered()
 {
     ui->annoWidget->hide();
     ui->explanation->hide();
 }
 
-// Shows a warning that there is no internet connection
+/**
+ * @brief MainWindow::pop_no_connection shows a warning that there is no internet connection
+ */
 void MainWindow::pop_no_connection()
 {
     QMessageBox::warning(this, tr("No Connectioin"), tr("No connection available, check your internet settings!"));
 }
 
+/**
+ * @brief MainWindow::on_actionDelete_all_annotations_triggered deletes all the entries in the data base
+ */
 void MainWindow::on_actionDelete_all_annotations_triggered(){
    databank::purgeDB();
 }
 
+/**
+ * @brief MainWindow::on_actionDelete_current_annotation_triggered deletes the entry in the data base corresponding
+ * to the row clicked
+ */
 void MainWindow::on_actionDelete_current_annotation_triggered()
 {
     if (0 <= cellClicked && cellClicked < tableObj.getNumLines()){
         databank::deleterow(tableObj.getLine(cellClicked).getHgvsNotation());
     } else {
-        QMessageBox::warning(this, tr("Delete current Row"), tr("Please select a line first!"));
+        QMessageBox::warning(this, tr("Delete current Row"), tr("Please select a line!"));
     }
 }
 

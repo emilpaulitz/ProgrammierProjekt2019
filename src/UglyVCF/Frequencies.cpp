@@ -15,7 +15,7 @@
 Frequencies::Frequencies(){
 
 }
-//Objekt with Arrya, keeps frequencies
+//Objekt with Array, keeps frequencies
 Frequencies::Frequencies(double afr, double eas, double gnomad_eas, double gnomad_nfe, double gnomad_fin,
                          double sas, double gnomad, double amr, double gnomad_sas, double aa, double gnomad_afr,
                          double eur, double ea, double gnomad_asj, double gnomad_amr, double gnomad_oth)

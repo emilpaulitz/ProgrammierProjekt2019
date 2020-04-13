@@ -36,7 +36,7 @@ public:
     bool isReset();
     void resetFilter();
     bool isFilterByImpact();
-    void openWindow();
+    void windowOpened();
 
 
 private slots:

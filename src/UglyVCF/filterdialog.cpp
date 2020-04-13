@@ -13,10 +13,22 @@ FilterDialog::FilterDialog(QWidget *parent) :
     }
 }
 
-void FilterDialog::openWindow(){
+FilterDialog::~FilterDialog()
+{
+    delete ui;
+}
+
+/**
+ * @brief FilterDialog::windowOpened resets the reset variable when the filterDialog window is opened again
+ */
+void FilterDialog::windowOpened(){
     this->reset = false;
 }
 
+/**
+ * @brief FilterDialog::getFreq returns frequency entered by the user in the main filter window or 1 if reset
+ * @return
+ */
 double FilterDialog::getFreq(){
     if (isReset()){
         return 1;
@@ -24,6 +36,12 @@ double FilterDialog::getFreq(){
     return ui->doubleSpinBox->value();
 }
 
+/**
+ * @brief FilterDialog::getFreq returns the user-entered frequency threshold from the impact window,
+ *  in the respective impact field
+ * @param impact
+ * @return
+ */
 double FilterDialog::getFreq(FilterDialog::Impact impact){
     if(filterByImpact) {
         switch (impact) {
@@ -44,10 +62,18 @@ double FilterDialog::getFreq(FilterDialog::Impact impact){
     return 1;
 }
 
+/**
+ * @brief FilterDialog::isFilterByImpact returns if the user wants to filter by impact
+ * @return
+ */
 bool FilterDialog::isFilterByImpact(){
     return this->filterByImpact;
 }
 
+/**
+ * @brief FilterDialog::getRegion returns the user-entered region or the first if reset
+ * @return
+ */
 FilterDialog::Region FilterDialog::getRegion(){
     if (isReset()){
         return (Region) 0;
@@ -64,6 +90,10 @@ FilterDialog::Region FilterDialog::getRegion(){
     return LASTREGION;
 }
 
+/**
+ * @brief FilterDialog::hideUnknown returns if the user wants to hide entries with unkown frequencies
+ * @return
+ */
 bool FilterDialog::hideUnknown(){
     if (isReset()){
         return false;
@@ -71,10 +101,20 @@ bool FilterDialog::hideUnknown(){
     return ui->hideBox->isChecked();
 }
 
+/**
+ * @brief FilterDialog::isReset returns if the user wants to reset the filter
+ * @return
+ */
 bool FilterDialog::isReset(){
     return this->reset;
 }
 
+/**
+ * @brief FilterDialog::stringToImpact static method to convert a string (e.g. "HIGH")
+ * into the corresponding impact enum type. If not possible returns the nonsensical "LASTIMPACT"
+ * @param str
+ * @return
+ */
 FilterDialog::Impact FilterDialog::stringToImpact(QString str) {
     if (str == "HIGH") {
         return FilterDialog::HIGH;
@@ -91,6 +131,11 @@ FilterDialog::Impact FilterDialog::stringToImpact(QString str) {
     }
 }
 
+/**
+ * @brief FilterDialog::regionToString static method to convert a region enum type into the corresponding string (e.g. "afr")
+ * @param region
+ * @return
+ */
 QString FilterDialog::regionToString(FilterDialog::Region region) {
     switch (region) {
     case FilterDialog::aa:
@@ -147,17 +192,18 @@ QString FilterDialog::regionToString(FilterDialog::Region region) {
     }
 }
 
-FilterDialog::~FilterDialog()
-{
-    delete ui;
-}
-
+/**
+ * @brief FilterDialog::resetFilter Lets other methods kno the filter has been reset
+ */
 void FilterDialog::resetFilter(){
     qDebug() << __FUNCTION__;
     this->filterByImpact = false;
     this->reset = true;
 }
 
+/**
+ * @brief FilterDialog::on_resetButton_clicked calls FilterDialog::resetFilter()
+ */
 void FilterDialog::on_resetButton_clicked()
 {
     resetFilter();

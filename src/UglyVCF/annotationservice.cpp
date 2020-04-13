@@ -25,15 +25,15 @@ AnnotationService::AnnotationService()
 {
 }
 
+/**
+ * @brief AnnotationService::setupAnnoService similarly to a constructor, setting the object up for work.
+ * Out sourced to be able to control the order of connects
+ * @param table
+ */
 void AnnotationService::setupAnnoService(VCFtable *table){
     annoTableObj = table;
     manager = new QNetworkAccessManager();
     connect(manager, &QNetworkAccessManager::finished, this, &AnnotationService::setAnnoFromVEP);
-}
-
-// To be called when the job to pull every annotation has been enqueued
-void AnnotationService::setPullingAllAnnos(bool b){
-    this->pullingAllAnnos = b;
 }
 
 /**
@@ -145,9 +145,12 @@ void AnnotationService::setAnnoFromDB(int row, QString & hgvs){
     emit annotation_set(row);
 }
 
+/**
+ * @brief AnnotationService::startQueue starts handling of the queue if it is not already running
+ */
 void AnnotationService::startQueue() {
     if (!isPullingAllAnnos()){
-        setPullingAllAnnos(true);
+        this->pullingAllAnnos = true;
         handle_queue();
     }
 }
@@ -160,7 +163,7 @@ void AnnotationService::startQueue() {
 void AnnotationService::handle_queue()
 {
     // work through the necessary db pulls until the queue is empty or an VEP request is to be made.
-    // When that finishes, it will call handle_queue
+    // When that finishes, it will call the function again
     while (!queue.isEmpty()) {
 
         this->currentIndex = queue.dequeue();
@@ -175,7 +178,7 @@ void AnnotationService::handle_queue()
     }
 
     // pulling is finished
-    setPullingAllAnnos(false);
+    this->pullingAllAnnos = false;
     emit queueFinished();
 }
 
