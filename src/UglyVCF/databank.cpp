@@ -38,6 +38,7 @@ void databank::createTable()
 {
    QSqlQuery query;
 
+   //create tables and declare primary keys
    QString query1 = "CREATE TABLE annotation "
                     "(hgvs text PRIMARY KEY,most_severe_consequence text)";
 
@@ -53,15 +54,15 @@ void databank::createTable()
                     "hgnc_id text,strand text,biotype text,distance text,terms text,"
                     "PRIMARY KEY(hgvs,transcript_id))";
 
-   QString query4 = "ALTER TABLE frequencies ADD FOREIGN KEY (hgvs) "
-                    "REFERENCES annotation ON DELETE CASCADE";
-   QString query5 = "ALTER TABLE transcripsconsn ADD FOREIGN KEY (hgvs) "
-                    "REFERENCES annotation ON DELETE CASCADE";
+   // add Table references for frequncies and transcriptscons
+   QString query4 = "ALTER TABLE frequencies ADD FOREIGN KEY (hgvs) REFERENCES annotation ON DELETE CASCADE";
+   QString query5 = "ALTER TABLE transcripscons ADD FOREIGN KEY (hgvs) REFERENCES annotation ON DELETE CASCADE";
    query.exec(query1);
    query.exec(query2);
    query.exec(query3);
    query.exec(query4);
    query.exec(query5);
+
 
 }
 
@@ -202,7 +203,6 @@ Annotation & databank::retrieveAnno(QString hgvs){
 
     query.exec(retrive);
     query.next();
-    qDebug() << "is freq query valid?: " << query.isValid();
 
     double afr,eas,gnomad_eas,gnomad_nfe,gnomad_fin,sas,gnomad,amr,gnomad_sas,
     aa,gnomad_afr,eur,ea,gnomad_asj,gnomad_amr,gnomad_oth;
@@ -233,9 +233,6 @@ Annotation & databank::retrieveAnno(QString hgvs){
     retrive = "SELECT t.transcript_id,t.impact,t.variant_allele,t.gene_symbole,t.gene_symbol_source,t.gene_id"
               ",t.hgnc_id,t.strand,t.biotype,t.distance,t.terms FROM transcripscons AS t WHERE t.hgvs ='"+hgvs+"'";
     query.exec(retrive);
-    //qDebug() <<"Transcripcons: " << query.lastError();
-    //qDebug() << "Query" << query.lastQuery();
-
 
     QString transcript_id,impact, variant_allele,gene_symbole,gene_symbol_source,gene_id,
             hgnc_id,strand,biotype,distance,mehstring;
@@ -275,10 +272,15 @@ Annotation & databank::retrieveAnno(QString hgvs){
 
    }
 
+    // construct Object
     Annotation* reanno = new Annotation(refreq,relist,hgvs,most_severe_consequence);
-   // qDebug() << "geht 3";
+
     return *reanno;
 }
+
+/**
+ * @brief databank::purgeDB, deletes the complete database and sets up new tables
+ */
 
 void databank::purgeDB() {
 QSqlQuery query;
@@ -288,6 +290,10 @@ query.exec(toexe);
 createTable();
 }
 
+/**
+ * @brief databank::deleterow, deletes all entrys in the DB with the given HGVS notation
+ * @param hgvs, QString HGVS notation
+ */
 void databank::deleterow(QString hgvs){
 QSqlQuery query;
 QString query1 = "DELETE FROM annotation AS t WHERE t.hgvs ='"+hgvs+"'";
