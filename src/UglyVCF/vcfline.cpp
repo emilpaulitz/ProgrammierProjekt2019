@@ -156,6 +156,7 @@ QString VCFline::getChrNum()
         if (num.length() <= 2) return num;
     }
 
+    //case notation without chr in the beginning
     return getChr();
 }
 
