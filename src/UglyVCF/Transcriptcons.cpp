@@ -8,7 +8,6 @@
 #include <QList>
 
 
-
 QString Transcriptcons::getTranscript_id() const
 {
     return transcript_id;
@@ -123,9 +122,13 @@ Transcriptcons::Transcriptcons()
 {
 
 }
-//constructor mit input
-Transcriptcons::Transcriptcons(QString transcript_id,QString impact,QString variant_allele,QString gene_symbole,QString gene_symbol_source,
-                               QString gene_id,QString hgnc_id,QString strand,QString biotype,QString distance,QList<QString> consequence_terms){
+
+//Constructor
+Transcriptcons::Transcriptcons(QString transcript_id,QString impact,QString variant_allele,
+                               QString gene_symbole,QString gene_symbol_source,
+                               QString gene_id,QString hgnc_id,QString strand,QString biotype,
+                               QString distance,QList<QString> consequence_terms)
+{
 this->transcript_id = transcript_id;
 this->impact = impact;
 this->variant_allele = variant_allele;
@@ -136,36 +139,36 @@ this->hgnc_id = hgnc_id;
 this->strand = strand;
 this->biotype = biotype;
 this->distance = distance;
-this->consequence_terms = consequence_terms;}
+this->consequence_terms = consequence_terms;
+}
 
 
-
-
-
-
-//gets a JsonDoc and retuns a list of transcritioncons
+/**
+  takes a Json Document and parses the information
+ * @brief Transcriptcons::parse_TranscriptconsList
+ * @param QJsonDoucument doc
+ * @return a list of transcriptcons objects
+ */
 QList<Transcriptcons> Transcriptcons::parse_TranscriptconsList(QJsonDocument doc){
 
 QList<Transcriptcons> tlist;
-
 QJsonArray jarray = doc.array();
 QJsonObject jobject = jarray[0].toObject();
 QString key = "transcript_consequences";
 QJsonArray transarray = jobject.value(key).toArray();
 int listlength = transarray.size();
 
-//fill the qlist with all available trans...cons objects
+//fill the QList with all available consequence_terms of the QjsonArray
 for(int i = 0; i < listlength; i++){
     QJsonObject ob = transarray[i].toObject();
     QJsonArray ja = ob.value("consequence_terms").toArray();
     QList<QString> consequence_terms;
 
-
     for(int o = 0; o < ja.size(); o++){
         consequence_terms << ja[o].toString();
     }
 
-    //creates a trans..cons object to be included in the qlist inlist
+    //sets the values of the attributes for the current transcriptcons objects
     QString trans = ob.value("transcript_id").toString();
     QString imp = ob.value("impact").toString();
     QString var = ob.value("variant_allele").toString();
@@ -177,16 +180,21 @@ for(int i = 0; i < listlength; i++){
     QString bio = ob.value("biotype").toString();
     QString dist = QString::number(ob.value("distance").toInt());
 
-
-
+    //creates a transcriptcons object
     Transcriptcons inlist = Transcriptcons(trans,imp,var,gene,genesy,geneid,hgnc,strand,bio,dist,consequence_terms);
-
+    // adds the new Transcriptcons object to the QList
     tlist << inlist;
 }
 
 return tlist;
 }
 
+/**
+  turns the Transcriptcons object into a string that includes all its attributes
+ * @brief Transcriptcons::print_Transcriptcons
+ * @param trans
+ * @return a Qstring in a nice format of the transcriptcons object
+ */
 QString Transcriptcons::print_Transcriptcons(Transcriptcons trans){
     QString re = "TRANSCRIPT_ID: ";
     QString li;
@@ -208,7 +216,13 @@ QString Transcriptcons::print_Transcriptcons(Transcriptcons trans){
     return re;
 }
 
-QString Transcriptcons::print_Transcriptcons(QList<Transcriptcons> trans){
+/**
+  adds together all transcriptcons of the annotation
+ * @brief Transcriptcons::print_allTranscriptcons
+ * @param trans
+ * @return a string with all transcriptcons objects in a nice format
+ */
+QString Transcriptcons::print_allTranscriptcons(QList<Transcriptcons> trans){
     QString re;
 
     for(int i = 0; i < trans.size(); i++){

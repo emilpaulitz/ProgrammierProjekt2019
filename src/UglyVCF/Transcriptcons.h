@@ -58,7 +58,7 @@ public:
 
     static QString print_Transcriptcons(Transcriptcons trans);
 
-    static QString print_Transcriptcons(QList<Transcriptcons> trans);
+    static QString print_allTranscriptcons(QList<Transcriptcons> trans);
 };
 
 #endif // TRANSCRIPTCONS_H

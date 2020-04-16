@@ -19,27 +19,6 @@ void Annotation::setMost_severe_consequence(const QString &value)
     most_severe_consequence = value;
 }
 
-/**
- * @brief Annotation::getConsequenceClass returns the highest impact a transcript-consequence of this
- *  annotation has. Returns FilterDialog::LASTIMPACT if there is no transcript-consequence!
- * @return
- */
-FilterDialog::Impact Annotation::getConsequenceClass(){
-
-    FilterDialog::Impact mostSevereImpact = FilterDialog::LASTIMPACT;
-
-    for (Transcriptcons transcript:this->getTranscriptcons())
-    {
-        if ((int) FilterDialog::stringToImpact(transcript.getImpact()) < (int) mostSevereImpact)
-        {
-            mostSevereImpact = FilterDialog::stringToImpact(transcript.getImpact());
-        }
-    }
-
-    return mostSevereImpact;
-}
-
-
 Frequencies Annotation::getFrequencies() const
 {
     return frequencies;
@@ -75,7 +54,7 @@ Annotation::Annotation()
 }
 
 Annotation::Annotation(QJsonDocument &doc){
-    Annotation anno = pars_Annotation(doc);
+    Annotation anno = parse_Annotation(doc);
     this->frequencies = anno.getFrequencies();
     this->transcriptcons = anno.getTranscriptcons();
     this->id = anno.getId();
@@ -90,7 +69,32 @@ Annotation::Annotation(Frequencies frequencies, QList<Transcriptcons> transcript
     this->most_severe_consequence = most_severe_consequence;
 }
 
-QString pars_most_severe_consequence(QJsonDocument &doc){
+/**
+ * @brief Annotation::getConsequenceClass
+ * @return the highest impact a transcriptcons of this annotation
+ */
+FilterDialog::Impact Annotation::getConsequenceClass(){
+
+    FilterDialog::Impact mostSevereImpact = FilterDialog::LASTIMPACT;
+
+    // goes through all transcriptcons to compare their impact
+    for (Transcriptcons transcript:this->getTranscriptcons())
+    {
+        if ((int) FilterDialog::stringToImpact(transcript.getImpact()) < (int) mostSevereImpact)
+        {
+            mostSevereImpact = FilterDialog::stringToImpact(transcript.getImpact());
+        }
+    }
+    return mostSevereImpact;
+}
+
+/**
+  returns the most servere consequence of this annotation
+ * @brief pars_most_severe_consequence
+ * @param doc
+ * @return string
+ */
+QString parse_most_severe_consequence(QJsonDocument &doc){
     QString key = "most_severe_consequence";
     QJsonArray jarray = doc.array();
     QJsonObject jobject = jarray[0].toObject();
@@ -100,7 +104,13 @@ QString pars_most_severe_consequence(QJsonDocument &doc){
     return restring;
 }
 
-QString pars_id(QJsonDocument &doc){
+/**
+  returns the id of this annotation
+ * @brief parse_id
+ * @param doc
+ * @return
+ */
+QString parse_id(QJsonDocument &doc){
 
     QString key = "id";
     QJsonArray jarray = doc.array();
@@ -111,10 +121,16 @@ QString pars_id(QJsonDocument &doc){
     return restring;
 }
 
-Annotation Annotation::pars_Annotation(QJsonDocument &doc){
+/**
+  creates the annotation object out of a given QJson Document
+ * @brief Annotation::parse_Annotation
+ * @param doc
+ * @return
+ */
+Annotation Annotation::parse_Annotation(QJsonDocument &doc){
 
-    QString id = pars_id(doc);
-    QString most_severe_consequence = pars_most_severe_consequence(doc);
+    QString id = parse_id(doc);
+    QString most_severe_consequence = parse_most_severe_consequence(doc);
     QList<Transcriptcons> transcriptcons =  Transcriptcons::parse_TranscriptconsList(doc);
     Frequencies frequencies = Frequencies::parse_Frequencies(doc);
     Annotation reAnno = Annotation(frequencies,transcriptcons,id,most_severe_consequence);
@@ -122,12 +138,22 @@ Annotation Annotation::pars_Annotation(QJsonDocument &doc){
     return reAnno;
 }
 
+/**
+  checks whether annotation is empty
+ * @brief Annotation::isEmpty
+ * @return
+ */
 bool Annotation::isEmpty(){
     return this->id.isEmpty();
 }
 
+/**
+  creates a string out of the annotation in a nice format
+ * @brief Annotation::print_Annotation
+ * @return
+ */
 QString Annotation::print_Annotation(){
-    QString printcons = Transcriptcons::print_Transcriptcons(this->getTranscriptcons());
+    QString printcons = Transcriptcons::print_allTranscriptcons(this->getTranscriptcons());
     QString printfrequencies = Frequencies::print_Frequencies(this->getFrequencies());
     QString id = this->getId();
     QString most_severe_consequence = this->getMost_severe_consequence();

@@ -38,12 +38,9 @@ Frequencies::Frequencies(double afr, double eas, double gnomad_eas, double gnoma
     this->freqByRegions[FilterDialog::gnomad_oth] = gnomad_oth;
 }
 
-
-
-
-
 /**
-  * @brief Frequencies::parse_Frequencies, parases a QJason Doc to a Frequenciesy object
+  parses a QJason Doc to a Frequenciesy object
+  * @brief Frequencies::parse_Frequencies
   * @param QJsonDocument doc
   * @returnFrequencies Object
   */
@@ -53,32 +50,23 @@ Frequencies Frequencies::parse_Frequencies(QJsonDocument doc){
   QString key2 = "frequencies";
   qWarning() << "is doc empty?" << doc.isEmpty();
 
-  //declare the array
+  //define the array
   QJsonArray jarray = doc.array();
   qWarning() << "is array empty? " << jarray.isEmpty();
 
-    //go into first (0) compartment of array,and create objet jobcet
+  //creates a QJson Object of the first compartment of the QJsonArray
   QJsonObject jobject = jarray[0].toObject();
   qWarning() << "is jobject empty? " << jobject.isEmpty();
   qWarning() << "list of key in jobject" << jobject.keys();
 
-  /**Key Liste <- ("allele_string", "assembly_name", "end", "id", "input",
-         "most_severe_consequence", "seq_region_name",
-         "start", "strand", "transcript_consequences")
-         key1 fehlt -> keine freqcies -> crash weiter unten
-    **/
-
-  //take the array value of key colocated_variants of jobject
+  //takes the array value of key colocated_variants
   QJsonArray jarrayco = jobject.value(key1).toArray();
   qWarning() << "is jarrayco empty? " << jarrayco.isEmpty(); //<- ist empty im bug
 
-  //go into first(0) compartment of array
   int index = 0;
   QJsonObject jobjectfre;
 
-
-  //go through all colocated_variant array object till we find one with frequencies,set jobjectfre to this object
-
+  //goes through all colocated_variants in the array object till we find one with frequencies,
   for(int a = 0; a <jarrayco.size(); a++){
     jobjectfre = jarrayco[a].toObject();
     QJsonObject freqob = jobjectfre.value(key2).toObject();
@@ -91,7 +79,6 @@ Frequencies Frequencies::parse_Frequencies(QJsonDocument doc){
   qWarning() << "is jobjectfre empty?" << jobjectfre.isEmpty();
 
   //search for key the last char of the value to key: allele_string
-
   QString key3 = "-,A,C,G,T,U";
   QString key4 = QString(key3[key3.size()-1]);
 
@@ -109,7 +96,7 @@ Frequencies Frequencies::parse_Frequencies(QJsonDocument doc){
       index = index+2;
   }
 
-
+//define doubles for each region
   double afr,eas,gnomad_eas,gnomad_nfe,gnomad_fin,sas,gnomad,amr,gnomad_sas,
   aa,gnomad_afr,eur,ea,gnomad_asj,gnomad_amr,gnomad_oth;
 
@@ -131,7 +118,7 @@ Frequencies Frequencies::parse_Frequencies(QJsonDocument doc){
   gnomad_oth = jAllele.value("gnomad_oth").toDouble(-1);
   gnomad_sas = jAllele.value("gnomad_sas").toDouble(-1);
 
-  //create freq. ob to return with given values
+  //create frequencie object to return with given values
   Frequencies freq = Frequencies(afr,eas,gnomad_eas,gnomad_nfe,gnomad_fin,sas,gnomad,amr,gnomad_sas,
                                  aa,gnomad_afr,eur,ea,gnomad_asj,gnomad_amr,gnomad_oth);
 
@@ -139,9 +126,9 @@ Frequencies Frequencies::parse_Frequencies(QJsonDocument doc){
 }
 
 
-//returns a String containing all the regions and their frequency
 /**
-  * @brief Frequencies::print_Frequencies, creates a readable QString out of a Frequencies object
+  creates a string that contains all the regions and their frequencies in a nice format
+  * @brief Frequencies::print_Frequencies
   * @param Frequencies freq
   * @return QString
   */
@@ -151,20 +138,23 @@ Frequencies Frequencies::parse_Frequencies(QJsonDocument doc){
     QString region;
     QString value;
 
+    //going through all regions
     for (int i = 0; i < FilterDialog::LASTREGION; i++) {
 
         FilterDialog::Region reg = (FilterDialog::Region) i;
         region = FilterDialog::regionToString(reg) + ": ";
+
+        //sets the corresponding values or warning in case frequencies are unknown
                 if(freq.getFreq(reg) == -1){
            value= "frequency unknown";
     }
                 else{
                 value= QString::number(freq.getFreq(reg));
     }
-
+                //adds the region and its value to the string
                 restring+= region + value;
 
-                // Add comma if not the last entry
+        // Add comma if not the last entry
         if (i + 1 != FilterDialog::LASTREGION) {
             restring += ", ";
         }

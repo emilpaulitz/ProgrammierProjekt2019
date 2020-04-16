@@ -35,7 +35,7 @@ public:
     QString getId() const;
     void setId(const QString &value);
 
-    static Annotation pars_Annotation(QJsonDocument &doc);
+    static Annotation parse_Annotation(QJsonDocument &doc);
 
     bool isEmpty();
 
