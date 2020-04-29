@@ -59,8 +59,6 @@ private slots:
 
     void on_actionset_reference_genome_triggered();
 
-    void on_actionSpace_for_Testing_triggered();
-
     void on_actionpull_all_annotations_triggered();
 
     void on_tableWidget_cellClicked(int row, int);
