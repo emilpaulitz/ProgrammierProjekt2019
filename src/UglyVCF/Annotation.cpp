@@ -75,6 +75,10 @@ Annotation::Annotation(Frequencies frequencies, QList<Transcriptcons> transcript
  */
 FilterDialog::Impact Annotation::getConsequenceClass(){
 
+    if (this->getTranscriptcons().isEmpty()){
+        return FilterDialog::MODIFER;
+    }
+
     FilterDialog::Impact mostSevereImpact = FilterDialog::LASTIMPACT;
 
     // goes through all transcriptcons to compare their impact
@@ -85,6 +89,7 @@ FilterDialog::Impact Annotation::getConsequenceClass(){
             mostSevereImpact = FilterDialog::stringToImpact(transcript.getImpact());
         }
     }
+
     return mostSevereImpact;
 }
 
