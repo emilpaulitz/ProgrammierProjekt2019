@@ -37,7 +37,7 @@ void AnnotationService::setupAnnoService(VCFtable *table){
 }
 
 /**
- * @brief AnnotationService::isPullingAllAnnos Returns if the Queue has been filled and is being handled.
+ * @brief AnnotationService::isPullingAllAnnos Returns true if the Queue has been filled and is being handled.
  * @return
  */
 bool AnnotationService::isPullingAllAnnos() const{

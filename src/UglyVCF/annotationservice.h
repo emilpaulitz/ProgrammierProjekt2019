@@ -25,22 +25,25 @@ private :
 public:
     AnnotationService();
 
-    // methods
     void setupAnnoService(VCFtable* table);
-    void makeVEPrequest(QNetworkAccessManager &manager, VCFline &line);
-    void makeVEPrequest(QString notation);
-    void pullAnnotations(VCFtable &table);
-
-    void makeSingleRequest(int row);
-    void setAnnoFromDB(int row, QString& hgvs);
-
-    // needed for inheritance of QObject to use Signals & Slots
-    AnnotationService(AnnotationService& rhs) = delete;
-
-    QQueue<int> getQueue() const;
+    // status methods
     bool isPullingAllAnnos() const;
     int getQueueSize() const;
+
+    // 'core' annotation methods
+    void pullAnnotations(VCFtable &table);
+    void makeSingleRequest(int row);
+
+private:
+    void makeVEPrequest(QNetworkAccessManager &manager, VCFline &line);
+
+    QQueue<int> getQueue() const;
     void startQueue();
+
+    void setAnnoFromDB(int row, QString& hgvs);
+
+    // needed because of inheritance of QObject to use Signals & Slots
+    AnnotationService(AnnotationService& rhs) = delete;
 
 private slots:
     void setAnnoFromVEP(QNetworkReply *reply);
