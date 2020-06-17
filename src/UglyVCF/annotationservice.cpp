@@ -52,7 +52,6 @@ bool AnnotationService::isPullingAllAnnos() const{
  */
 void AnnotationService::makeVEPrequest(QNetworkAccessManager &manager, VCFline &line)
 {
-    qDebug() << __FUNCTION__;
     // get annotations
     QString URL = "http://grch37.rest.ensembl.org/vep/homo_sapiens/hgvs/";
     QString notation = line.getHgvsNotation();
@@ -115,7 +114,6 @@ void AnnotationService::makeSingleRequest(int row)
 void AnnotationService::setAnnoFromVEP(QNetworkReply *reply)
 {
     int index = this->currentIndex;
-    qDebug() << __FUNCTION__ << index;
     QByteArray data = reply->readAll();
 
     // parse into annotation object
@@ -123,7 +121,6 @@ void AnnotationService::setAnnoFromVEP(QNetworkReply *reply)
     Annotation* anno = new Annotation(jsondoc);
 
     databank::addRow(*anno);
-    qDebug() << "inserted into DB";
 
     annoTableObj->getLine(index).setAnno(*anno);
     reply->deleteLater();
@@ -141,7 +138,6 @@ void AnnotationService::setAnnoFromVEP(QNetworkReply *reply)
 void AnnotationService::setAnnoFromDB(int row, QString & hgvs){
     Annotation & currAnno = databank::retrieveAnno(hgvs);
     annoTableObj->getLine(row).setAnno(currAnno);
-    qDebug() << "pulled from DB";
     emit annotation_set(row);
 }
 
